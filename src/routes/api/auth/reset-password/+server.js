@@ -3,16 +3,17 @@ import { json } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
 
 export async function POST({request}) {
-    const {newpass, email} = await request.json();
+    const {newPassword, email} = await request.json();
 
-    if(!newpass){return json({boxinfo: 'กรุณากรอกรหัสใหม่'},{status: 400});}
+    if(newPassword.length < 8){
+            return json({boxinfo: 'กรุณากรอกรหัสผ่าน 8 ตัวขึ้นไป'}, {status: 400});
+    }
+
+    if(!newPassword){return json({boxinfo: 'กรุณากรอกรหัสใหม่'},{status: 400});}
 
     try{
-        if(newpass.length < 8){
-            return json({boxinfo: 'กรุณากรอกรหัสผ่าน 8 ตัวขึ้นไป'}, {status: 400});
-        }
-
-        const hashpass = await bcrypt.hash(newpass,10);
+        
+        const hashpass = await bcrypt.hash(newPassword,10);
         
         await pool.execute('UPDATE users SET password = ? WHERE email = ?', [hashpass,email]);
         return json({ boxinfo: 'บันทึกรหัสผ่านสำเร็จ✅'}, {status: 201});

@@ -1,5 +1,5 @@
 <script>
-	import { goto , invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
 	let username = $state('');
@@ -12,25 +12,35 @@
 	/** @param {any} e */
 	const handleLogin = async (e) => {
 		e.preventDefault();
+		if (isloading) return;
+		isloading = true;
+		message = 'กำลังทำการประมวลผล';
 
-		const res = await fetch('/api/auth/login', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				username: username,
-				password: password
-			})
-		});
+		try {
+			const res = await fetch('/api/auth/login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({
+					username: username,
+					password: password
+				})
+			});
 
-		const data = await res.json();
-		if (res.ok) {
-			message = data.message;
-			await invalidateAll();
-			setTimeout(() => {
-				goto(home);
-			}, 1300);
-		} else {
-			message = data.message || 'เกิดข้อผิดพลาดไม่สามารถเข้าสู่ระบบได้';
+			const data = await res.json();
+			if (res.ok) {
+				message = data.message;
+				await invalidateAll();
+				setTimeout(() => {
+					goto(home);
+				}, 1300);
+			} else {
+				message = data.message || 'เกิดข้อผิดพลาดไม่สามารถเข้าสู่ระบบได้';
+			}
+		} catch (error) {
+			console.error(error);
+			message = 'การเชื่อมต่อขัดข้อง';
+		} finally {
+			isloading = false;
 		}
 	};
 
@@ -40,49 +50,83 @@
 	let otp = $state('');
 	let newPassword = $state('');
 	let boxinfo = $state('');
+	let isloading = false;
 
 	async function sendOTP() {
-		const res = await fetch('/api/auth/send-otp', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ email })
-		});
+		if (isloading) return;
+		isloading = true;
+		boxinfo = 'กำลังประมวลผล กรุณารอสักครู่⌛';
 
-		const data = await res.json();
-		if (res.ok) {
-			step = 2;
-			boxinfo = '';
-		} else boxinfo = data.boxinfo || 'เกิดข้อผิดพลาด ไม่สามารถดำเนินการต่อได้';
+		try {
+			const res = await fetch('/api/auth/send-otp', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email })
+			});
+
+			const data = await res.json();
+			if (res.ok) {
+				step = 2;
+				boxinfo = '';
+			} else boxinfo = data.boxinfo || 'เกิดข้อผิดพลาด ไม่สามารถดำเนินการต่อได้';
+		} catch (error) {
+			console.error(error);
+			boxinfo = 'การเชื่อมต่อขัดข้อง';
+		} finally {
+			isloading = false;
+		}
 	}
 
 	async function verifyOTP() {
-		const res = await fetch('/api/auth/verify-otp', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ otp })
-		});
+		if (isloading) return;
+		isloading = true;
+		boxinfo = 'กำลังทำการตรวจเช็ค OTP';
 
-		const data = await res.json();
-		if (res.ok) {
-			step = 3;
-			boxinfo = '';
-		}else boxinfo = data.boxinfo || 'ตรวจสอบรหัสผ่านไม่สำเร็จ';
+		try {
+			const res = await fetch('/api/auth/verify-otp', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ otp })
+			});
+
+			const data = await res.json();
+			if (res.ok) {
+				step = 3;
+				boxinfo = '';
+			} else boxinfo = data.boxinfo || 'ตรวจสอบรหัสผ่านไม่สำเร็จ';
+		} catch (error) {
+			console.error(error);
+			boxinfo = 'การเชื่อมต่อขัดข้อง';
+		} finally {
+			isloading = false;
+		}
 	}
 
 	async function resetPassword() {
-		const res = await fetch('/api/auth/reset-password',{
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({newPassword , email})
-        });
+		if (isloading) return;
+		isloading = true;
+		boxinfo = 'กำลังทำการประมวลผล';
 
-        const data = await res.json();
-        if(res.ok){
-            boxinfo = data.boxinfo;
-            setTimeout(() => {
-                showModal = false;
-            }, 1500);
-        }else boxinfo = data.boxinfo || 'ดำเนินการไม่สำเร็จ';
+		try {
+			const res = await fetch('/api/auth/reset-password', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ newPassword, email })
+			});
+
+			const data = await res.json();
+			if (res.ok) {
+				boxinfo = data.boxinfo;
+				setTimeout(() => {
+					showModal = false;
+				}, 1500);
+			} else boxinfo = data.boxinfo || 'ดำเนินการไม่สำเร็จ';
+		} catch (error) {
+			console.error(error);
+			boxinfo = 'การเชื่อมต่อขัดข้อง';
+		} finally {
+			isloading = false;
+		}
 	}
 </script>
 
@@ -169,7 +213,7 @@
 				<button
 					onclick={sendOTP}
 					class="bgcolor-uni btn-submit w-full cursor-pointer rounded-xl py-3 font-bold text-amber-400 hover:bg-amber-500"
-					>ส่งรหัสยืนยัน</button
+					>ส่งขอรหัสยืนยัน</button
 				>
 			{:else if step === 2}
 				<p class="mb-4 text-gray-400">กรอกรหัส 6 หลักที่ได้รับในอีเมล</p>
