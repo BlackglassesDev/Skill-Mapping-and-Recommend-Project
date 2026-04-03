@@ -1,10 +1,16 @@
 <script>
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+
 	/** @type {{ data: { courses: any[], user: any } }} */
-    let { data } = $props();
-    
-    // บังคับให้เป็น Array เสมอเพื่อป้องกัน Error .length
-    let courses = $derived(Array.isArray(data.courses) ? data.courses : []);
-    // let user = $derived(data.user);
+	let { data } = $props();
+
+	// บังคับให้เป็น Array เสมอเพื่อป้องกัน Error .length
+	let courses = $derived(Array.isArray(data.courses) ? data.courses : []);
+	// let user = $derived(data.user);
+	let job_skill_Modal = $state(false);
+	let selectedJobSkills = $state([]); // ตัวแปรเก็บรายการ Skill ที่ดึงมา
+	let selectedJobName = $state(''); // เก็บชื่ออาชีพเพื่อโชว์บนหัว Modal
 
 	// ข้อมูลจำลองสำหรับวนลูป
 	const steps = [
@@ -20,6 +26,30 @@
 		{ id: 4, name: 'นักพัฒนาซอฟต์แวร์' },
 		{ id: 5, name: 'วิศวกรรมคอมพิวเตอร์' }
 	];
+
+	/** @param {string} id */
+	async function info_subject(id) {
+		const info = resolve(`/info_subject?id=${id}`);
+		goto(info);
+	}
+
+	async function call_job(id) {
+		try {
+			const res = await fetch('/api/job_skill', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ id })
+			});
+
+			const data = await res.json();
+			if (res.ok) {
+
+				job_skill_Modal = true;
+			}
+		} catch (error) {
+			console.error(error);
+		}
+	}
 </script>
 
 <svelte:head><title>Skill Mapping | RMUTL | Home</title></svelte:head>
@@ -27,7 +57,7 @@
 <div class="mx-auto max-w-6xl space-y-20 px-4 py-10 md:py-16">
 	<section class="space-y-4 text-center">
 		<h1 class="text-2xl font-bold text-[#443210] md:text-4xl">
-			เตรียมความพร้อมทักษะ <br> และเส้นทางอาชีพของคุณ
+			เตรียมความพร้อมทักษะ <br /> และเส้นทางอาชีพของคุณ
 		</h1>
 		<p class="text-sm text-gray-600 md:text-base">
 			สำรวจอาชีพในสายงาน และประเมินช่องว่างทักษะของคุณ อ้างอิงตามหลักสูตร มทร.ล้านนา
@@ -51,7 +81,11 @@
 		<h2 class="text-xl font-bold text-[#443210] md:text-2xl">เรียนจบแล้วเป็นอะไรได้บ้าง ?</h2>
 		<div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 			{#each jobs as job (job.id)}
-				<div class="group flex items-center gap-3">
+				<button
+					type="button"
+					onclick={() => call_job(job.id)}
+					class="group flex items-center gap-3"
+				>
 					<div
 						class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#443210] font-bold text-[#dca11d] shadow-md"
 					>
@@ -62,7 +96,7 @@
 					>
 						{job.name}
 					</div>
-				</div>
+				</button>
 			{/each}
 			<div class="flex items-center justify-end">
 				<a href="#" class="text-sm font-bold text-[#443210] hover:underline">ดูเพิ่มเติม</a>
@@ -75,16 +109,18 @@
 			รายวิชาในหลักสูตร 📖
 		</h2>
 		<div class="grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-4">
-		<!-- ถ้าไม่มีรายวิชา -->
-		{#if courses.length == 0}
-			<div class="text-center p-10 bg-gray-100 rounded-xl border-2 border-dashed">
-                <p class="text-gray-500">ไม่พบรายวิชาในหลักสูตรของคุณ</p>
-            </div>
-		{/if}
+			<!-- ถ้าไม่มีรายวิชา -->
+			{#if courses.length == 0}
+				<div class="rounded-xl border-2 border-dashed bg-gray-100 p-10 text-center">
+					<p class="text-gray-500">ไม่พบรายวิชาในหลักสูตรของคุณ</p>
+				</div>
+			{/if}
 
 			{#each courses as course (course.course_id)}
-				<div
-					class="rounded-xl border border-[#c58f1a] bg-[#dca11d] p-5 shadow-md transition-shadow hover:shadow-lg"
+				<button
+					type="button"
+					onclick={() => info_subject(course.course_id)}
+					class="btn cursor-pointer rounded-xl border border-[#c58f1a] bg-[#dca11d] p-5 shadow-md transition-shadow hover:shadow-lg"
 				>
 					<div class="mb-3">
 						<h3 class="text-lg leading-tight font-bold text-[#443210]">{course.course_code}</h3>
@@ -96,8 +132,16 @@
 						<span class="text-[10px] font-bold text-[#ffff]/70 uppercase">Skills</span>
 						<p class="text-xs leading-tight font-light text-[#ffff] italic">111111</p>
 					</div>
-				</div>
+				</button>
 			{/each}
 		</div>
 	</section>
 </div>
+
+<style>
+	.btn:hover {
+		box-shadow: 2px 3px 6px rgba(129, 64, 0, 0.765);
+		translate: 0 -5px; /* ขยับขึ้นข้างบน 5px */
+		transition: all 0.3s ease; /* เพิ่มความนุ่มนวล */
+	}
+</style>

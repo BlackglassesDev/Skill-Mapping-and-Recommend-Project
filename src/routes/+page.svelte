@@ -72,13 +72,13 @@
 				>
 					<div class="mb-3">
 						<img
-							class="w-full"
+							class="w-full leading-tight"
 							src="/img/rmutl20_logo.webp"
 							alt="pic_curriculum"
 						/>
 					</div>
-					<div class="border-t border-[#443210]/20 pt-2">
-						<span class="text-center text-lg font-bold text-[#ffff]/70 uppercase"
+					<div class="border-t border-[#443210]/20 pt-2 min-h-[80px] flex justify-center">
+						<span class="leading-tight text-center text-lg font-bold text-[#ffff]/70 uppercase"
 							>{curriculums.curriculum_name}</span
 						>
 					</div>
