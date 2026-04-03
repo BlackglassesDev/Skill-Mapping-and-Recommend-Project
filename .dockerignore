@@ -1,0 +1,30 @@
+# 1. Dependencies (ไม่ต้องเอาไป เพราะเราจะไป npm install ใหม่ข้างใน)
+node_modules
+npm-debug.log
+
+# 2. Build output (ของเก่าในเครื่องเรา ไม่เอาไปปน)
+.svelte-kit
+build
+package-lock.json (บางคนใส่ บางคนไม่ใส่ แต่แนะนำให้ข้ามไปก่อนถ้ายังแก้บ่อย)
+
+# 3. Environment Variables (สำคัญมาก! ห้ามเอา .env ตัวจริงเข้าไปเด็ดขาด)
+.env
+.env.*
+!.env.example
+
+# 4. Docker related (ไฟล์ตัวมันเองไม่ต้องเอาเข้าไปในเครื่องลูก)
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# 5. Git & IDE (ไฟล์ขยะจากระบบปฏิบัติการและ Editor)
+.git
+.gitignore
+.vscode
+.DS_Store
+Thumbs.db
+
+# 6. Database (ถ้ามีโฟลเดอร์เก็บข้อมูลในเครื่อง ไม่ต้องเอาเข้า Image)
+database/data
+
+Caddyfile

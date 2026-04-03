@@ -1,0 +1,9 @@
+# ถ้าเทสในเครื่องตัวเอง
+localhost {
+    reverse_proxy app:3000
+}
+
+# ถ้าเอาขึ้น Server จริง (เปลี่ยน domain เป็นของคุณ)
+# rmutl-skill.com {
+#     reverse_proxy app:3000
+# }
