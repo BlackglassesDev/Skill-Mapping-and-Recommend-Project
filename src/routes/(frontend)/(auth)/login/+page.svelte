@@ -132,13 +132,37 @@
 
 <svelte:head><title>เข้าสู่ระบบ</title></svelte:head>
 
-<article class="flex min-h-screen items-center justify-center p-4">
+<article class="flex min-h-screen items-center justify-center p-4 bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
 	<article
 		class="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl"
 	>
-		<header class="bgcolor-uni flex items-baseline justify-between gap-3 p-6 text-2xl">
-			<span class="font-bold text-amber-400">Skill Mapping</span>
-			<span class="font-bold text-white">เข้าสู่ระบบ</span>
+		<header class="bgcolor-uni flex items-center justify-between gap-3 p-6 text-2xl">
+			<div class="flex items-center gap-3">
+				<span class="font-bold text-amber-400">Skill Mapping</span>
+				<span class="font-bold text-white">-</span>
+				<span class="font-bold text-white">เข้าสู่ระบบ</span>
+			</div>
+
+			<a
+				href="http://localhost:5173/"
+				class="text-white transition-transform hover:scale-110 hover:text-amber-400"
+				title="กลับหน้าหลัก"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="2"
+					stroke="currentColor"
+					class="h-7 w-7"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+					/>
+				</svg>
+			</a>
 		</header>
 
 		{#if message}
@@ -168,27 +192,44 @@
 					class="mt-3 mb-3 w-full rounded-lg border border-slate-500 p-3 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
 				/>
 
-				<article>
-					<button
-						type="button"
-						onclick={() => (showModal = true)}
-						class="cursor-pointer font-bold text-amber-900">ลืมรหัสผ่าน ?</button
-					>
-				</article>
-
 				<button
 					type="submit"
-					class="btn-submit bgcolor-uni mt-6 w-full cursor-pointer rounded-lg py-1 text-2xl font-bold text-amber-400 shadow-md transition-all hover:bg-amber-800 active:scale-[0.98]"
+					class="btn-submit bgcolor-uni mt-2 mb-4 w-full cursor-pointer rounded-lg py-3 text-2xl font-bold text-amber-400 shadow-md transition-all hover:bg-amber-800 active:scale-[0.98]"
 				>
 					เข้าสู่ระบบ
 				</button>
+				<div class="mt-2 flex w-full items-center justify-between">
+					<a
+						href={regis}
+						class="font-bold text-amber-900 underline transition hover:text-amber-600"
+					>
+						ลงทะเบียน
+					</a>
+
+					<button
+						type="button"
+						onclick={() => (showModal = true)}
+						class="flex cursor-pointer items-center gap-1 font-bold text-amber-900 transition hover:text-amber-600"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							fill="none"
+							viewBox="0 0 24 24"
+							stroke-width="1.5"
+							stroke="currentColor"
+							class="size-5"
+						>
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z"
+							/>
+						</svg>
+						ลืมรหัสผ่าน
+					</button>
+				</div>
 			</section>
 		</form>
-
-		<div class="text-md pb-2.5 text-center text-amber-950">
-			<span>ยังไม่มีบัญชีผู้ใช้งาน ?</span>
-			<a href={regis} class="text-amber-400">สมัครเลย!</a>
-		</div>
 	</article>
 </article>
 

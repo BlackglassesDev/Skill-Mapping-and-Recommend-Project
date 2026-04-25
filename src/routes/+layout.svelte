@@ -4,6 +4,7 @@
 	import { slide } from 'svelte/transition';
 	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
+	
 
 	let { children, data } = $props();
 	let sid = $derived(data?.user);
@@ -32,6 +33,8 @@
 	function toggleMenu() {
 		isMenuOpen = !isMenuOpen;
 	}
+
+	
 </script>
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
