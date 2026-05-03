@@ -13,10 +13,20 @@ export async function load({ url }) {
 				[id]
 			);
 
-			return {courses: rows};
+			const [jobRows] = await pool.execute(
+				'SELECT job_id, name_job FROM job WHERE curriculum_id = ?',[id]
+			);
+
+			return {
+				courses: rows,
+				jobs: jobRows
+			};
 		}catch(error){
 			console.log('Error: Check Curriculum', error);
-			return { courses: [] };
+			return {
+				courses: [],
+				jobs: []
+			};
 		}
 	}
 }

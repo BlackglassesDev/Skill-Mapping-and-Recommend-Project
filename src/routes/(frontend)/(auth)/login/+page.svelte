@@ -132,37 +132,40 @@
 
 <svelte:head><title>เข้าสู่ระบบ</title></svelte:head>
 
-<article class="flex min-h-screen items-center justify-center p-4 bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
+<article
+	class="flex min-h-screen items-center justify-center bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] p-4"
+>
 	<article
 		class="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl"
 	>
-		<header class="bgcolor-uni flex items-center justify-between gap-3 p-6 text-2xl">
-			<div class="flex items-center gap-3">
-				<span class="font-bold text-amber-400">Skill Mapping</span>
-				<span class="font-bold text-white">-</span>
-				<span class="font-bold text-white">เข้าสู่ระบบ</span>
-			</div>
-
-			<a
-				href="http://localhost:5173/"
-				class="text-white transition-transform hover:scale-110 hover:text-amber-400"
-				title="กลับหน้าหลัก"
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="2"
-					stroke="currentColor"
-					class="h-7 w-7"
+		<header
+			class="bgcolor-uni flex items-center justify-between gap-3 p-4 text-lg sm:p-6 sm:text-xl md:text-2xl"
+		>
+			<div class="flex items-center gap-2 sm:gap-3">
+				<a
+					href={home}
+					class="text-white transition-transform hover:scale-110 hover:text-amber-400"
+					title="กลับหน้าหลัก"
 				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="m9.75 9.75 4.5 4.5m0-4.5-4.5 4.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-					/>
-				</svg>
-			</a>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						fill="none"
+						viewBox="0 0 24 24"
+						stroke-width="2"
+						stroke="currentColor"
+						class="h-7 w-7"
+					>
+						<path
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							d="m11.25 9-3 3m0 0 3 3m-3-3h7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+						/>
+					</svg>
+				</a>
+
+				<span class="font-bold whitespace-nowrap text-amber-400">Skill Mapping</span>
+			</div>
+			<span class="font-bold whitespace-nowrap text-white">เข้าสู่ระบบ</span>
 		</header>
 
 		{#if message}

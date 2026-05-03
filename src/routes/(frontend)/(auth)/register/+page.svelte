@@ -51,12 +51,12 @@
 	<article
 		class="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
 	>
-		<header class="bgcolor-uni flex items-center justify-between gap-3 p-6 text-2xl">
-			<div class="flex items-center gap-3">
+		<header class="bgcolor-uni flex items-center justify-between gap-3 p-4 text-lg sm:p-6 sm:text-xl md:text-2xl">
+			<div class="flex items-center gap-2 sm:gap-3">
 				<a
-					href="http://localhost:5173/login"
+					href={login_page}
 					class="text-white transition-transform hover:scale-110 hover:text-amber-400"
-					title="กลับหน้าหลัก"
+					title="กลับหน้าเข้าสู่ระบบ"
 				>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -73,10 +73,9 @@
 						/>
 					</svg>
 				</a>
-				<span class="font-bold text-amber-400">Skill Mapping</span>
-				<span class="font-bold text-white">-</span>
-				<span class="font-bold text-white">ลงทะเบียน</span>
+				<span class="font-bold whitespace-nowrap text-amber-400">Skill Mapping</span>
 			</div>
+			<span class="font-bold whitespace-nowrap text-white">ลงทะเบียน</span>
 		</header>
 
 		{#if message}
