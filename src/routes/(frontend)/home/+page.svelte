@@ -6,7 +6,7 @@
 	let { data } = $props();
 
 	// บังคับให้เป็น Array เสมอเพื่อป้องกัน Error .length
-	let courses = $derived(Array.isArray(data.courses) ? data.courses : []);
+	let courses = $derived(Array.isArray(data.courses) ? data.courses.slice(0.8) : []);
 	let jobs = $derived(Array.isArray(data.jobs) ? data.jobs.slice(0,5) : []);
 	let boxinfo = $state('');
 

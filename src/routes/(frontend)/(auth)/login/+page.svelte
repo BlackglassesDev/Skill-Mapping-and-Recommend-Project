@@ -1,48 +1,12 @@
 <script>
+	import { enhance } from '$app/forms';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
-	let username = $state('');
-	let password = $state('');
 	let message = $state('');
 
 	const home = resolve('/home');
 	const regis = resolve('/register');
-
-	/** @param {any} e */
-	const handleLogin = async (e) => {
-		e.preventDefault();
-		if (isloading) return;
-		isloading = true;
-		message = 'กำลังทำการประมวลผล';
-
-		try {
-			const res = await fetch('/api/auth/login', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({
-					username: username,
-					password: password
-				})
-			});
-
-			const data = await res.json();
-			if (res.ok) {
-				message = data.message;
-				await invalidateAll();
-				setTimeout(() => {
-					goto(home);
-				}, 1300);
-			} else {
-				message = data.message || 'เกิดข้อผิดพลาดไม่สามารถเข้าสู่ระบบได้';
-			}
-		} catch (error) {
-			console.error(error);
-			message = 'การเชื่อมต่อขัดข้อง';
-		} finally {
-			isloading = false;
-		}
-	};
 
 	let showModal = $state(false);
 	let step = $state(1);
@@ -50,7 +14,7 @@
 	let otp = $state('');
 	let newPassword = $state('');
 	let boxinfo = $state('');
-	let isloading = false;
+	let isloading = $state(false);
 
 	async function sendOTP() {
 		if (isloading) return;
@@ -174,14 +138,35 @@
 			</h1>
 		{/if}
 
-		<form onsubmit={handleLogin}>
+		<form
+			method="POST"
+			action="?/login"
+			use:enhance={() => {
+				isloading = true;
+				message = 'กำลังตรวจสอบข้อมูล...';
+
+				return async ({ result }) => {
+					if (result.type === 'success') {
+						message = result.data?.message;
+
+						setTimeout(async () => {
+							await invalidateAll();
+							goto(home);
+						}, 1000);
+					} else {
+						message = result.data?.message || 'เกิดข้อผิดพลาด';
+						isloading = false;
+					}
+				};
+			}}
+		>
 			<section class="p-8">
 				<label for="user" class="text-md font-semibold text-slate-700">ชื่อผู้ใช้งาน</label>
 				<input
 					type="text"
 					placeholder="StudentRMUTL"
 					id="user"
-					bind:value={username}
+					name="username"
 					required
 					class="mt-3 mb-5 w-full rounded-lg border border-slate-500 p-3 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
 				/>
@@ -190,16 +175,21 @@
 					type="password"
 					placeholder="รหัสผ่านของคุณ"
 					id="pass"
-					bind:value={password}
+					name="password"
 					required
 					class="mt-3 mb-3 w-full rounded-lg border border-slate-500 p-3 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
 				/>
 
 				<button
 					type="submit"
-					class="btn-submit bgcolor-uni mt-2 mb-4 w-full cursor-pointer rounded-lg py-3 text-2xl font-bold text-amber-400 shadow-md transition-all hover:bg-amber-800 active:scale-[0.98]"
+					disabled={isloading}
+					class="btn-submit bgcolor-uni mt-2 mb-4 w-full cursor-pointer rounded-lg py-3 text-2xl font-bold text-amber-400 shadow-md transition-all hover:bg-amber-800 active:scale-[0.98] disabled:scale-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
 				>
-					เข้าสู่ระบบ
+					{#if isloading}
+						กำลังประมวลผล...
+					{:else}
+						เข้าสู่ระบบ
+					{/if}
 				</button>
 				<div class="mt-2 flex w-full items-center justify-between">
 					<a
