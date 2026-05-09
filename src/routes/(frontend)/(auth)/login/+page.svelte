@@ -3,95 +3,15 @@
 	import { goto, invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
-	let message = $state('');
-
 	const home = resolve('/home');
 	const regis = resolve('/register');
 
 	let showModal = $state(false);
 	let step = $state(1);
-	let email = $state('');
-	let otp = $state('');
-	let newPassword = $state('');
+	let backup_email = $state('');
 	let boxinfo = $state('');
+	let message = $state('');
 	let isloading = $state(false);
-
-	async function sendOTP() {
-		if (isloading) return;
-		isloading = true;
-		boxinfo = 'กำลังประมวลผล กรุณารอสักครู่⌛';
-
-		try {
-			const res = await fetch('/api/auth/send-otp', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ email })
-			});
-
-			const data = await res.json();
-			if (res.ok) {
-				step = 2;
-				boxinfo = '';
-			} else boxinfo = data.boxinfo || 'เกิดข้อผิดพลาด ไม่สามารถดำเนินการต่อได้';
-		} catch (error) {
-			console.error(error);
-			boxinfo = 'การเชื่อมต่อขัดข้อง';
-		} finally {
-			isloading = false;
-		}
-	}
-
-	async function verifyOTP() {
-		if (isloading) return;
-		isloading = true;
-		boxinfo = 'กำลังทำการตรวจเช็ค OTP';
-
-		try {
-			const res = await fetch('/api/auth/verify-otp', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ otp })
-			});
-
-			const data = await res.json();
-			if (res.ok) {
-				step = 3;
-				boxinfo = '';
-			} else boxinfo = data.boxinfo || 'ตรวจสอบรหัสผ่านไม่สำเร็จ';
-		} catch (error) {
-			console.error(error);
-			boxinfo = 'การเชื่อมต่อขัดข้อง';
-		} finally {
-			isloading = false;
-		}
-	}
-
-	async function resetPassword() {
-		if (isloading) return;
-		isloading = true;
-		boxinfo = 'กำลังทำการประมวลผล';
-
-		try {
-			const res = await fetch('/api/auth/reset-password', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ newPassword, email })
-			});
-
-			const data = await res.json();
-			if (res.ok) {
-				boxinfo = data.boxinfo;
-				setTimeout(() => {
-					showModal = false;
-				}, 1500);
-			} else boxinfo = data.boxinfo || 'ดำเนินการไม่สำเร็จ';
-		} catch (error) {
-			console.error(error);
-			boxinfo = 'การเชื่อมต่อขัดข้อง';
-		} finally {
-			isloading = false;
-		}
-	}
 </script>
 
 <svelte:head><title>เข้าสู่ระบบ</title></svelte:head>
@@ -147,6 +67,7 @@
 
 				return async ({ result }) => {
 					if (result.type === 'success') {
+						// @ts-ignore
 						message = result.data?.message;
 
 						setTimeout(async () => {
@@ -154,6 +75,7 @@
 							goto(home);
 						}, 1000);
 					} else {
+						// @ts-ignore
 						message = result.data?.message || 'เกิดข้อผิดพลาด';
 						isloading = false;
 					}
@@ -237,44 +159,120 @@
 			{/if}
 
 			{#if step === 1}
-				<p class="mb-4 text-gray-400">กรอกอีเมลเพื่อรับรหัสยืนยัน</p>
-				<input
-					type="email"
-					bind:value={email}
-					placeholder="StudentRmutl@live.rmutl.ac.th"
-					class="mb-2 w-full rounded-lg border border-slate-500 p-3 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
-				/>
-				<button
-					onclick={sendOTP}
-					class="bgcolor-uni btn-submit w-full cursor-pointer rounded-xl py-3 font-bold text-amber-400 hover:bg-amber-500"
-					>ส่งขอรหัสยืนยัน</button
+				<form
+					method="POST"
+					action="?/sendOTP"
+					use:enhance={() => {
+						isloading = true;
+						boxinfo = 'กำลังดำเนินการ';
+
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								// @ts-ignore
+								boxinfo = result.data?.boxinfo;
+								step = 2;
+								isloading = false;
+								boxinfo = '';
+							} else {
+								// @ts-ignore
+								boxinfo = result.data?.boxinfo || 'ส่งไม่สำเร็จ';
+								isloading = false;
+							}
+						};
+					}}
 				>
+					<p class="mb-4 text-gray-400">กรอกอีเมลเพื่อรับรหัสยืนยัน</p>
+					<input
+						type="email"
+						name="email"
+						bind:value={backup_email}
+						placeholder="StudentRmutl@live.rmutl.ac.th"
+						class="mb-2 w-full rounded-lg border border-slate-500 p-3 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
+					/>
+					<button
+						type="submit"
+						disabled={isloading}
+						class="bgcolor-uni btn-submit w-full cursor-pointer rounded-xl py-3 font-bold text-amber-400 hover:bg-amber-500 active:scale-[0.98] disabled:scale-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
+						>{isloading ? 'กำลังส่ง...' : 'ส่งขอรหัสยืนยัน'}</button
+					>
+				</form>
 			{:else if step === 2}
-				<p class="mb-4 text-gray-400">กรอกรหัส 6 หลักที่ได้รับในอีเมล</p>
-				<input
-					type="text"
-					bind:value={otp}
-					maxlength="6"
-					class="mb-2 w-full rounded-lg border border-slate-500 p-3 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
-				/>
-				<button
-					onclick={verifyOTP}
-					class="bgcolor-uni btn-submit w-full cursor-pointer rounded-xl py-3 font-bold text-amber-400"
-					>ตรวจสอบรหัส</button
+				<form
+					method="POST"
+					action="?/verifyOTP"
+					use:enhance={() => {
+						isloading = true;
+						boxinfo = 'กำลังดำเนินการ';
+
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								// @ts-ignore
+								boxinfo = result.data?.boxinfo;
+								step = 3;
+								isloading = false;
+								boxinfo = '';
+							} else {
+								// @ts-ignore
+								boxinfo = result.data?.boxinfo || 'ดำเนินการไม่สำเร็จ';
+								isloading = false;
+							}
+						};
+					}}
 				>
+					<p class="mb-4 text-gray-400">กรอกรหัส 6 หลักที่ได้รับในอีเมล</p>
+					<input
+						type="text"
+						name="otp"
+						maxlength="6"
+						class="mb-2 w-full rounded-lg border border-slate-500 p-3 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
+					/>
+					<button
+						type="submit"
+						disabled={isloading}
+						class="bgcolor-uni btn-submit w-full cursor-pointer rounded-xl py-3 font-bold text-amber-400 active:scale-[0.98] disabled:scale-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
+						>{isloading ? 'กำลังตรวจสอบ..' : 'ตรวจสอบรหัส'}</button
+					>
+				</form>
 			{:else if step === 3}
-				<p class="mb-4 text-gray-400">ตั้งรหัสผ่านใหม่</p>
-				<input
-					type="password"
-					bind:value={newPassword}
-					placeholder="รหัสผ่านใหม่ 8 หลัก"
-					class="mb-2 w-full rounded-lg border border-slate-500 p-3 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
-				/>
-				<button
-					onclick={resetPassword}
-					class="bgcolor-uni btn-submit w-full cursor-pointer rounded-xl py-3 font-bold text-amber-400"
-					>ยืนยันรหัสใหม่</button
+				<form
+					method="POST"
+					action="?/resetpass"
+					use:enhance={() => {
+						isloading = true;
+						boxinfo = 'กำลังดำเนินการ';
+
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								// @ts-ignore
+								boxinfo = result.data?.boxinfo;
+								setTimeout(() => {
+									showModal = false;
+									isloading = false;
+									boxinfo = '';
+								}, 1500);
+							} else {
+								// @ts-ignore
+								boxinfo = result.data?.boxinfo || 'ดำเนินการไม่สำเร็จ';
+								isloading = false;
+							}
+						};
+					}}
 				>
+					<p class="mb-4 text-gray-400">ตั้งรหัสผ่านใหม่</p>
+					<input type="hidden" name="email" value={backup_email}>
+					<input
+						type="password"
+						name="newPassword"
+						placeholder="รหัสผ่านใหม่ 8 หลัก"
+						class="mb-2 w-full rounded-lg border border-slate-500 p-3 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
+					/>
+					<button
+						type="submit"
+						disabled={isloading}
+						class="bgcolor-uni btn-submit w-full cursor-pointer rounded-xl py-3 font-bold text-amber-400 active:scale-[0.98] disabled:scale-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
+						>{isloading? 'กำลังเปลี่ยนรหัสผ่าน...' : 'ยืนยันรหัสใหม่'}</button
+					>
+				</form>
 			{/if}
 
 			<button
