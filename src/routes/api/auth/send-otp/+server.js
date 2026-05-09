@@ -15,10 +15,10 @@ export async function POST({ request }) {
     
     // 2. สุ่มเลข 6 หลัก
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expires = new Date(Date.now() + 5 * 60 * 1000); // หมดอายุใน 5 นาที
+    // const expires = new Date(Date.now() + 5 * 60 * 1000); // หมดอายุใน 5 นาที
 
     // 3. บันทึกลง DB
-    await pool.execute('UPDATE users SET otp_code = ?, otp_expires = ? WHERE email = ?', [otp, expires, email]);
+    await pool.execute(`UPDATE users SET otp_code = ?, otp_expires = DATE_ADD(UTC_TIMESTAMP(), INTERVAL '7:5' HOUR_MINUTE) WHERE email = ?`, [otp, email]);
 
     // 4. ส่งอีเมลจริง
     const transporter = nodemailer.createTransport({
