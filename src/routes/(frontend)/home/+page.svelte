@@ -1,4 +1,5 @@
 <script>
+	import { enhance } from '$app/forms';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
@@ -7,9 +8,8 @@
 
 	// บังคับให้เป็น Array เสมอเพื่อป้องกัน Error .length
 	let courses = $derived(Array.isArray(data.courses) ? data.courses.slice(0.8) : []);
-	let jobs = $derived(Array.isArray(data.jobs) ? data.jobs.slice(0,5) : []);
+	let jobs = $derived(Array.isArray(data.jobs) ? data.jobs.slice(0, 5) : []);
 	let boxinfo = $state('');
-
 	let job_skill_Modal = $state(false);
 	/** @type {any[]} */
 	let selectedJobSkills = $state([]); // ตัวแปรเก็บรายการ Skill ที่ดึงมา
@@ -23,29 +23,8 @@
 
 	/** @param {string} id */
 	async function info_subject(id) {
-		const info = resolve(`/info_subject?id=${id}`);
+		const info = resolve(`/info_subject?info=${id}`);
 		goto(info);
-	}
-	/** @param {string} id */
-	async function call_job(id) {
-		try {
-			const res = await fetch('/api/job_skill', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ id })
-			});
-
-			const data = await res.json();
-			if (res.ok) {
-				job_skill_Modal = true;
-				selectedJobSkills = data.skills;
-			} else {
-				boxinfo = data.boxinfo || 'ระบบข้อมูลเกิดข้อผิดพลาด';
-			}
-		} catch (error) {
-			console.error(error);
-			boxinfo = 'การเชื่อมต่อขัดข้อง';
-		}
 	}
 </script>
 
@@ -83,22 +62,38 @@
 				</div>
 			{/if}
 			{#each jobs as job (job.job_id)}
-				<button
-					type="button"
-					onclick={() => call_job(job.job_id)}
-					class="group flex cursor-pointer items-center gap-3"
+				<form
+				class="w-full"
+					method="POST"
+					action="?/call_jobs"
+					use:enhance={() => {
+						job_skill_Modal = true;
+
+						return async ({result}) => {
+							if(result.type === 'success'){
+								//@ts-ignore
+								selectedJobSkills = result.data?.Skills;
+							}else{
+								// @ts-ignore
+								boxinfo = result.data?.boxinfo;
+							}
+						}
+					}}
 				>
-					<div
-						class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#443210] font-bold text-[#dca11d] shadow-md"
-					>
-						{job.job_id}
-					</div>
-					<div
-						class="flex-1 cursor-pointer rounded-lg bg-[#dca11d] px-5 py-3 font-bold text-[#443210] shadow transition-transform hover:translate-x-1"
-					>
-						{job.name_job}
-					</div>
-				</button>
+					<input type="hidden" name="id" value={job.job_id} />
+					<button type="submit" class=" w-full group flex cursor-pointer items-center gap-3">
+						<div
+							class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#443210] font-bold text-[#dca11d] shadow-md"
+						>
+							{job.job_id}
+						</div>
+						<div
+							class="flex-1 cursor-pointer rounded-lg bg-[#dca11d] px-5 py-3 font-bold text-[#443210] shadow transition-transform hover:translate-x-1"
+						>
+							{job.name_job}
+						</div>
+					</button>
+				</form>
 			{/each}
 			{#if jobs.length > 0}
 				<div class="flex items-center justify-end">

@@ -1,5 +1,6 @@
-import { redirect } from '@sveltejs/kit';
+import { redirect,fail } from '@sveltejs/kit';
 import { pool } from '$lib/server/db.js';
+
 
 export async function load({ url }) {
 	const id = url.searchParams.get('id');
@@ -31,4 +32,31 @@ export async function load({ url }) {
 	}
 }
 
+export const actions = {
+	call_jobs: async ({request,fetch}) => {
+		const data = await request.formData();
+		const id = data.get('id');
 
+		try {
+			const res = await fetch('/api/job_skill', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ id })
+			});
+
+			const result = await res.json();
+			if (!res.ok) {
+				return fail(res.status,{
+					success: false,
+					boxinfo: result.boxinfo || 'ระบบข้อมูลเกิดข้อผิดพลาด'
+				});
+			}
+			return {success: true, Skills: result.skills}
+		} catch (error) {
+			console.error(error);
+			return fail(500,{
+				boxinfo: 'การเชื่อมต่อขัดข้อง'
+			});
+		}
+	}
+}
