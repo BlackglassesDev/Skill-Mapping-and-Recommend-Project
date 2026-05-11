@@ -94,7 +94,7 @@
 						{job.job_id}
 					</div>
 					<div
-						class="flex-1 cursor-default rounded-lg bg-[#dca11d] px-5 py-3 font-bold text-[#443210] shadow transition-transform hover:translate-x-1"
+						class="flex-1 cursor-pointer rounded-lg bg-[#dca11d] px-5 py-3 font-bold text-[#443210] shadow transition-transform hover:translate-x-1"
 					>
 						{job.name_job}
 					</div>
