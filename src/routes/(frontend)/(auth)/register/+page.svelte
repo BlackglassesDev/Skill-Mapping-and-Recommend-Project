@@ -1,57 +1,25 @@
 <script>
-	import { goto } from '$app/navigation';
+	import { enhance } from '$app/forms';
+	import { goto,invalidateAll } from '$app/navigation';
 	import { resolve } from '$app/paths';
 
-	let full_name = $state('');
-	let username = $state('');
-	let email = $state('');
-	let password = $state('');
-	let confirmPassword = $state('');
 	let message = $state('');
+	let isloading = $state(false);
 
 	const login_page = resolve('/login');
-
-	/** @param {any} e */
-	const handleRegister = async (e) => {
-		e.preventDefault();
-
-		if (password !== confirmPassword) {
-			message = 'รหัสผ่านไม่ตรงกัน❌';
-			return;
-		}
-
-		const res = await fetch('/api/auth/register', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({
-				full_name: full_name,
-				username: username,
-				email: email,
-				password: password
-			})
-			//ส่งไปเก็บที่บอดี้ให้แบคเอนรู้
-		});
-
-		const data = await res.json();
-
-		if (res.ok) {
-			message = data.message;
-			setTimeout(() => {
-				goto(login_page);
-			}, 1500);
-		} else {
-			message = data.error || 'เกิดข้อผิดพลาด😱';
-		}
-	};
 </script>
 
 <svelte:head><title>ลงทะเบียน</title></svelte:head>
 
-<article class="flex min-h-screen items-center justify-center p-4 bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]">
+<article
+	class="flex min-h-screen items-center justify-center bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] p-4"
+>
 	<article
 		class="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xl"
 	>
-		<header class="bgcolor-uni flex items-center justify-between gap-3 p-4 text-lg sm:p-6 sm:text-xl md:text-2xl">
+		<header
+			class="bgcolor-uni flex items-center justify-between gap-3 p-4 text-lg sm:p-6 sm:text-xl md:text-2xl"
+		>
 			<div class="flex items-center gap-2 sm:gap-3">
 				<a
 					href={login_page}
@@ -84,7 +52,29 @@
 			</h1>
 		{/if}
 
-		<form onsubmit={handleRegister}>
+		<form
+			method="POST"
+			action="?/regis"
+			use:enhance={() => {
+				isloading = true;
+				message = 'กำลังสมัครสมาชิก..';
+
+				return async ({ result }) => {
+					if (result.type === 'success') {
+						// @ts-ignore
+						message = result.data?.message;
+						setTimeout(async() => {
+							await invalidateAll();
+							goto(login_page);
+						}, 1500);
+					}else{
+						// @ts-ignore
+						message = result.data?.message || 'เกิดข้อผิดพลาด';
+						isloading = false;
+					}
+				};
+			}}
+		>
 			<section class="mx-4 mt-4 grid grid-cols-2 gap-3 p-3">
 				<div class="flex flex-col gap-0.5">
 					<label for="fullname" class="text-md font-semibold text-slate-700">ชื่อ - นามสกุล</label>
@@ -92,7 +82,7 @@
 						id="fullname"
 						type="text"
 						placeholder="เรียนดี มีชัย"
-						bind:value={full_name}
+						name="full_name"
 						required
 						class="w-full rounded-lg border border-slate-500 p-3 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
 					/>
@@ -104,7 +94,7 @@
 						id="username"
 						type="text"
 						placeholder="StudentRmutl"
-						bind:value={username}
+						name="username"
 						required
 						class="w-full rounded-lg border border-slate-500 p-3 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
 					/>
@@ -116,7 +106,7 @@
 						id="mail"
 						type="email"
 						placeholder="StudentRmutl@live.rmutl.ac.th"
-						bind:value={email}
+						name="email"
 						required
 						class="w-full rounded-lg border border-slate-500 p-2.5 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
 					/>
@@ -128,7 +118,7 @@
 						id="pass"
 						type="password"
 						placeholder="รหัสผ่านอย่างน้อย 8 ตัว"
-						bind:value={password}
+						name="password"
 						required
 						class="w-full rounded-lg border border-slate-500 p-2.5 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
 					/>
@@ -140,7 +130,7 @@
 						id="conpass"
 						type="password"
 						placeholder="รหัสผ่านอย่างน้อย 8 ตัว"
-						bind:value={confirmPassword}
+						name="confirmPassword"
 						required
 						class="w-full rounded-lg border border-slate-500 p-2.5 text-amber-900 transition outline-none focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
 					/>
@@ -148,7 +138,9 @@
 
 				<div class="col-span-2 mt-2 mb-4">
 					<button
-						class="btn-submit bgcolor-uni w-full cursor-pointer rounded-lg py-4 text-2xl font-bold text-amber-400 shadow-md transition-all hover:bg-amber-800 active:scale-[0.98]"
+					type="submit"
+					disabled={isloading}
+						class="btn-submit bgcolor-uni w-full cursor-pointer rounded-lg py-4 text-2xl font-bold text-amber-400 shadow-md transition-all hover:bg-amber-800 active:scale-[0.98] disabled:scale-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:grayscale"
 					>
 						ลงทะเบียน
 					</button>
