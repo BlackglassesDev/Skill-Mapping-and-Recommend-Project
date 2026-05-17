@@ -8,9 +8,12 @@
 
 	// บังคับให้เป็น Array เสมอเพื่อป้องกัน Error .length
 	let courses = $derived(Array.isArray(data.courses) ? data.courses.slice(0.8) : []);
+	let allcourses = $derived(Array.isArray(data.courses) ? data.courses : []);
 	let jobs = $derived(Array.isArray(data.jobs) ? data.jobs.slice(0, 5) : []);
+	let alljobs = $derived(Array.isArray(data.jobs) ? data.jobs : []);
 	let boxinfo = $state('');
 	let job_skill_Modal = $state(false);
+	let jobs_more = $state(false);
 	/** @type {any[]} */
 	let selectedJobSkills = $state([]); // ตัวแปรเก็บรายการ Skill ที่ดึงมา
 
@@ -63,25 +66,25 @@
 			{/if}
 			{#each jobs as job (job.job_id)}
 				<form
-				class="w-full"
+					class="w-full"
 					method="POST"
 					action="?/call_jobs"
 					use:enhance={() => {
 						job_skill_Modal = true;
 
-						return async ({result}) => {
-							if(result.type === 'success'){
+						return async ({ result }) => {
+							if (result.type === 'success') {
 								//@ts-ignore
 								selectedJobSkills = result.data?.Skills;
-							}else{
+							} else {
 								// @ts-ignore
 								boxinfo = result.data?.boxinfo;
 							}
-						}
+						};
 					}}
 				>
 					<input type="hidden" name="id" value={job.job_id} />
-					<button type="submit" class=" w-full group flex cursor-pointer items-center gap-3">
+					<button type="submit" class=" group flex w-full cursor-pointer items-center gap-3">
 						<div
 							class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#443210] font-bold text-[#dca11d] shadow-md"
 						>
@@ -97,7 +100,11 @@
 			{/each}
 			{#if jobs.length > 0}
 				<div class="flex items-center justify-end">
-					<a href="#" class="text-sm font-bold text-[#443210] hover:underline">ดูเพิ่มเติม</a>
+					<button
+						type="button"
+						onclick={() => (jobs_more = true)}
+						class="text-sm font-bold text-[#443210] hover:underline">ดูเพิ่มเติม</button
+					>
 				</div>
 			{/if}
 		</div>
@@ -171,6 +178,95 @@
 				onclick={() => (job_skill_Modal = false)}
 				class="mt-4 w-full cursor-pointer text-sm text-gray-500">ยกเลิก</button
 			>
+		</div>
+	</div>
+{/if}
+
+{#if jobs_more}
+	<div class="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-4">
+		<div
+			class="relative w-full max-w-sm rounded-[24px] bg-[#ffffff] p-6 shadow-2xl sm:max-w-md md:max-w-lg"
+		>
+			<button
+				type="button"
+				onclick={() => (jobs_more = false)}
+				class="absolute top-5 right-5 cursor-pointer text-gray-500 transition-colors hover:text-gray-800"
+				aria-label="ปิดหน้าต่าง"
+				title="ปิดหน้าต่าง"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="1.5"
+					stroke="currentColor"
+					class="h-6 w-6"
+				>
+					<path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+				</svg>
+			</button>
+
+			<h2 class="pt-6 pb-6 text-center text-lg font-bold text-[#443210] sm:pt-0 sm:text-2xl">
+				อาชีพที่เรียนจบแล้วสามารถเป็นได้
+			</h2>
+
+			{#if boxinfo}
+				<h1
+					class="mb-3 rounded-xl border border-amber-800 bg-amber-200 p-2 text-center text-sm font-bold text-amber-950"
+				>
+					{boxinfo}
+				</h1>
+			{/if}
+
+			<div class="scrollbar-thin flex max-h-[60vh] flex-col gap-3 overflow-y-auto pr-1">
+				{#each alljobs as item, i (i)}
+					<form
+						class="w-full"
+						method="POST"
+						action="?/call_jobs"
+						use:enhance={() => {
+							job_skill_Modal = true;
+
+							return async ({ result }) => {
+								if (result.type === 'success') {
+									//@ts-ignore
+									selectedJobSkills = result.data?.Skills;
+								} else {
+									// @ts-ignore
+									boxinfo = result.data?.boxinfo;
+								}
+							};
+						}}
+					>
+						<input type="hidden" name="id" value={item.job_id} />
+						<button type="submit" class=" group flex w-full cursor-pointer items-center gap-3">
+							<div
+								class="group w-full cursor-pointer rounded-[14px] border border-[#f0ac2c] bg-[#ffffff] p-4 shadow-sm transition-all hover:shadow-amber-500"
+							>
+								<div class="flex items-center justify-between gap-3">
+									<p class="font-bold text-[#443210] transition-colors md:text-lg">
+										{item.name_job}
+									</p>
+
+									<div
+										class="shrink-0 rounded-full bg-[#443210] px-3 py-1 text-[10px] font-bold text-[#dca11d] transition-colors group-hover:bg-[#dca11d] group-hover:text-[#443210] md:text-xs"
+									>
+										Level: {item.level_skill}
+									</div>
+								</div>
+							</div>
+						</button>
+					</form>
+				{/each}
+			</div>
+
+			<!-- <button
+                type="button"
+                onclick={() => (jobs_more = false)}
+                class="mt-6 w-full cursor-pointer text-sm font-medium text-gray-500 transition-colors hover:text-gray-800"
+            >
+                ยกเลิก
+            </button> -->
 		</div>
 	</div>
 {/if}
