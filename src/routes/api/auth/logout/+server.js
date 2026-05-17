@@ -13,5 +13,5 @@ export async function POST({ cookies, locals }) {
     locals.user = null;
 
     // 3. ส่งกลับไปบอกหน้าบ้านว่าสำเร็จแล้ว
-    return json({ success: true, message: 'ออกจากระบบสำเร็จ' });
+    return json({ success: true, message: 'ออกจากระบบสำเร็จ' },{status: 200 });
 }
