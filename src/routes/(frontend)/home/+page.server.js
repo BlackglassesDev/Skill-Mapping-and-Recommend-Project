@@ -3,7 +3,7 @@ import { pool } from '$lib/server/db.js';
 
 
 export async function load({ url }) {
-	const id = url.searchParams.get('id');
+	const id = url.searchParams.get('curriculum');
 
 	if(!id){
 		throw redirect(302, '/');

@@ -18,7 +18,7 @@
 
 	/** @param {string} id */
 	async function send_to_home(id) {
-		const home = resolve(`/home?id=${id}`);
+		const home = resolve(`/home?curriculum=${id}`);
 		goto(home);
 	}
 </script>
