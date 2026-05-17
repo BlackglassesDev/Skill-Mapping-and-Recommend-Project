@@ -220,6 +220,7 @@
 					}}
 				>
 					<p class="mb-4 text-gray-400">กรอกรหัส 6 หลักที่ได้รับในอีเมล</p>
+					<input type="hidden" name="email" value={backup_email}>
 					<input
 						type="text"
 						name="otp"

@@ -73,12 +73,13 @@ export const actions = {
 	verifyOTP: async ({ request, fetch }) => {
 		const data = await request.formData();
 		const otp = data.get('otp');
+		const email = data.get('email');
 
 		try {
 			const res = await fetch('/api/auth/verify-otp', {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ otp })
+				body: JSON.stringify({ otp,email })
 			});
 
 			const result = await res.json();

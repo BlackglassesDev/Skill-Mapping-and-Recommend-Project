@@ -16,7 +16,7 @@ export async function POST({request}) {
         const hashpass = await bcrypt.hash(newPassword,10);
         
         await pool.execute('UPDATE users SET password = ? WHERE email = ?', [hashpass,email]);
-        return json({ boxinfo: 'บันทึกรหัสผ่านสำเร็จ✅'}, {status: 201});
+        return json({ boxinfo: 'บันทึกรหัสผ่านสำเร็จ✅'}, {status: 200});
 
     }catch(error){
         console.error('บันทึกรหัสผ่านไม่สำเร็จ❌',error);
