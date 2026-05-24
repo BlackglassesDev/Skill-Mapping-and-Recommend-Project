@@ -15,7 +15,6 @@
 	// ตั้งค่า Path ทั่วไป
 	const homePath = resolve('/home');
 	const loginPath = resolve('/login');
-	const job = resolve('/job');
 	const curriculum = resolve('/curriculum');
 	//flooter
 	const about = resolve('/about');
@@ -23,7 +22,7 @@
 	const help = resolve('/help');
 	//student
 	const grade_users = resolve('/grade_users');
-	const assess_skills = resolve('/asess_skill');
+	const assess_skills = resolve('/assess_skills');
 	//teacher
 	const manage_course = resolve('/manage_course');
 	const manage_skill = resolve('/manage_skill');
@@ -134,8 +133,8 @@
 				<a href={homePath} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}
 					>หน้าหลัก</a
 				>
-				<a href={job} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}
-					>อาชีพในสายงาน</a
+				<a href={assess_skills} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}
+					>ประเมินทักษะ</a
 				>
 				<a href={curriculum} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}
 					>ข้อมูลหลักสูตร</a
@@ -200,7 +199,7 @@
 			<div class="hidden items-center gap-8 md:flex">
 				<div class="flex items-center gap-6 text-sm font-light">
 					<a href={homePath} class="transition-colors hover:text-[#dca11d]">หน้าหลัก</a>
-					<a href={job} class="transition-colors hover:text-[#dca11d]">อาชีพในสายงาน</a>
+					<a href={assess_skills} class="transition-colors hover:text-[#dca11d]">ประเมินทักษะ</a>
 					<a href={curriculum} class="transition-colors hover:text-[#dca11d]">ข้อมูลหลักสูตร</a>
 				</div>
 				<a
@@ -237,8 +236,8 @@
 				<a href={homePath} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}
 					>หน้าหลัก</a
 				>
-				<a href={job} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}
-					>อาชีพในสายงาน</a
+				<a href={assess_skills} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}
+					>ประเมินทักษะ</a
 				>
 				<a href={curriculum} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}
 					>ข้อมูลหลักสูตร</a
