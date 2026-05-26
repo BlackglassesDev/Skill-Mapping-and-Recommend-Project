@@ -1,21 +1,224 @@
 <script>
+	//
 	import { resolve } from '$app/paths';
+	import { enhance } from '$app/forms';
 
-	// 🎯 รับ Props ตามมาตรฐาน Svelte 5 Rune
+	// 🎯 1. ดึงข้อมูลประยุกต์ใช้ผ่าน Props (Svelte 5 Rune)
 	let { data } = $props();
 
-    let login = resolve('/login');
-    let home = resolve('/home');
+	let login = resolve('/login');
+	let home = resolve('/home');
 
-	// 🎯 สถานะการควบคุม (State Runes)
-	let selectedCareer = $state('Full-Stack Developer');
-	let authModalOpen = $state(!data.user); // ถ้าไม่ได้ Login ตัว Modal เตือนจะเด้งขึ้นมาทันที
+	// 🎯 2. สเตทควบคุมการแสดงผลมอดอล
+	let authModalOpen = $state(!data.user);
+	let curriculumModalOpen = $state(data.user && data.hasCurriculum === false);
+	let curriculumList = $derived(Array.isArray(data?.curriculum) ? data.curriculum : []);
 
-	// จำลองทักษะที่ต้องศึกษาเพิ่มอ้างอิงตามอาชีพที่เลือก
-	let skillsToLearn = $derived(
-		selectedCareer === 'Full-Stack Developer' ? 'Node Backend, SQL DB' : 'Python, AI Framework'
+	// ตัวแปรผูกกับ Dropdown หลักสูตรที่เลือก
+	let selectedCurriculumId = $state('');
+	let allCourses = $derived(Array.isArray(data?.allCourses) ? data.allCourses : []);
+
+	let filteredCourses = $derived(
+		selectedCurriculumId
+			? // @ts-ignore
+				allCourses.filter((course) => String(course.curriculum_id) === String(selectedCurriculumId))
+			: []
 	);
 </script>
+
+{#if authModalOpen}
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+		<div
+			class="w-full max-w-sm rounded-[24px] border border-gray-200 bg-[#FAF9F6] p-6 text-center shadow-2xl"
+		>
+			<div
+				class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-[#DCA11D]"
+			>
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					fill="none"
+					viewBox="0 0 24 24"
+					stroke-width="2"
+					stroke="currentColor"
+					class="h-8 w-8"
+				>
+					<path
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
+					/>
+				</svg>
+			</div>
+			<h3 class="text-xl font-bold text-[#443210]">กรุณาเข้าสู่ระบบ</h3>
+			<p class="mt-2 text-sm leading-relaxed text-gray-500">
+				คุณจำเป็นต้องเข้าสู่ระบบก่อน เพื่อทำการวิเคราะห์และตรวจสอบช่องว่างทักษะตามรายวิชาเลือก
+			</p>
+			<div class="mt-6 flex flex-col gap-2">
+				<a
+					href={login}
+					class="flex w-full items-center justify-center rounded-xl bg-[#443210] py-3 text-sm font-bold text-[#DCA11D] shadow-md transition-all hover:bg-[#543f15]"
+				>
+					เข้าสู่ระบบตอนนี้
+				</a>
+				<a
+					href={home}
+					class="py-2 text-xs font-semibold text-gray-400 hover:text-gray-700 hover:underline"
+				>
+					กลับหน้าหลัก
+				</a>
+			</div>
+		</div>
+	</div>
+{/if}
+
+{#if curriculumModalOpen && !authModalOpen}
+	<div class="fixed inset-0 z-40 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+		<div
+			class="max-h-[90vh] w-full max-w-xl overflow-y-auto rounded-[24px] border border-gray-200 bg-[#FAF9F6] p-6 text-left shadow-2xl"
+		>
+			<div class="mb-6 text-center">
+				<h3 class="text-xl font-bold tracking-tight text-[#443210]">บันทึกข้อมูลการเรียน</h3>
+				<p class="mt-1 text-xs text-gray-500">
+					กรุณาระบุหลักสูตรเพื่อดึงข้อมูลวิชาในการเลือกบันทึกเกรดสะสมของคุณ
+				</p>
+			</div>
+
+			<form
+				method="POST"
+				action="?/saveCurriculumAndGrades"
+				use:enhance={() => {
+					return async ({ result }) => {
+						if (result.type === 'success') {
+							curriculumModalOpen = false; // ปิดมอดอลทันทีเมื่อบันทึกผ่านสำเร็จ
+						}
+					};
+				}}
+				class="space-y-5"
+			>
+				<div class="space-y-2">
+					<label for="curriculum" class="block text-sm font-bold text-[#443210]/90">
+						1. เลือกหลักสูตรสาขาวิชา <span class="text-red-500">*</span>
+					</label>
+					<div class="relative">
+						<select
+							id="curriculum"
+							name="curriculum_id"
+							bind:value={selectedCurriculumId}
+							required
+							class="w-full appearance-none rounded-xl border border-gray-300 bg-white py-3 pr-10 pl-4 text-sm font-bold text-[#443210] shadow-sm focus:border-[#DCA11D] focus:ring-1 focus:ring-[#DCA11D] focus:outline-none"
+						>
+							<option value="" disabled selected>-- กรุณาเลือกหลักสูตร --</option>
+							{#each curriculumList as curri (curri.curriculum_id)}
+								<option value={curri.curriculum_id}>{curri.curriculum_name}</option>
+							{/each}
+						</select>
+						<div
+							class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400"
+						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="2.5"
+								stroke="currentColor"
+								class="h-4 w-4"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="m19.5 8.25-7.5 7.5-7.5-7.5"
+								/>
+							</svg>
+						</div>
+					</div>
+				</div>
+
+				<hr class="border-gray-200" />
+
+				<div class="space-y-3">
+					<span class="block text-sm font-bold text-[#443210]/90">
+						2. เลือกเกรดรายวิชาที่เรียนผ่านมาแล้ว
+					</span>
+
+					{#if filteredCourses.length > 0}
+						<div class="max-h-[40vh] space-y-2 overflow-y-auto pr-1">
+							{#each filteredCourses as course (course.course_code)}
+								<div
+									class="flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-white p-3.5 shadow-sm"
+								>
+									<div class="min-w-0 flex-1">
+										<p class="text-xs font-bold tracking-wide text-[#DCA11D] uppercase">
+											{course.course_code}
+										</p>
+										<p class="mt-0.5 truncate text-sm font-bold text-[#443210]">
+											{course.course_name}
+										</p>
+										<input type="hidden" name="course_codes" value={course.course_code} />
+									</div>
+
+									<div class="relative w-28 shrink-0">
+										<select
+											name="course_grades"
+											required
+											class="w-full appearance-none rounded-lg border border-gray-300 bg-[#FAF9F6] px-3 py-2 text-sm font-bold text-[#443210] focus:border-[#DCA11D] focus:outline-none"
+										>
+											<option value="" disabled selected>เลือกเกรด</option>
+											<option value="NOT_TAKEN">ยังไม่ได้เรียน</option>
+											<option value="A">A</option>
+											<option value="B+">B+</option>
+											<option value="B">B</option>
+											<option value="C+">C+</option>
+											<option value="C">C</option>
+											<option value="D+">D+</option>
+											<option value="D">D</option>
+											<option value="F">F</option>
+										</select>
+										<div
+											class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400"
+										>
+											<svg
+												xmlns="http://www.w3.org/2000/svg"
+												fill="none"
+												viewBox="0 0 24 24"
+												stroke-width="2"
+												stroke="currentColor"
+												class="h-3 w-3"
+											>
+												<path
+													stroke-linecap="round"
+													stroke-linejoin="round"
+													d="m19.5 8.25-7.5 7.5-7.5-7.5"
+												/>
+											</svg>
+										</div>
+									</div>
+								</div>
+							{/each}
+						</div>
+					{:else}
+						<div
+							class="rounded-xl border border-dashed border-gray-200 bg-white p-8 text-center text-sm text-gray-400 italic"
+						>
+							{selectedCurriculumId
+								? 'ไม่พบรายวิชาในหลักสูตรนี้'
+								: 'กรุณาเลือกหลักสูตรด้านบนก่อน เพื่อให้ระบบแสดงรายวิชา'}
+						</div>
+					{/if}
+				</div>
+
+				<div class="pt-2">
+					<button
+						type="submit"
+						disabled={filteredCourses.length === 0}
+						class="w-full cursor-pointer rounded-xl bg-[#443210] py-3 text-sm font-bold text-[#DCA11D] shadow-md transition-all hover:bg-[#543f15] disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500"
+					>
+						บันทึกหลักสูตรและเกรดรายวิชา
+					</button>
+				</div>
+			</form>
+		</div>
+	</div>
+{/if}
 
 <div class="min-h-screen bg-[#FAF9F6] text-[#443210] antialiased">
 	<main class="container mx-auto max-w-7xl space-y-10 px-4 py-8 md:px-8">
@@ -26,7 +229,7 @@
 				<div
 					class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#DCA11D] bg-[#DCA11D] text-3xl font-bold text-white shadow-md md:h-20 md:w-20 md:text-4xl"
 				>
-					{data.summary.passedCoursesCount || '0'}
+					รอกรอก
 				</div>
 				<div>
 					<h4 class="text-sm font-medium tracking-wider text-gray-500 uppercase">
@@ -42,7 +245,7 @@
 				<div
 					class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#DCA11D] bg-[#DCA11D] text-3xl font-bold text-white shadow-md md:h-20 md:w-20 md:text-4xl"
 				>
-					{data.summary.accumulatedSkillsCount || '3'}
+					รอกรอกทักษะ
 				</div>
 				<div>
 					<h4 class="text-sm font-medium tracking-wider text-gray-500 uppercase">
@@ -60,7 +263,7 @@
 						<span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#DCA11D]"></span>
 						<p class="text-sm font-medium text-[#443210]/80">
 							ทักษะที่โดดเด่นที่สุด: <strong class="block text-lg font-bold text-[#443210]"
-								>{data.summary.topSkill}</strong
+								>รอกรอกยังไม่ได้ทำ</strong
 							>
 						</p>
 					</div>
@@ -68,7 +271,7 @@
 						<span class="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#443210]/50"></span>
 						<p class="text-sm font-medium text-[#443210]/70">
 							ทักษะที่เป็นรอง: <strong class="block text-base font-bold text-[#443210]/90"
-								>{data.summary.secondarySkill}</strong
+								>รอกรอกยังไม่ได้ทำ</strong
 							>
 						</p>
 					</div>
@@ -87,7 +290,7 @@
 					<div class="relative max-w-xs flex-1">
 						<select
 							id="career-dropdown"
-							bind:value={selectedCareer}
+							// bind:value={selectedCareer}     รอกรอกยังไม่ได้ทำ
 							class="w-full appearance-none rounded-xl border border-gray-300 bg-[#FAF9F6] py-3 pr-10 pl-4 text-sm font-bold text-[#443210] shadow-sm transition-all focus:border-[#DCA11D] focus:ring-1 focus:ring-[#DCA11D] focus:outline-none"
 						>
 							<option value="Full-Stack Developer">Full-Stack Developer</option>
@@ -120,7 +323,7 @@
 						ทักษะที่ต้องศึกษาเพิ่ม
 					</h3>
 					<p class="mt-2 text-xl font-bold tracking-tight text-[#DCA11D] md:text-2xl">
-						{skillsToLearn}
+						รอกรอกยังไม่ได้ทำ
 					</p>
 				</div>
 			</div>
@@ -154,7 +357,7 @@
 		<section class="space-y-6">
 			<h2 class="text-xl font-bold text-[#443210] md:text-2xl">แนะนำวิชาเลือก</h2>
 
-			<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+			<!-- <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				{#each data.recommendedCourses as course (course.id)}
 					<div
 						class="group flex flex-col justify-between rounded-2xl border border-gray-200 bg-[#FAF9F6] p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#DCA11D]/60 hover:bg-white hover:shadow-md"
@@ -191,7 +394,7 @@
 						</div>
 					</div>
 				{/each}
-			</div>
+			</div> -->
 
 			<div class="flex justify-end pt-2">
 				<button
@@ -204,47 +407,3 @@
 		</section>
 	</main>
 </div>
-
-{#if authModalOpen}
-	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-		<div class="w-full max-w-sm rounded-[24px] bg-[#E3E1DF] p-6 text-center shadow-2xl sm:max-w-md">
-			<div
-				class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-amber-100 text-[#DCA11D]"
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					fill="none"
-					viewBox="0 0 24 24"
-					stroke-width="2"
-					stroke="currentColor"
-					class="h-8 w-8"
-				>
-					<path
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z"
-					/>
-				</svg>
-			</div>
-			<h3 class="text-xl font-bold text-[#443210]">กรุณาเข้าสู่ระบบ</h3>
-			<p class="mt-2 text-sm leading-relaxed text-gray-600">
-				คุณจำเป็นต้องเข้าสู่ระบบก่อน เพื่อทำการวิเคราะห์ เปรียบเทียบ
-				และตรวจสอบช่องว่างทักษะตามรายวิชาเลือก
-			</p>
-			<div class="mt-6 flex flex-col gap-2">
-				<a
-					href={login}
-					class="flex w-full items-center justify-center rounded-xl bg-[#443210] py-3 text-sm font-bold text-[#DCA11D] shadow-md transition-all hover:bg-[#543f15]"
-				>
-					เข้าสู่ระบบตอนนี้
-				</a>
-				<a
-					href={home}
-					class="py-2 text-xs font-semibold text-gray-500 hover:text-gray-800 hover:underline"
-				>
-					กลับหน้าหลัก
-				</a>
-			</div>
-		</div>
-	</div>
-{/if}
