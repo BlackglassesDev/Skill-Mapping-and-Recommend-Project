@@ -109,7 +109,7 @@ CREATE TABLE course_skills (
     FOREIGN KEY (skill_id) REFERENCES skills(skill_id) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-INSERT INTO course_skills(couse_id, skill_id, skill_level) VALUE
+INSERT INTO course_skills(course_id, skill_id, skill_level) VALUE
     (1, 5, 4),
     (2, 6, 4),
     (2, 1, 3),
@@ -119,8 +119,10 @@ INSERT INTO course_skills(couse_id, skill_id, skill_level) VALUE
 CREATE TABLE student_grades (
     user_id INT,
     course_id INT,
-    grade FLOAT NOT NULL, -- เก็บเป็นแต้ม 4.0, 3.5, 3.0...
+    grade_letter VARCHAR(5) NOT NULL,  -- เก็บเกรดตัวอักษร เช่น 'A', 'B+', 'C+'
+    grade_point DECIMAL(3,2) NOT NULL, -- เก็บแต้มตัวเลข เช่น 4.00, 3.50, 2.50
     PRIMARY KEY (user_id, course_id),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (course_id) REFERENCES courses(course_id)
+    FOREIGN KEY (course_id) REFERENCES courses(course_id) ON DELETE CASCADE
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+
