@@ -2,6 +2,7 @@
 	//
 	import { resolve } from '$app/paths';
 	import { enhance } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 
 	// 🎯 1. ดึงข้อมูลประยุกต์ใช้ผ่าน Props (Svelte 5 Rune)
 	let { data } = $props();
@@ -15,8 +16,16 @@
 	let curriculumList = $derived(Array.isArray(data?.curriculum) ? data.curriculum : []);
 
 	// ตัวแปรผูกกับ Dropdown หลักสูตรที่เลือก
-	let selectedCurriculumId = $state('');
+	let selectedCurriculumId = $state(
+		data.currentUserCurriculumId ? String(data.currentUserCurriculumId) : ''
+	);
 	let allCourses = $derived(Array.isArray(data?.allCourses) ? data.allCourses : []);
+
+	$effect(() => {
+		if (data.currentUserCurriculumId) {
+			selectedCurriculumId = String(data.currentUserCurriculumId);
+		}
+	});
 
 	let filteredCourses = $derived(
 		selectedCurriculumId
@@ -90,6 +99,7 @@
 					return async ({ result }) => {
 						if (result.type === 'success') {
 							curriculumModalOpen = false; // ปิดมอดอลทันทีเมื่อบันทึกผ่านสำเร็จ
+							await invalidateAll();
 						}
 					};
 				}}
@@ -109,7 +119,7 @@
 						>
 							<option value="" disabled selected>-- กรุณาเลือกหลักสูตร --</option>
 							{#each curriculumList as curri (curri.curriculum_id)}
-								<option value={curri.curriculum_id}>{curri.curriculum_name}</option>
+								<option value={String(curri.curriculum_id)}>{curri.curriculum_name}</option>
 							{/each}
 						</select>
 						<div
@@ -143,6 +153,9 @@
 					{#if filteredCourses.length > 0}
 						<div class="max-h-[40vh] space-y-2 overflow-y-auto pr-1">
 							{#each filteredCourses as course (course.course_code)}
+								{@const oldGrade = data.savedGrades?.find(
+									(g) => g.course_id === course.course_id
+								)?.grade_letter}
 								<div
 									class="flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-white p-3.5 shadow-sm"
 								>
@@ -162,16 +175,18 @@
 											required
 											class="w-full appearance-none rounded-lg border border-gray-300 bg-[#FAF9F6] px-3 py-2 text-sm font-bold text-[#443210] focus:border-[#DCA11D] focus:outline-none"
 										>
-											<option value="" disabled selected>เลือกเกรด</option>
-											<option value="NOT_TAKEN">ยังไม่ได้เรียน</option>
-											<option value="A">A</option>
-											<option value="B+">B+</option>
-											<option value="B">B</option>
-											<option value="C+">C+</option>
-											<option value="C">C</option>
-											<option value="D+">D+</option>
-											<option value="D">D</option>
-											<option value="F">F</option>
+											<option value="" disabled selected={!oldGrade}>เลือกเกรด</option>
+											<option value="NOT_TAKEN" selected={oldGrade === 'NOT_TAKEN'}
+												>ยังไม่ได้เรียน</option
+											>
+											<option value="A" selected={oldGrade === 'A'}>A</option>
+											<option value="B+" selected={oldGrade === 'B+'}>B+</option>
+											<option value="B" selected={oldGrade === 'B'}>B</option>
+											<option value="C+" selected={oldGrade === 'C+'}>C+</option>
+											<option value="C" selected={oldGrade === 'C'}>C</option>
+											<option value="D+" selected={oldGrade === 'D+'}>D+</option>
+											<option value="D" selected={oldGrade === 'D'}>D</option>
+											<option value="F" selected={oldGrade === 'F'}>F</option>
 										</select>
 										<div
 											class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400"
@@ -206,7 +221,7 @@
 					{/if}
 				</div>
 
-				<div class="pt-2">
+				<div class="mt-6 flex flex-col gap-2">
 					<button
 						type="submit"
 						disabled={filteredCourses.length === 0}
@@ -214,6 +229,14 @@
 					>
 						บันทึกหลักสูตรและเกรดรายวิชา
 					</button>
+
+					{#if curriculumModalOpen && data.hasCurriculum}
+						<button
+							type="button"
+							class="py-2 text-xs text-center cursor-pointer font-semibold text-gray-400 hover:text-gray-700 hover:underline"
+							onclick={() => (curriculumModalOpen = false)}>ย้อนกลับ</button
+						>
+					{/if}
 				</div>
 			</form>
 		</div>
@@ -403,6 +426,11 @@
 				>
 					แนะนำสายงานที่ถนัด
 				</button>
+				<button
+					type="button"
+					class="cursor-pointer rounded-xl bg-[#443210] px-6 py-3 mx-3 text-sm font-bold text-[#DCA11D] shadow-md transition-all hover:bg-[#543f15] hover:shadow-lg focus:outline-none"
+					onclick={() => (curriculumModalOpen = true)}>ปรับปรุงเกรด</button
+				>
 			</div>
 		</section>
 	</main>
