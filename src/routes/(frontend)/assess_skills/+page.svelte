@@ -153,7 +153,7 @@
 										<p class="mt-0.5 truncate text-sm font-bold text-[#443210]">
 											{course.course_name}
 										</p>
-										<input type="hidden" name="course_codes" value={course.course_code} />
+										<input type="hidden" name="course_id" value={course.course_id} />
 									</div>
 
 									<div class="relative w-28 shrink-0">
