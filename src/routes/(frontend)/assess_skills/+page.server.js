@@ -74,11 +74,11 @@ export const load = async ({ locals }) => {
 				);
 
 				const [fetchedJobs] = await pool.execute(
-                    `SELECT job_id, name_job FROM job WHERE curriculum_id = ?`, 
-                    [userCurriculumId]
-                );
+					`SELECT job_id, name_job FROM job WHERE curriculum_id = ?`,
+					[userCurriculumId]
+				);
 				//@ts-ignore
-                jobRows = fetchedJobs;
+				jobRows = fetchedJobs;
 
 				// @ts-ignore
 				completedCoursesCount = countRows[0] ? countRows[0].total : 0;
@@ -166,6 +166,14 @@ export const actions = {
 			for (let i = 0; i < course_ids.length; i++) {
 				const courseId = course_ids[i];
 				const gradeLetter = course_grades[i];
+
+				if (gradeLetter === 'NOT_TAKEN') {
+					await pool.execute('DELETE FROM student_grades WHERE user_id = ? AND course_id = ?', [
+						userId,
+						courseId
+					]);
+					continue; // ลบเสร็จแล้วให้ข้ามลูปวิชานี้ไปได้เลย ไม่ต้องไปทำงานต่อด้านล่าง
+				}
 
 				if (gradeLetter === 'NOT_TAKEN' || !gradeLetter) {
 					continue;
