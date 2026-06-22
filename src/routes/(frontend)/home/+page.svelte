@@ -18,6 +18,7 @@
 	let jobs_more = $state(false);
 	/** @type {any[]} */
 	let selectedJobSkills = $state([]); // ตัวแปรเก็บรายการ Skill ที่ดึงมา
+	// @ts-ignore
 	let courseSkillsList = $derived(Array.isArray(data.course_skills) ? data.course_skills : []);
 
 	// ข้อมูลจำลองสำหรับวนลูป
@@ -345,7 +346,7 @@
 									<div
 										class="shrink-0 rounded-full bg-[#443210] px-3 py-1 text-[10px] font-bold text-[#dca11d] transition-colors group-hover:bg-[#dca11d] group-hover:text-[#443210] md:text-xs"
 									>
-										Level: {item.level_skill}
+										Click!
 									</div>
 								</div>
 							</div>
