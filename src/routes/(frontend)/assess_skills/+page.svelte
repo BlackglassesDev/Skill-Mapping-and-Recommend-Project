@@ -20,6 +20,8 @@
 		data.currentUserCurriculumId ? String(data.currentUserCurriculumId) : ''
 	);
 	let allCourses = $derived(Array.isArray(data?.allCourses) ? data.allCourses : []);
+	let selectedCareerId = $state('');
+	let joblist = $derived(Array.isArray(data.jobs) ? data.jobs : []);
 
 	$effect(() => {
 		if (data.currentUserCurriculumId) {
@@ -233,7 +235,7 @@
 					{#if curriculumModalOpen && data.hasCurriculum}
 						<button
 							type="button"
-							class="py-2 text-xs text-center cursor-pointer font-semibold text-gray-400 hover:text-gray-700 hover:underline"
+							class="cursor-pointer py-2 text-center text-xs font-semibold text-gray-400 hover:text-gray-700 hover:underline"
 							onclick={() => (curriculumModalOpen = false)}>ย้อนกลับ</button
 						>
 					{/if}
@@ -243,7 +245,9 @@
 	</div>
 {/if}
 
-<div class="min-h-screen bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] text-[#443210] antialiased">
+<div
+	class="min-h-screen bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] text-[#443210] antialiased"
+>
 	<main class="container mx-auto max-w-7xl space-y-10 px-4 py-8 md:px-8">
 		<section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			<div
@@ -313,12 +317,13 @@
 					<div class="relative max-w-xs flex-1">
 						<select
 							id="career-dropdown"
-							// bind:value={selectedCareer}     รอกรอกยังไม่ได้ทำ
+							bind:value={selectedCareerId}
 							class="w-full appearance-none rounded-xl border border-[#DCA11D] bg-[#ffffff] py-3 pr-10 pl-4 text-sm font-bold text-[#443210] shadow-sm transition-all focus:border-[#DCA11D] focus:ring-1 focus:ring-[#DCA11D] focus:outline-none"
 						>
-							<option value="Full-Stack Developer">Full-Stack Developer</option>
-							<option value="Data Scientist">Data Scientist</option>
-							<option value="Network Engineer">Network Engineer</option>
+							<option value='' disabled>-- กรุณาเลือกตำแหน่งงาน --</option>
+							{#each joblist as job (job.job_id)}
+								<option value={String(job.job_id)}>{job.name_job}</option>
+							{/each}
 						</select>
 						<div
 							class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500"
@@ -428,7 +433,7 @@
 				</button>
 				<button
 					type="button"
-					class="cursor-pointer rounded-xl bg-[#443210] px-6 py-3 mx-3 text-sm font-bold text-[#DCA11D] shadow-md transition-all hover:bg-[#543f15] hover:shadow-lg focus:outline-none"
+					class="mx-3 cursor-pointer rounded-xl bg-[#443210] px-6 py-3 text-sm font-bold text-[#DCA11D] shadow-md transition-all hover:bg-[#543f15] hover:shadow-lg focus:outline-none"
 					onclick={() => (curriculumModalOpen = true)}>ปรับปรุงเกรด</button
 				>
 			</div>

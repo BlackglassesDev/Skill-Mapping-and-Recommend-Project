@@ -15,7 +15,8 @@ export const load = async ({ locals }) => {
 			allCourse: [],
 			savedGrades: [],
 			passedSkillsCount: [],
-			completedCoursesCount: []
+			completedCoursesCount: [],
+			jobs: []
 		};
 	}
 
@@ -46,19 +47,12 @@ export const load = async ({ locals }) => {
 		let savedGrades = [];
 		let completedCoursesCount = 0;
 		let passedSkillsCount = 0;
+		let jobRows = [];
 		if (userId) {
 			// เอาคำว่า const ออก แล้วเปลี่ยนไปยัดค่าใส่ตัวแปร savedGrades ตรงๆ เลยครับ
 			const [gradeRows] = await pool.execute(
 				'SELECT course_id, grade_letter FROM student_grades WHERE user_id = ?',
 				[userId]
-			);
-
-			const [countRows] = await pool.execute(
-				`SELECT COUNT(*) AS total
-                FROM student_grades sg
-				INNER JOIN courses c ON sg.course_id = c.course_id
-                WHERE sg.user_id = ? AND grade_letter NOT IN ('NOT_TAKEN', 'F') AND c.curriculum_id = ?`,
-				[userId, userCurriculumId]
 			);
 
 			const [skillCountRows] = await pool.execute(
@@ -69,13 +63,32 @@ export const load = async ({ locals }) => {
                 AND sg.grade_letter NOT IN ('NOT_TAKEN', 'F')`,
 				[userId]
 			);
+
+			if (userCurriculumId) {
+				const [countRows] = await pool.execute(
+					`SELECT COUNT(*) AS total
+                FROM student_grades sg
+				INNER JOIN courses c ON sg.course_id = c.course_id
+                WHERE sg.user_id = ? AND grade_letter NOT IN ('NOT_TAKEN', 'F') AND c.curriculum_id = ?`,
+					[userId, userCurriculumId]
+				);
+
+				const [fetchedJobs] = await pool.execute(
+                    `SELECT job_id, name_job FROM job WHERE curriculum_id = ?`, 
+                    [userCurriculumId]
+                );
+				//@ts-ignore
+                jobRows = fetchedJobs;
+
+				// @ts-ignore
+				completedCoursesCount = countRows[0] ? countRows[0].total : 0;
+			}
+
 			// @ts-ignore
 			passedSkillsCount = skillCountRows[0] ? skillCountRows[0].total_skills : 0;
 
 			//@ts-ignore
 			savedGrades = gradeRows;
-			// @ts-ignore
-			completedCoursesCount = countRows[0] ? countRows[0].total : 0;
 		}
 
 		// 6. ส่งค่าทั้งหมดกลับไปที่หน้าบ้าน (+page.svelte)
@@ -87,6 +100,7 @@ export const load = async ({ locals }) => {
 			savedGrades: savedGrades,
 			completedCoursesCount: completedCoursesCount,
 			passedSkillsCount: passedSkillsCount,
+			jobs: jobRows,
 			curriculum: JSON.parse(JSON.stringify(curriculumRows)) // รายชื่อหลักสูตรทั้งหมดในตาราง curriculum
 		};
 	} catch (error) {
@@ -99,7 +113,8 @@ export const load = async ({ locals }) => {
 			allCourse: [],
 			savedGrades: [],
 			completedCoursesCount: [],
-			passedSkillsCount: []
+			passedSkillsCount: [],
+			jobs: []
 		};
 	}
 };
