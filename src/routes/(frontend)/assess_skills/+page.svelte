@@ -246,7 +246,7 @@
 {/if}
 
 <div
-	class="min-h-screen bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] text-[#443210] antialiased"
+	class="min-h-screen bg-gradient-to-b bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] from-gray-50/50 to-gray-100/30 bg-[size:24px_24px] py-16"
 >
 	<main class="container mx-auto max-w-7xl space-y-10 px-4 py-8 md:px-8">
 		<section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -320,7 +320,7 @@
 							bind:value={selectedCareerId}
 							class="w-full appearance-none rounded-xl border border-[#DCA11D] bg-[#ffffff] py-3 pr-10 pl-4 text-sm font-bold text-[#443210] shadow-sm transition-all focus:border-[#DCA11D] focus:ring-1 focus:ring-[#DCA11D] focus:outline-none"
 						>
-							<option value='' disabled>-- กรุณาเลือกตำแหน่งงาน --</option>
+							<option value="" disabled>-- กรุณาเลือกตำแหน่งงาน --</option>
 							{#each joblist as job (job.job_id)}
 								<option value={String(job.job_id)}>{job.name_job}</option>
 							{/each}

@@ -17,7 +17,7 @@
 <svelte:head><title>เข้าสู่ระบบ</title></svelte:head>
 
 <article
-	class="flex min-h-screen items-center justify-center bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] p-4"
+	class="flex min-h-screen items-center justify-center bg-gradient-to-b from-gray-50/50 to-gray-100/30 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] p-4"
 >
 	<article
 		class="w-full max-w-lg overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl"

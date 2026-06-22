@@ -26,7 +26,7 @@
 <svelte:head><title>Skill Mapping | RMUTL</title></svelte:head>
 
 <div
-	class="min-h-screen bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"
+	class="min-h-screen bg-gradient-to-b from-gray-50/50 to-gray-100/30 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] py-16"
 >
 	<div class="mx-auto max-w-6xl space-y-6 px-4 py-6">
 		<div class="flex justify-center">

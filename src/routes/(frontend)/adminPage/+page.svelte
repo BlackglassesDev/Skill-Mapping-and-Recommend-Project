@@ -29,119 +29,106 @@
     const curriculumPath = resolve('/curriculum');
     const manageSkillsPath = resolve('/manage_global_skills');
 
-    // 🗂️ 2. ก้อนข้อมูลการ์ดเมนู เพื่อเอาไปวนลูปแสดงผล
+    // 🗂️ 2. ก้อนข้อมูลการ์ดเมนูสไตล์ 3D นุ่มละมุน (คุมดีไซน์ตามรูปแบบของพี่)
     const adminCards = [
         {
-            title: 'ภาพรวมระบบ (Dashboard)',
-            description: 'ดูสถิติผู้ใช้งานรายบุคคล สรุปจำนวนอาจารย์ นักศึกษา และกราฟวิเคราะห์ทักษะภาพรวม',
+            title: 'ภาพรวมระบบ',
+            subTitle: 'Dashboard',
+            description: 'ตรวจสอบผลและสถิติการใช้งานแต่ละภาคเรียน หน่วยกิตภาพรวม และกราฟวิเคราะห์ทักษะสะสมรายบุคคล',
             icon: '📊',
             href: dashboardPath,
-            bgHover: 'hover:border-[#dca11d] hover:shadow-lg hover:shadow-[#dca11d]/5'
+            iconBg: 'bg-emerald-50 text-emerald-500'
         },
         {
             title: 'จัดการผู้ใช้งาน',
-            description: 'เพิ่ม บล็อก หรือแก้ไขสิทธิ์ผู้ใช้งาน (Student / Teacher / Admin) และระบบ Import Excel',
+            subTitle: 'User Management',
+            description: 'ระบบจัดการบัญชีผู้ใช้งาน ค้นหาประวัติ ตรวจสอบชั่วโมง และเครื่องมือนำเข้าข้อมูลผ่าน Excel',
             icon: '👥',
             href: manageUsersPath,
-            bgHover: 'hover:border-[#dca11d] hover:shadow-lg hover:shadow-[#dca11d]/5'
+            iconBg: 'bg-blue-50 text-blue-500'
         },
         {
             title: 'ข้อมูลหลักสูตร',
-            description: 'จัดการโครงสร้างหลักสูตรวิศวกรรมคอมพิวเตอร์ เพิ่มปีหลักสูตร และหมวดหมู่กลุ่มวิชา',
+            subTitle: 'Curriculum Management',
+            description: 'กำหนดการและโครงสร้างวิศวกรรมคอมพิวเตอร์ จัดหมวดหมู่รายวิชาบังคับและวิชาเลือก',
             icon: '🗺️',
             href: curriculumPath,
-            bgHover: 'hover:border-[#dca11d] hover:shadow-lg hover:shadow-[#dca11d]/5'
+            iconBg: 'bg-amber-50 text-amber-500'
         },
         {
             title: 'คลังทักษะมาตรฐาน',
-            description: 'กำหนดชุดทักษะ (Skill Matrix) กลางของภาควิชา เพื่อให้อาจารย์นำไปจับคู่กับรายวิชา',
+            description: 'กำหนดเกณฑ์และชุดทักษะความเชี่ยวชาญกลาง เพื่อใช้เทียบโยงและประเมินผลระดับคณะ',
+            subTitle: 'Skill Framework',
             icon: '🎯',
             href: manageSkillsPath,
-            bgHover: 'hover:border-[#dca11d] hover:shadow-lg hover:shadow-[#dca11d]/5'
+            iconBg: 'bg-rose-50 text-rose-500'
         }
     ];
 </script>
 
 <div 
-    class="fixed top-20 left-0 right-0 z-50 flex justify-center p-4 transition-all duration-500 ease-out pointer-events-none"
+    class="fixed top-6 left-0 right-0 z-50 flex justify-center p-4 transition-all duration-500 ease-out pointer-events-none"
     class:translate-y-0={showMessage}
-    class:-translate-y-full={!showMessage}
+    class:-translate-y-20={!showMessage}
     class:opacity-100={showMessage}
     class:opacity-0={!showMessage}
 >
-    <div class="pointer-events-auto flex items-center gap-3 rounded-full bg-[#443210] px-6 py-3 text-sm font-medium text-white shadow-xl border border-[#dca11d]/30">
-        <span class="text-base">🔔</span>
-        <span>{alertMessage}</span>
+    <div class="pointer-events-auto flex items-center gap-3 rounded-2xl bg-white px-5 py-3.5 text-sm font-semibold text-[#443210] shadow-xl border border-gray-100 max-w-md">
+        <span class="flex h-6 w-6 items-center justify-center rounded-full bg-[#dca11d]/10 text-base">🔔</span>
+        <span class="flex-1 text-gray-700">{alertMessage}</span>
         <button 
             onclick={() => showMessage = false} 
-            class="ml-3 text-[#dca11d] hover:text-white transition-colors font-bold text-xs"
+            class="text-gray-400 hover:text-gray-600 transition-colors ml-2 p-1 text-xs"
         >
             ✕
         </button>
     </div>
 </div>
 
-<div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-    <div class="mb-8 text-center md:text-left">
-        <div class="flex flex-col items-center gap-2 md:flex-row md:gap-4">
-            <div
-                class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#443210] text-xl text-[#dca11d] shadow-md"
-            >
-                🛠️
+<div class="min-h-screen bg-gradient-to-b from-gray-50/50 to-gray-100/30 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] py-16">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+        
+        <div class="mb-14 text-center">
+            <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-2xl shadow-sm border border-gray-100 mb-4">
+                ⚙️
             </div>
-            <div>
-                <h1 class="text-3xl font-black text-[#443210] md:text-4xl">
-                    แผงควบคุม <span class="text-[#dca11d]">ผู้ดูแลระบบ</span>
-                </h1>
-                <p class="mt-1 text-sm font-light text-gray-500 md:text-base">
-                    CPE Skill Mapping Management Console — เลือกเมนูที่ต้องการเพื่อเริ่มจัดการข้อมูล
-                </p>
-            </div>
+            <h1 class="text-3xl font-extrabold tracking-tight text-[#443210] sm:text-4xl">
+                แผงควบคุม<span class="text-[#dca11d]">ผู้ดูแลระบบ</span>
+            </h1>
+            <p class="mx-auto mt-2 max-w-xl text-sm font-normal text-gray-400 leading-relaxed">
+                CPE Skill Mapping Console — แหล่งรวมระบบทางลัดสำหรับจัดการข้อมูลหลักสูตรและสมาชิก
+            </p>
+            <div class="mx-auto mt-6 h-1 w-12 rounded-full bg-gray-200"></div>
         </div>
-    </div>
 
-    <hr class="mb-10 border-gray-200" />
-
-    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {#each adminCards as card (card.title)}
-            <a
-                href={card.href}
-                class="group flex flex-col justify-between rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 {card.bgHover}"
-            >
-                <div>
-                    <div
-                        class="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#443210]/5 text-3xl transition-transform duration-300 group-hover:scale-110"
-                    >
-                        {card.icon}
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {#each adminCards as card (card.title)}
+                <a
+                    href={card.href}
+                    class="group relative flex flex-col items-center rounded-[28px] border border-gray-200 bg-white p-8 text-center shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1.5 hover:border-[#dca11d]/40 hover:shadow-[0_12px_30px_-6px_rgba(220,161,29,0.12)]"
+                >
+                    <div class="flex h-24 w-24 items-center justify-center rounded-full shadow-inner text-4xl transition-transform duration-500 ease-out group-hover:scale-110 {card.iconBg}">
+                        <span class="drop-shadow-md">{card.icon}</span>
                     </div>
 
-                    <h3
-                        class="mt-5 text-xl font-bold text-[#443210] transition-colors group-hover:text-[#dca11d]"
-                    >
+                    <h3 class="mt-6 text-lg font-black text-[#443210] tracking-tight group-hover:text-[#dca11d] transition-colors">
                         {card.title}
                     </h3>
+                    
+                    {#if card.subTitle}
+                        <span class="text-[11px] font-bold tracking-widest text-gray-300 uppercase mt-0.5">{card.subTitle}</span>
+                    {/if}
 
-                    <p class="mt-2 text-sm leading-relaxed font-light text-gray-500">
+                    <p class="mt-3 text-xs font-normal leading-relaxed text-gray-400">
                         {card.description}
                     </p>
-                </div>
+                    
+                    <div class="mt-auto pt-6 text-[11px] font-bold tracking-wider text-gray-300 uppercase group-hover:text-[#dca11d] transition-colors">
+                        Click to manage →
+                    </div>
+                </a>
+            {/each}
+        </div>
 
-                <div
-                    class="mt-8 flex items-center text-sm font-semibold text-[#443210] transition-colors group-hover:text-[#dca11d]"
-                >
-                    <span>จัดการระบบ</span>
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="ml-1.5 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1.5"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                    >
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                </div>
-            </a>
-        {/each}
     </div>
 </div>

@@ -38,7 +38,7 @@
 <svelte:head><title>Skill Mapping | RMUTL | Home</title></svelte:head>
 
 <div
-	class="min-h-screen bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"
+	class="min-h-screen bg-gradient-to-b bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] from-gray-50/50 to-gray-100/30 bg-[size:24px_24px] py-16"
 >
 	<div class="mx-auto max-w-6xl space-y-20 px-4 py-10 md:py-16">
 		<section class="space-y-4 text-center">
@@ -159,7 +159,7 @@
 
 			<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
 				{#each displayCourses as course (course.course_id)}
-				{@const currentSkills = courseSkillsList.filter(s => s.course_id === course.course_id)}
+					{@const currentSkills = courseSkillsList.filter((s) => s.course_id === course.course_id)}
 					<button
 						type="button"
 						onclick={() => info_subject(course.course_id)}
