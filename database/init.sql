@@ -42,10 +42,32 @@ CREATE TABLE courses (
 
 INSERT INTO courses (course_code, course_name, credits, curriculum_id)
 -- รหัสวิชา   ชื่อวิชา   หน่วยกิต  ไอดีหลักสูตร
-VALUES ('CPE101', 'Computer Programming', 3, 1),
-    ('CPE102', 'Digital Logic Design', 3, 1),
-    ('IT201', 'Database Systems', 3, 1),
-    ('GEN101', 'English for Communication', 2, 1),
+VALUES ('ENGCC304', 'Computer Programming', 3, 1),
+    ('ENGEE105', 'Fundamental of Engineering Training', 1, 1),
+    ('ENGEE106', 'Electrical Instruments and Measurements', 3, 1),
+    ('ENGEE160', 'Engineering Electronics', 3, 1),
+    ('ENGEE161', 'Digital Circuits and Logic Design', 3, 1),
+    ('ENGEE501', 'Electric Circuits', 3, 1),
+    ('ENGCE106', 'Data Communication and Networks', 3, 1),
+    ('ENGCE110', 'Computer and Data Security', 3, 1),
+    ('ENGCE117', 'Computer Programming for Computer Engineer', 3, 1),
+    ('ENGCE120', 'Basic Computer Engineering Skills', 2, 1),
+    ('ENGCE121', 'Computer Architecture and Organization', 3, 1),
+    ('ENGCE122', 'Microprocessors and Interface', 3, 1),
+    ('ENGCE123', 'Embedded Systems and Internet of Everything', 3, 1),
+    ('ENGCE124', 'Data Structures and Algorithms', 3, 1),
+    ('ENGCE125', 'Operating Systems', 3, 1),
+    ('ENGCE126', 'Database Systems', 3, 1),
+    ('ENGCE127', 'System Analysis and Design', 3, 1),
+    ('ENGCE200', 'Digital Systems Design', 3, 1),
+    ('ENGCE400', 'Introduction to Artificial Intelligence and Machine Learning', 3, 1),
+    ('ENGCE109', 'Computer Networks', 3, 1),
+    ('ENGCE134', 'Network Security', 3, 1),
+    ('ENGCE174', 'Object-Oriented Programming', 3, 1),
+    ('ENGCE301', 'Software Design and Development', 3, 1),
+    ('ENGCE306', 'Web Programming', 3, 1),
+    ('ENGCE309', 'Cloud Computing', 3, 1),
+    ('ENGCE310', 'Cloud Application Development', 3, 1),
 
     ('GEN101', 'test for Communication', 3, 2);
 
