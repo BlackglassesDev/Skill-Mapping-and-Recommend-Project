@@ -28,6 +28,9 @@
     const manage_skill = resolve('/manage_skill');
     const overview = resolve('/overview');
 
+    //admin
+    const adminPage = resolve('/adminPage');
+
     // Logic สำหรับเมนูมือถือ
     let isMenuOpen = $state(false);
     function toggleMenu() {
@@ -61,7 +64,7 @@
                     {/if}
 
                     {#if sid.role === 'admin'}
-                        <a href={homePath} class="transition-colors hover:text-[#dca11d]">แอด</a>
+                        <a href={adminPage} class="transition-colors hover:text-[#dca11d]">หน้าหลักแอดมิน</a>
                         <a href={curriculum} class="transition-colors hover:text-[#dca11d]">ข้อมูลหลักสูตร</a>
                     {/if}
 
@@ -135,7 +138,8 @@
                 {/if}
 
                 {#if sid.role === 'admin'}
-                    <a href={homePath} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}>แอด</a>
+                    <a href={adminPage} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}>หน้าหลักแอดมิน</a>
+                    <a href={homePath} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}>หน้าหลักแอดมิน</a>
                     <a href={curriculum} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}>ข้อมูลหลักสูตร</a>
                 {/if}
 
