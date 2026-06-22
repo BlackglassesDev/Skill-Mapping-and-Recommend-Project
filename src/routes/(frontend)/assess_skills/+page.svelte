@@ -243,16 +243,16 @@
 	</div>
 {/if}
 
-<div class="min-h-screen bg-[#FAF9F6] text-[#443210] antialiased">
+<div class="min-h-screen bg-slate-50 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px] text-[#443210] antialiased">
 	<main class="container mx-auto max-w-7xl space-y-10 px-4 py-8 md:px-8">
 		<section class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
 			<div
-				class="flex items-center gap-5 rounded-2xl border border-gray-200 bg-[#FAF9F6] p-6 shadow-sm transition-all hover:shadow-md"
+				class="flex items-center gap-5 rounded-2xl border border-[#DCA11D] bg-[#ffffff] p-6 shadow-sm transition-all hover:shadow-md"
 			>
 				<div
 					class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#DCA11D] bg-[#DCA11D] text-3xl font-bold text-white shadow-md md:h-20 md:w-20 md:text-4xl"
 				>
-					รอกรอก
+					{data.completedCoursesCount || 0}
 				</div>
 				<div>
 					<h4 class="text-sm font-medium tracking-wider text-gray-500 uppercase">
@@ -263,7 +263,7 @@
 			</div>
 
 			<div
-				class="flex items-center gap-5 rounded-2xl border border-gray-200 bg-[#FAF9F6] p-6 shadow-sm transition-all hover:shadow-md"
+				class="flex items-center gap-5 rounded-2xl border border-[#DCA11D] bg-[#ffffff] p-6 shadow-sm transition-all hover:shadow-md"
 			>
 				<div
 					class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#DCA11D] bg-[#DCA11D] text-3xl font-bold text-white shadow-md md:h-20 md:w-20 md:text-4xl"
@@ -279,7 +279,7 @@
 			</div>
 
 			<div
-				class="flex flex-col justify-center rounded-2xl border border-gray-200 bg-[#FAF9F6] p-6 shadow-sm transition-all hover:shadow-md sm:col-span-2 lg:col-span-1"
+				class="flex flex-col justify-center rounded-2xl border border-[#DCA11D] bg-[#ffffff] p-6 shadow-sm transition-all hover:shadow-md sm:col-span-2 lg:col-span-1"
 			>
 				<div class="space-y-3">
 					<div class="flex items-start gap-2">
@@ -314,7 +314,7 @@
 						<select
 							id="career-dropdown"
 							// bind:value={selectedCareer}     รอกรอกยังไม่ได้ทำ
-							class="w-full appearance-none rounded-xl border border-gray-300 bg-[#FAF9F6] py-3 pr-10 pl-4 text-sm font-bold text-[#443210] shadow-sm transition-all focus:border-[#DCA11D] focus:ring-1 focus:ring-[#DCA11D] focus:outline-none"
+							class="w-full appearance-none rounded-xl border border-[#DCA11D] bg-[#ffffff] py-3 pr-10 pl-4 text-sm font-bold text-[#443210] shadow-sm transition-all focus:border-[#DCA11D] focus:ring-1 focus:ring-[#DCA11D] focus:outline-none"
 						>
 							<option value="Full-Stack Developer">Full-Stack Developer</option>
 							<option value="Data Scientist">Data Scientist</option>
@@ -341,7 +341,7 @@
 					</div>
 				</div>
 
-				<div class="rounded-2xl border border-gray-200 bg-[#FAF9F6] p-6 shadow-sm">
+				<div class="rounded-2xl border border-[#DCA11D] bg-[#ffffff] p-6 shadow-sm">
 					<h3 class="text-sm font-bold tracking-wider text-gray-400 uppercase">
 						ทักษะที่ต้องศึกษาเพิ่ม
 					</h3>
@@ -357,7 +357,7 @@
 				<h3 class="mb-4 text-base font-bold text-[#443210]/90">กราฟวิเคราะห์ทักษะ (Radar Chart)</h3>
 
 				<div
-					class="flex h-64 w-full items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-[#FAF9F6]"
+					class="flex h-64 w-full items-center justify-center rounded-xl border-2 border-dashed border-gray-200 bg-gray-100"
 				>
 					<p class="text-sm font-medium text-gray-400 italic">
 						[ ส่วนสำหรับเรนเดอร์ Radar Chart Canvas ]
