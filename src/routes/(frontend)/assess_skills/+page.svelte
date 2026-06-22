@@ -268,7 +268,7 @@
 				<div
 					class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-[#DCA11D] bg-[#DCA11D] text-3xl font-bold text-white shadow-md md:h-20 md:w-20 md:text-4xl"
 				>
-					รอกรอกทักษะ
+					{data.passedSkillsCount || 0}
 				</div>
 				<div>
 					<h4 class="text-sm font-medium tracking-wider text-gray-500 uppercase">

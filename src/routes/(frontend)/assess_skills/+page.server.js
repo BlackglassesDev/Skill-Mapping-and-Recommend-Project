@@ -1,12 +1,5 @@
-
-
-
 //         ตอนนี้ต้องแก้เรื่อง
 //  ผู้ใช้เปลี่ยนหลักสูตรแล้ว นับข้อมูลวิชาของหลักสูตรเก่า
-
-
-
-
 
 import { pool } from '$lib/server/db.js';
 import { fail } from '@sveltejs/kit';
@@ -21,7 +14,8 @@ export const load = async ({ locals }) => {
 			users: [],
 			allCourse: [],
 			savedGrades: [],
-            completedCoursesCount: []
+			passedSkillsCount: [],
+			completedCoursesCount: []
 		};
 	}
 
@@ -50,7 +44,8 @@ export const load = async ({ locals }) => {
 		);
 
 		let savedGrades = [];
-        let completedCoursesCount = 0;
+		let completedCoursesCount = 0;
+		let passedSkillsCount = 0;
 		if (userId) {
 			// เอาคำว่า const ออก แล้วเปลี่ยนไปยัดค่าใส่ตัวแปร savedGrades ตรงๆ เลยครับ
 			const [gradeRows] = await pool.execute(
@@ -58,18 +53,29 @@ export const load = async ({ locals }) => {
 				[userId]
 			);
 
-            const [countRows] = await pool.execute(
+			const [countRows] = await pool.execute(
 				`SELECT COUNT(*) AS total
                 FROM student_grades sg
 				INNER JOIN courses c ON sg.course_id = c.course_id
                 WHERE sg.user_id = ? AND grade_letter NOT IN ('NOT_TAKEN', 'F') AND c.curriculum_id = ?`,
-				[userId,userCurriculumId]
+				[userId, userCurriculumId]
 			);
+
+			const [skillCountRows] = await pool.execute(
+				`SELECT COUNT(DISTINCT cs.skill_id) AS total_skills
+                FROM student_grades sg
+                INNER JOIN course_skills cs ON sg.course_id = cs.course_id
+                WHERE sg.user_id = ? 
+                AND sg.grade_letter NOT IN ('NOT_TAKEN', 'F')`,
+				[userId]
+			);
+			// @ts-ignore
+			passedSkillsCount = skillCountRows[0] ? skillCountRows[0].total_skills : 0;
 
 			//@ts-ignore
 			savedGrades = gradeRows;
-            // @ts-ignore
-            completedCoursesCount = countRows[0] ? countRows[0].total : 0;
+			// @ts-ignore
+			completedCoursesCount = countRows[0] ? countRows[0].total : 0;
 		}
 
 		// 6. ส่งค่าทั้งหมดกลับไปที่หน้าบ้าน (+page.svelte)
@@ -79,7 +85,8 @@ export const load = async ({ locals }) => {
 			users: rows_user, // ข้อมูล users
 			allCourses: courseRows, // ดึงวิชาทุกหลักสูตร
 			savedGrades: savedGrades,
-            completedCoursesCount: completedCoursesCount,
+			completedCoursesCount: completedCoursesCount,
+			passedSkillsCount: passedSkillsCount,
 			curriculum: JSON.parse(JSON.stringify(curriculumRows)) // รายชื่อหลักสูตรทั้งหมดในตาราง curriculum
 		};
 	} catch (error) {
@@ -91,7 +98,8 @@ export const load = async ({ locals }) => {
 			users: [],
 			allCourse: [],
 			savedGrades: [],
-            completedCoursesCount: []
+			completedCoursesCount: [],
+			passedSkillsCount: []
 		};
 	}
 };
