@@ -1,6 +1,3 @@
-//         ตอนนี้ต้องแก้เรื่อง
-//  ผู้ใช้เปลี่ยนหลักสูตรแล้ว นับข้อมูลวิชาของหลักสูตรเก่า
-
 import { pool } from '$lib/server/db.js';
 import { fail } from '@sveltejs/kit';
 
