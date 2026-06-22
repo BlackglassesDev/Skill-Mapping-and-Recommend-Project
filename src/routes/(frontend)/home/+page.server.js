@@ -18,15 +18,24 @@ export async function load({ url }) {
 				'SELECT job_id, name_job FROM job WHERE curriculum_id = ?',[id]
 			);
 
+			const [course_skills] = await pool.execute(
+				`SELECT cs.course_id, s.skill_name FROM course_skills cs
+				INNER JOIN skills s ON cs.skill_id = s.skill_id
+				INNER JOIN courses c ON cs.course_id = c.course_id
+				WHERE c.curriculum_id = ?`,[id]
+			);
+
 			return {
 				courses: rows,
-				jobs: jobRows
+				jobs: jobRows,
+				course_skills: course_skills
 			};
 		}catch(error){
 			console.log('Error: Check Curriculum', error);
 			return {
 				courses: [],
-				jobs: []
+				jobs: [],
+				course_skills: []
 			};
 		}
 	}

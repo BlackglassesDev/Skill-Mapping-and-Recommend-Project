@@ -18,6 +18,7 @@
 	let jobs_more = $state(false);
 	/** @type {any[]} */
 	let selectedJobSkills = $state([]); // ตัวแปรเก็บรายการ Skill ที่ดึงมา
+	let courseSkillsList = $derived(Array.isArray(data.course_skills) ? data.course_skills : []);
 
 	// ข้อมูลจำลองสำหรับวนลูป
 	const steps = [
@@ -157,6 +158,7 @@
 
 			<div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
 				{#each displayCourses as course (course.course_id)}
+				{@const currentSkills = courseSkillsList.filter(s => s.course_id === course.course_id)}
 					<button
 						type="button"
 						onclick={() => info_subject(course.course_id)}
@@ -179,7 +181,13 @@
 							<span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase"
 								>Skills</span
 							>
-							<p class="mt-0.5 line-clamp-1 text-xs font-medium text-[#443210]/70 italic">111111</p>
+							{#if currentSkills.length > 0}
+								<p class="mt-0.5 line-clamp-1 text-xs font-medium text-[#443210]/70 italic">
+									{currentSkills.map((s) => s.skill_name).join(', ')}
+								</p>
+							{:else}
+								<p class="mt-0.5 text-xs font-medium text-gray-400 italic">ไม่มีข้อมูลทักษะ</p>
+							{/if}
 						</div>
 					</button>
 				{/each}
@@ -244,12 +252,10 @@
 
 			{#each selectedJobSkills as item, i (i)}
 				<div
-					class="group mb-3 rounded-xl border border-amber-500/60 bg-[#ffffff] p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-1"
+					class="group mb-3 rounded-xl border border-amber-500/60 bg-[#ffffff] p-4 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
 				>
 					<div class="flex items-center justify-between gap-3">
-						<p
-							class="text-base font-bold text-[#443210] transition-colors md:text-lg"
-						>
+						<p class="text-base font-bold text-[#443210] transition-colors md:text-lg">
 							{item.skill_name}
 						</p>
 
