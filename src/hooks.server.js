@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'; // 1. นำเข้า JWT
 import { env } from '$env/dynamic/private'; // 2. นำเข้า Secret Key
+import { redirect } from '@sveltejs/kit';
 
 export const handle = async ({ event, resolve }) => {
     // กำหนดค่าเริ่มต้นไว้ก่อนเลย เพื่อความชัวร์
@@ -31,6 +32,19 @@ export const handle = async ({ event, resolve }) => {
         // ลบคุกกี้ทิ้งถ้ามันใช้งานไม่ได้ เพื่อให้ User ต้องล็อกอินใหม่
         event.cookies.delete('session', { path: '/' });
         event.locals.user = null;
+    }
+
+    /////////////   check role middleware    /////////////
+
+    const userRole = event.locals.user?.role;
+
+    const currentPath = event.url.pathname;
+    const isAdminPage = currentPath.startsWith('/adminPage') ||
+    currentPath.startsWith('/manage_users');
+    if(isAdminPage){
+        if(userRole !== 'admin'){
+            throw redirect(303,'/');
+        }
     }
 
     return resolve(event);
