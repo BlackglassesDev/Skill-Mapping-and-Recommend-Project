@@ -26,7 +26,7 @@
 	// 🔗 1. ประกาศ Path ลิงก์ปลายทางของแต่ละหน้า
 	const dashboardPath = resolve('/admin_dashboard');
 	const manageUsersPath = resolve('/manage_users');
-	const curriculumPath = resolve('/curriculum');
+	const curriculumPath = resolve('/curriculums_manage');
 	const manageSkillsPath = resolve('/manage_global_skills');
 
 	// 🗂️ 2. ก้อนข้อมูลการ์ดเมนูสไตล์ 3D นุ่มละมุน (ปรับคู่สีไอคอนให้เข้มคมชัดขึ้น)
