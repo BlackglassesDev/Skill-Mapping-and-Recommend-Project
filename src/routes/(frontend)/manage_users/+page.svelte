@@ -1,6 +1,5 @@
 <script>
-	import { resolve } from '$app/paths';
-	import { enhance } from '$app/forms'; // 🌟 ใช้สำหรับทำให้ฟอร์มส่งค่าแบบนุ่มนวล ไม่ต้องรอโหลดหน้าใหม่เต็ม ๆ
+	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 
 	//รับข้อมูลที่ส่งมาจาก +page.server.js ผ่าน data prop
@@ -89,13 +88,13 @@
 			</div>
 
 			<div class="flex w-full flex-wrap justify-center gap-3 md:w-auto">
-				<a
-					href="/api/export-users"
-					download
-					class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-5 py-2.5 text-center text-sm font-bold text-[#443210] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50 sm:w-auto"
+				<button
+					type="button"
+					onclick={() => window.open('/api/export-users', '_blank')}
+					class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-[#443210] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50 sm:w-auto"
 				>
-					📤 ส่งออกข้อมูล (Export CSV)
-				</a>
+					📥 ส่งออกข้อมูล (Export CSV)
+				</button>
 				<!-- <button
 					class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_12px_rgba(68,50,16,0.2)] transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:bg-[#443210]/90 hover:text-[#dca11d] sm:w-auto"
 				>

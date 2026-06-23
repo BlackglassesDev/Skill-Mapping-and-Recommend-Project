@@ -10,7 +10,7 @@ export async function load() {
                 u.username,
                 u.email,
                 u.role,
-                cl.curriculum_name AS department -- 🌟 เติมคอมมาด้านบน และใช้ AS เปลี่ยนชื่อให้ตรงกับหน้าบ้าน
+                cl.curriculum_name AS department
             FROM users u
             LEFT JOIN curriculum cl ON u.curriculum_id = cl.curriculum_id` // LEFT JOIN เผื่อกรณีแอดมินไม่มี curriculum_id จะได้ไม่หลุดหายไปจากตาราง
         );
@@ -38,8 +38,8 @@ export const actions = {
         try {
             // ทำการ UPDATE ข้อมูลลงตาราง users บน MySQL
             await pool.execute(
-                `UPDATE users 
-                SET username = ?, email = ?, full_name = ?, role = ? 
+                `UPDATE users
+                SET username = ?, email = ?, full_name = ?, role = ?
                 WHERE id = ?`,
                 [username, email, full_name, role, id]
             );
