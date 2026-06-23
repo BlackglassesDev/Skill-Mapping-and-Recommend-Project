@@ -2,16 +2,20 @@
 	//@ts-nocheck
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
-	import { resolve } from '$app/paths'; // เพิ่มตัวจัดการ path สำหรับปุ่มย้อนกลับ
+	import { resolve } from '$app/paths';
 
-	//รับข้อมูลที่ส่งมาจาก +page.server.js ผ่าน data prop
+	// รับข้อมูลที่ส่งมาจาก +page.server.js ผ่าน data prop
 	let { data } = $props();
 
-	//สถานะการค้นหาและตัวกรอง
+	// สถานะการค้นหาและตัวกรอง
 	let searchQuery = $state('');
 	let selectedRole = $state('all');
 
-	//นำข้อมูลจาก DB มาตั้งต้นใน $state (จะอัปเดตอัตโนมัติเมื่อ Server ดึงข้อมูลให้ใหม่)
+	// ระบบ Pagination State
+	let currentPage = $state(1);
+	let itemsPerPage = $state(10); // แสดงหน้าละ 10 รายการ
+
+	// นำข้อมูลจาก DB มาตั้งต้นใน $state
 	let users = $derived(data?.users ?? []);
 
 	// State สำหรับควบคุม Modal แก้ไขข้อมูล
@@ -28,10 +32,10 @@
 	let isDeleteModalOpen = $state(false);
 	let userToDelete = $state({ id: '', full_name: '', username: '' });
 
-	// ตัวแปร path ย้อนกลับสไตล์เดียวกับหน้าก่อนหน้านี้
+	// ตัวแปร path ย้อนกลับ
 	let adminPage = resolve('/adminPage');
 
-	// โลจิกคำนวณสถิติตัวเลขด่วน
+	// โลจิกคำนวณสถิติตัวเลขด่วน (คิดจากทั้งหมดในระบบ)
 	let totalUsers = $derived(users.length);
 	let totalStudents = $derived(users.filter((u) => u.role?.toLowerCase() === 'student').length);
 	let totalTeachers = $derived(users.filter((u) => u.role?.toLowerCase() === 'teacher').length);
@@ -53,7 +57,22 @@
 		})
 	);
 
-	//ฟังก์ชันเปิด Modal พร้อมโหลดข้อมูลผู้ใช้เข้าฟอร์ม
+	// รีเซ็ตหน้ากลับไปหน้า 1 เสมอเมื่อมีการค้นหาหรือเปลี่ยนตัวกรอง
+	$effect(() => {
+		searchQuery;
+		selectedRole;
+		currentPage = 1;
+	});
+
+	// คำนวณ Pagination จากข้อมูลที่กรองแล้ว
+	let totalPages = $derived(Math.max(1, Math.ceil(filteredUsers.length / itemsPerPage)));
+
+	// ตัดข้อมูลเฉพาะหน้าที่จะแสดงผล
+	let paginatedUsers = $derived(
+		filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+	);
+
+	// ฟังก์ชันเปิด Modal พร้อมโหลดข้อมูลผู้ใช้เข้าฟอร์ม
 	function openEditModal(user) {
 		editingUser = {
 			id: user.id,
@@ -218,7 +237,7 @@
 						</tr>
 					</thead>
 					<tbody class="divide-y-2 divide-gray-100 text-sm font-medium">
-						{#each filteredUsers as user (user.id)}
+						{#each paginatedUsers as user (user.id)}
 							<tr class="transition-colors hover:bg-gray-50/60">
 								<td class="px-6 py-4 whitespace-nowrap">
 									<div class="font-black text-[#443210]">{user.id}</div>
@@ -301,10 +320,53 @@
 					</tbody>
 				</table>
 			</div>
+
 			<div
-				class="flex items-center justify-between border-t-2 border-gray-100 bg-gray-50/50 px-6 py-4 text-xs font-bold text-gray-400"
+				class="flex flex-col items-center justify-between gap-4 border-t-2 border-gray-100 bg-gray-50/50 px-6 py-4 text-xs font-bold text-gray-400 sm:flex-row"
 			>
-				<span>แสดงผล {filteredUsers.length} จากทั้งหมด {users.length} รายการ</span>
+				<span class="text-gray-600">
+					แสดงข้อมูลหน้า <span class="font-black text-[#443210]">{currentPage}</span>
+					จากทั้งหมด <span class="font-black text-[#443210]">{totalPages}</span> หน้า (รวม {filteredUsers.length}
+					รายการ)
+				</span>
+
+				<div class="flex items-center gap-2">
+					<button
+						type="button"
+						disabled={currentPage === 1}
+						onclick={() => (currentPage = 1)}
+						class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-400 shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
+					>
+						«
+					</button>
+
+					<button
+						type="button"
+						disabled={currentPage === 1}
+						onclick={() => currentPage--}
+						class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 text-sm font-bold text-gray-500 shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
+					>
+						◀ ก่อนหน้า
+					</button>
+
+					<button
+						type="button"
+						disabled={currentPage === totalPages}
+						onclick={() => currentPage++}
+						class="inline-flex h-9 items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-4 text-sm font-bold text-[#443210] shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
+					>
+						ถัดไป ▶
+					</button>
+
+					<button
+						type="button"
+						disabled={currentPage === totalPages}
+						onclick={() => (currentPage = totalPages)}
+						class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-gray-200 bg-white text-sm font-bold text-gray-400 shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
+					>
+						»
+					</button>
+				</div>
 			</div>
 		</div>
 	</div>
