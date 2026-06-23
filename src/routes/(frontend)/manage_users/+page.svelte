@@ -1,7 +1,8 @@
 <script>
-//@ts-nocheck
+	//@ts-nocheck
 	import { enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
+	import { resolve } from '$app/paths'; // เพิ่มตัวจัดการ path สำหรับปุ่มย้อนกลับ
 
 	//รับข้อมูลที่ส่งมาจาก +page.server.js ผ่าน data prop
 	let { data } = $props();
@@ -26,6 +27,9 @@
 
 	let isDeleteModalOpen = $state(false);
 	let userToDelete = $state({ id: '', full_name: '', username: '' });
+
+	// ตัวแปร path ย้อนกลับสไตล์เดียวกับหน้าก่อนหน้านี้
+	let adminPage = resolve('/adminPage');
 
 	// โลจิกคำนวณสถิติตัวเลขด่วน
 	let totalUsers = $derived(users.length);
@@ -73,34 +77,52 @@
 </script>
 
 <div
-	class="min-h-screen bg-gray-50 bg-[linear-gradient(to_right,#80808018_1px,transparent_1px),linear-gradient(to_bottom,#80808018_1px,transparent_1px)] bg-[size:24px_24px] py-12"
+	class="min-h-screen bg-gray-50 bg-[linear-gradient(to_right,#80808018_1px,transparent_1px),linear-gradient(to_bottom,#80808018_1px,transparent_1px)] bg-[size:24px_24px] py-16"
 >
 	<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-		<div
-			class="mb-10 flex flex-col items-center justify-between gap-6 rounded-[24px] border-2 border-gray-200/80 bg-white p-6 shadow-[0_8px_24px_rgba(0,0,0,0.04)] md:flex-row md:items-center"
-		>
-			<div class="text-center md:text-left">
-				<h1 class="text-3xl font-black text-[#443210] md:text-4xl">
-					จัดการ<span class="text-[#dca11d]">ผู้ใช้งานระบบ</span>
-				</h1>
-				<p class="mt-2 text-sm font-medium text-gray-500">
-					ข้อมูลผู้ใช้งานจริงจากระบบฐานข้อมูล — สามารถค้นหา คัดกรอง และจำแนกสังกัดแผนกได้ทันที
-				</p>
-			</div>
+		<div class="mb-8 rounded-3xl border-2 border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+			<div
+				class="flex flex-col items-center gap-5 text-center md:flex-row md:items-start md:gap-6 md:text-left"
+			>
+				<div
+					class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-amber-100 bg-amber-50 text-2xl text-[#dca11d] shadow-sm"
+				>
+					👥
+				</div>
 
-			<div class="flex w-full flex-wrap justify-center gap-3 md:w-auto">
-				<button
-					type="button"
-					onclick={() => window.open('/api/export-users', '_blank')}
-					class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-[#443210] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50 sm:w-auto"
-				>
-					📥 ส่งออกข้อมูล (Export CSV)
-				</button>
-				<!-- <button
-					class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-sm font-bold text-white shadow-[0_4px_12px_rgba(68,50,16,0.2)] transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:bg-[#443210]/90 hover:text-[#dca11d] sm:w-auto"
-				>
-					➕ เพิ่มผู้ใช้ใหม่
-				</button> -->
+				<div class="flex-1 space-y-1.5">
+					<h1 class="text-2xl font-extrabold tracking-tight text-[#443210] sm:text-3xl">
+						จัดการ<span class="text-[#dca11d]">ผู้ใช้งานระบบ</span>
+					</h1>
+					<p class="max-w-2xl text-sm leading-relaxed font-medium text-gray-500">
+						User Management — ข้อมูลผู้ใช้งานจริงจากระบบฐานข้อมูล สามารถตรวจสอบ ค้นหา
+						และปรับปรุงบทบาทสังกัดของผู้ใช้งานในระบบ Skill Mapping ได้ทันที
+					</p>
+
+					<div
+						class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-red-100 bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-600"
+					>
+						<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500"></span>
+						Admin Mode Only
+					</div>
+				</div>
+
+				<div class="flex w-full shrink-0 flex-col gap-3 pt-2 md:w-auto md:items-end">
+					<a
+						href={adminPage}
+						class="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-500 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50 md:w-full"
+					>
+						← กลับหน้าควบคุม
+					</a>
+
+					<button
+						type="button"
+						onclick={() => window.open('/api/export-users', '_blank')}
+						class="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-[#443210] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50 md:w-full"
+					>
+						📥 ส่งออกข้อมูล (Export CSV)
+					</button>
+				</div>
 			</div>
 		</div>
 
@@ -315,7 +337,7 @@
 				use:enhance={() => {
 					return async ({ result }) => {
 						if (result.type === 'success') {
-							isEditModalOpen = false; // ปิด Modal ทันทีเมื่อบันทึกฝั่ง Server สำเร็จ
+							isEditModalOpen = false;
 							await invalidateAll();
 						}
 					};
@@ -456,7 +478,7 @@
 				use:enhance={() => {
 					return async ({ result }) => {
 						if (result.type === 'success') {
-							isDeleteModalOpen = false; // ลบสำเร็จฝั่งเซิร์ฟเวอร์ปุ๊บ ปิด Modal ทันที
+							isDeleteModalOpen = false;
 							await invalidateAll();
 						}
 					};
@@ -464,20 +486,17 @@
 				class="flex justify-end gap-3 px-6 pb-6"
 			>
 				<input type="hidden" name="id" value={userToDelete.id} />
-
 				<button
 					type="button"
 					onclick={() => (isDeleteModalOpen = false)}
 					class="rounded-xl border-2 border-gray-200 bg-white px-4 py-2 text-xs font-bold text-[#443210] transition-colors hover:bg-gray-50"
+					>ยกเลิก</button
 				>
-					ยกเลิก
-				</button>
 				<button
 					type="submit"
 					class="rounded-xl border-2 border-rose-600 bg-rose-600 px-5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:border-rose-700 hover:bg-rose-700"
+					>🗑️ ยืนยันลบข้อมูล</button
 				>
-					🗑️ ยืนยันลบข้อมูล
-				</button>
 			</form>
 		</div>
 	</div>

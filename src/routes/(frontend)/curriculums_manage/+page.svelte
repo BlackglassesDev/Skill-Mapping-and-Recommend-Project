@@ -1,12 +1,14 @@
 <script>
     import { enhance } from '$app/forms';
     import { invalidateAll } from '$app/navigation';
+    import { resolve } from '$app/paths';
 
-    // รับข้อมูลรายวิชาจากหลังบ้าน (สมมติตัวแปรหลักคือ data.subjects)
+    // รับข้อมูลรายวิชาจากหลังบ้านเหมือนเดิมทุกประการ
     let { data } = $props();
 
-    // สถานะควบคุมการสลับแสดงผลฟิลเตอร์ (หากพี่อยากพัฒนาต่อยอดในอนาคต)
+    // สถานะควบคุมและตัวแปรฟังก์ชันทุกอย่างคงเดิม ไม่มีการเปลี่ยนชื่อ
     let selectedCurriculum = $state('cpe');
+    let adminPage = resolve('/adminPage');
 </script>
 
 <svelte:head><title>Skill Mapping | Manage Curriculums |</title></svelte:head>
@@ -35,7 +37,7 @@
                 </div>
                 
                 <div class="shrink-0 pt-2">
-                    <a href="/admin_dashboard" class="inline-flex items-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-4 py-2 text-xs font-bold text-gray-500 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50">
+                    <a href={adminPage} class="inline-flex items-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-4 py-2 text-xs font-bold text-gray-500 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50">
                         ← กลับหน้าควบคุม
                     </a>
                 </div>
@@ -58,7 +60,16 @@
                 </div>
             </div>
 
-            <div class="flex items-end">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+                
+                <button
+                    type="button"
+                    onclick={() => window.open('/api/export-curriculums', '_blank')}
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-[#443210] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50 sm:w-auto"
+                >
+                    📤 ส่งออกหลักสูตร (Export CSV)
+                </button>
+
                 <button 
                     type="button"
                     class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#443210] px-6 py-3 text-sm font-black text-white shadow-[0_4px_12px_rgba(68,50,16,0.15)] transition-all duration-300 hover:-translate-y-1 hover:bg-[#2d210a] hover:shadow-[0_8px_20px_rgba(68,50,16,0.25)] sm:w-auto"
@@ -137,6 +148,7 @@
                                 </div>
                             </td>
                         </tr>
+
                         <tr>
                             <td colspan="4" class="px-8 py-20">
                                 <div class="mx-auto flex max-w-sm flex-col items-center text-center">
@@ -150,7 +162,8 @@
                                 </div>
                             </td>
                         </tr>
-                        </tbody>
+
+                    </tbody>
                 </table>
             </div>
         </div>

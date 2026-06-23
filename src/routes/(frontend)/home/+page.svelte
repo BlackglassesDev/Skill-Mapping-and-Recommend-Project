@@ -199,7 +199,7 @@
 					<button
 						type="button"
 						onclick={() => (allcourses_more = !allcourses_more)}
-						class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-gray-300/70 bg-[#ffffff] px-5 py-2.5 text-sm font-bold text-[#443210] shadow-sm transition-all hover:bg-[#443210] hover:text-white hover:shadow-md"
+						class="flex cursor-pointer items-center gap-1.5 rounded-xl border border-gray-300/70 bg-[#ffffff] px-5 py-2.5 text-sm font-bold text-[#443210] shadow-sm transition-all hover:bg-[#443210] hover:text-white hover:shadow-md animate-bounce"
 					>
 						{#if allcourses_more}
 							<svg
