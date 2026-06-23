@@ -66,6 +66,8 @@
     ];
 </script>
 
+<svelte:head><title>Skill Mapping | ADMIN |</title></svelte:head>
+
 <div 
     class="fixed top-6 left-0 right-0 z-50 flex justify-center p-4 transition-all duration-500 ease-out pointer-events-none"
     class:translate-y-0={showMessage}

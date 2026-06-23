@@ -22,6 +22,8 @@
     let totalTeachers = $derived(users.filter(u => u.role === 'teacher').length);
 </script>
 
+<svelte:head><title>Skill Mapping | ADMIN | ManagerUsers</title></svelte:head>
+
 <div class="min-h-screen bg-gray-50 bg-[linear-gradient(to_right,#80808018_1px,transparent_1px),linear-gradient(to_bottom,#80808018_1px,transparent_1px)] bg-[size:24px_24px] py-12">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
