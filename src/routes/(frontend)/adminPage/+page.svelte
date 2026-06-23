@@ -38,7 +38,7 @@
 				'ตรวจสอบผลและสถิติการใช้งานแต่ละภาคเรียน หน่วยกิตภาพรวม และกราฟวิเคราะห์ทักษะสะสมรายบุคคล',
 			icon: '📊',
 			href: dashboardPath,
-			iconBg: 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+			iconBg: 'bg-emerald-100 text-emerald-700 border border-emerald-200 animate-pulse'
 		},
 		{
 			title: 'จัดการผู้ใช้งาน',
@@ -47,7 +47,7 @@
 				'ระบบจัดการบัญชีผู้ใช้งาน ค้นหาประวัติ ตรวจสอบชั่วโมง และเครื่องมือนำเข้าข้อมูลผ่าน Excel',
 			icon: '👥',
 			href: manageUsersPath,
-			iconBg: 'bg-blue-100 text-blue-700 border border-blue-200'
+			iconBg: 'bg-blue-100 text-blue-700 border border-blue-200 animate-pulse'
 		},
 		{
 			title: 'ข้อมูลหลักสูตร',
@@ -55,7 +55,7 @@
 			description: 'กำหนดการและโครงสร้างวิศวกรรมคอมพิวเตอร์ จัดหมวดหมู่รายวิชาบังคับและวิชาเลือก',
 			icon: '🗺️',
 			href: curriculumPath,
-			iconBg: 'bg-amber-100 text-amber-700 border border-amber-200'
+			iconBg: 'bg-amber-100 text-amber-700 border border-amber-200 animate-pulse'
 		},
 		{
 			title: 'คลังทักษะมาตรฐาน',
@@ -63,7 +63,7 @@
 			subTitle: 'Skill Framework',
 			icon: '🎯',
 			href: manageSkillsPath,
-			iconBg: 'bg-rose-100 text-rose-700 border border-rose-200'
+			iconBg: 'bg-rose-100 text-rose-700 border border-rose-200 animate-pulse'
 		}
 	];
 </script>
