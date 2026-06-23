@@ -53,7 +53,6 @@
                 <div class="flex items-center gap-6 text-sm font-light">
                     {#if sid.role === 'student'}
                         <a href={homePath} class="transition-colors hover:text-[#dca11d]">หน้าหลัก</a>
-                        <a href={grade_users} class="transition-colors hover:text-[#dca11d]">ปรับปรุงเกรด</a>
                         <a href={assess_skills} class="transition-colors hover:text-[#dca11d]">ประเมินทักษะ</a>
                     {/if}
 
