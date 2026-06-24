@@ -511,7 +511,7 @@
 							bind:value={skillToEdit.curriculum_id}
 							class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-white py-2.5 pr-10 pl-4 text-sm font-bold text-[#443210] shadow-sm transition-all outline-none focus:border-[#dca11d]"
 						>
-							<option value="">🌍 ส่วนกลาง / ทักษะทั่วไป (General Skill)</option>
+							<option value="">--เลือกหลักสูตรของทักษะ--</option>
 							{#each curriculumList as item (item.curriculum_id)}
 								<option value={String(item.curriculum_id)}>{item.curriculum_name}</option>
 							{/each}

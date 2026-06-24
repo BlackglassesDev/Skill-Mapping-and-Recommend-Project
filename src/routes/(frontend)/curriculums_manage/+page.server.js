@@ -7,7 +7,7 @@ export async function load() {
         );
 
         const [courseRows] = await pool.execute(
-            `SELECT course_id, course_code, course_name, curriculum_id FROM courses`
+            `SELECT course_id, course_code, course_name, curriculum_id, credits, description FROM courses`
         );
         return{
             curriculumRows: curriculumRows,
