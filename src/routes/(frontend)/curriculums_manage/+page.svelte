@@ -652,6 +652,23 @@
 			<form
 				method="POST"
 				action="?/updateCourse"
+				use:enhance={() => {
+					return async ({ result }) => {
+						if (result.data) {
+							alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
+							showMessage = true;
+
+							setTimeout(() => {
+								showMessage = false;
+							}, 4000);
+
+							if (result.data.success === true) {
+								isEditCourseModalOpen = false;
+								await invalidateAll();
+							}
+						}
+					};
+				}}
 				class="max-h-[75vh] space-y-4 overflow-y-auto p-6"
 			>
 				<input type="hidden" name="course_id" value={courseToEdit.course_id} />
@@ -819,9 +836,18 @@
 				action="?/deleteCourse"
 				use:enhance={() => {
 					return async ({ result }) => {
-						if (result.type === 'success') {
-							isDeleteCourseModalOpen = false; // ปิดป๊อปอัปเมื่อลบสำเร็จ
-							await invalidateAll(); // รีโหลดข้อมูลในตารางใหม่แบบ SPA
+						if (result.data) {
+							alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
+							showMessage = true;
+
+							setTimeout(() => {
+								showMessage = false;
+							}, 4000);
+
+							if (result.data.success === true) {
+								isDeleteCourseModalOpen = false; // ปิดป๊อปอัปเมื่อลบสำเร็จ
+								await invalidateAll(); // รีโหลดข้อมูลในตารางใหม่แบบ SPA
+							}
 						}
 					};
 				}}
