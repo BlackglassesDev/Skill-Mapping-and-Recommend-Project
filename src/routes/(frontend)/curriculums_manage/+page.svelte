@@ -1,6 +1,8 @@
 <script>
 	//@ts-nocheck
 	import { resolve } from '$app/paths';
+	import { invalidateAll } from '$app/navigation';
+	import { enhance } from '$app/forms';
 
 	// 1. รับข้อมูลจาก data prop ที่ส่งมาจาก page.server.js
 	let { data } = $props();
@@ -82,7 +84,9 @@
 		if (selectedCurriculum || searchQuery) {
 			currentPage = 1;
 		}
+	});
 
+	$effect(() => {
 		if (data?.message) {
 			alertMessage = data.message;
 			showMessage = true;
@@ -382,7 +386,7 @@
 
 {#if isAddCurriculumModalOpen}
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
+		class="fixed inset-0 z-30 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
 	>
 		<div
 			class="w-full max-w-md overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_24px_48px_rgba(0,0,0,0.05)]"
@@ -398,7 +402,32 @@
 				</div>
 			</div>
 
-			<form method="POST" action="?/createCurriculum" class="space-y-5 p-6">
+			<form
+				method="POST"
+				action="?/createCurriculum"
+				use:enhance={() => {
+					return async ({ result }) => {
+						if (result.data) {
+							// ดึงข้อความจากเซิร์ฟเวอร์ (เช่น 'ชื่อหลักสูตรนี้มีอยู่แล้ว❌' หรือ 'บันทึกข้อมูลสำเร็จ ✅')
+							alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
+							showMessage = true;
+
+							// ตั้งเวลาปิดตัวแจ้งเตือนอัตโนมัติภายใน 4 วินาที
+							setTimeout(() => {
+								showMessage = false;
+							}, 4000);
+
+							if (result.data.success === true) {
+								isAddCurriculumModalOpen = false;
+								await invalidateAll(); // รีเฟรชข้อมูลในตารางใหม่
+							}else{
+                                isAddCurriculumModalOpen = true;
+                            }
+						}
+					};
+				}}
+				class="space-y-5 p-6"
+			>
 				<div class="flex flex-col gap-1.5">
 					<label
 						for="curriculumName"
@@ -438,7 +467,7 @@
 
 {#if isAddCourseModalOpen}
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
+		class="fixed inset-0 z-30 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
 	>
 		<div
 			class="w-full max-w-lg overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_24px_48px_rgba(0,0,0,0.05)]"
@@ -459,6 +488,27 @@
 			<form
 				method="POST"
 				action="?/createCourse"
+                use:enhance={() => {
+					return async ({ result }) => {
+						if (result.data) {
+							// ดึงข้อความจากเซิร์ฟเวอร์ (เช่น 'ชื่อหลักสูตรนี้มีอยู่แล้ว❌' หรือ 'บันทึกข้อมูลสำเร็จ ✅')
+							alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
+							showMessage = true;
+
+							// ตั้งเวลาปิดตัวแจ้งเตือนอัตโนมัติภายใน 4 วินาที
+							setTimeout(() => {
+								showMessage = false;
+							}, 4000);
+
+							if (result.data.success === true) {
+								isAddCourseModalOpen = false;
+								await invalidateAll(); // รีเฟรชข้อมูลในตารางใหม่
+							}else{
+                                isAddCourseModalOpen = true;
+                            }
+						}
+					};
+				}}
 				class="max-h-[75vh] space-y-4 overflow-y-auto p-6"
 			>
 				<div class="flex flex-col gap-1.5">
@@ -581,7 +631,7 @@
 
 {#if isEditCourseModalOpen}
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
+		class="fixed inset-0 z-30 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
 	>
 		<div
 			class="w-full max-w-lg overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_24px_48px_rgba(0,0,0,0.05)]"
@@ -730,7 +780,7 @@
 
 {#if isDeleteCourseModalOpen}
 	<div
-		class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
+		class="fixed inset-0 z-30 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
 	>
 		<div
 			class="w-full max-w-md overflow-hidden rounded-[28px] border-2 border-rose-200 bg-white shadow-[0_24px_48px_rgba(225,29,72,0.08)]"
