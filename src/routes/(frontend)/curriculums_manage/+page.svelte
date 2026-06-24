@@ -141,9 +141,16 @@
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
                 <button
                     type="button"
-                    class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#443210] px-6 py-3 text-sm font-black text-white shadow-[0_4px_12px_rgba(68,50,16,0.15)] transition-all duration-300 hover:-translate-y-1 hover:bg-[#2d210a] hover:shadow-[0_8px_20px_rgba(68,50,16,0.25)] sm:w-auto"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#634c20] px-6 py-3 text-sm font-black text-white shadow-[0_4px_12px_rgba(68,50,16,0.15)] transition-all duration-300 hover:-translate-y-1 hover:bg-[#2d210a] hover:shadow-[0_8px_20px_rgba(68,50,16,0.25)] sm:w-auto"
                 >
                     ➕ เพิ่มรายวิชาใหม่
+                </button>
+
+                <button
+                    type="button"
+                    class="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#634c20] px-6 py-3 text-sm font-black text-white shadow-[0_4px_12px_rgba(68,50,16,0.15)] transition-all duration-300 hover:-translate-y-1 hover:bg-[#2d210a] hover:shadow-[0_8px_20px_rgba(68,50,16,0.25)] sm:w-auto"
+                >
+                    ➕ เพิ่มหลักสูตร
                 </button>
             </div>
         </div>
