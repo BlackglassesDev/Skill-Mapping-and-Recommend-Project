@@ -31,10 +31,27 @@
 		curriculum_id: ''
 	});
 
+	let isDeleteCourseModalOpen = $state(false);
+	let courseToDelete = $state({
+		course_id: '',
+		course_code: '',
+		course_name: ''
+	});
+
 	// ฟังก์ชันสำหรับกดปุ่มแก้ไขแล้วให้เอาข้อมูลวิชานั้นๆ มายัดใส่โครงสร้างรอไว้
 	function openEditModal(course) {
 		courseToEdit = { ...course }; // Clone ข้อมูลวิชาป้องกันการทับซ้อนข้อมูลตัวจริงบนตาราง
 		isEditCourseModalOpen = true;
+	}
+
+	function openDeleteModal(course) {
+		if (!course) return;
+		courseToDelete = {
+			course_id: course.course_id || '',
+			course_code: course.course_code || '',
+			course_name: course.course_name || ''
+		};
+		isDeleteCourseModalOpen = true;
 	}
 
 	// 4. 🔥 กรองขั้นที่ 1: กรองรายวิชาตามหลักสูตรที่เลือกก่อน
@@ -706,6 +723,73 @@
 						💾 บันทึกการแก้ไข
 					</button>
 				</div>
+			</form>
+		</div>
+	</div>
+{/if}
+
+{#if isDeleteCourseModalOpen}
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
+	>
+		<div
+			class="w-full max-w-md overflow-hidden rounded-[28px] border-2 border-rose-200 bg-white shadow-[0_24px_48px_rgba(225,29,72,0.08)]"
+		>
+			<div class="flex items-center gap-3 border-b-2 border-rose-50 bg-rose-50/50 px-6 py-5">
+				<span
+					class="flex h-10 w-10 items-center justify-center rounded-xl border border-rose-200 bg-rose-100 text-xl text-rose-600"
+					>⚠️</span
+				>
+				<div>
+					<h2 class="text-lg font-black text-rose-700">ยืนยันการลบรายวิชา</h2>
+					<p class="mt-0.5 text-xs font-bold text-rose-400">โปรดตรวจสอบข้อมูลก่อนกดยืนยัน</p>
+				</div>
+			</div>
+
+			<div class="p-6">
+				<div class="space-y-2 rounded-2xl border-2 border-gray-100 bg-gray-50/50 p-4">
+					<p class="text-xs font-medium text-gray-400">รายวิชาที่เลือก:</p>
+					<p class="text-sm font-black text-[#443210]">
+						รหัสวิชา: <span class="font-mono text-gray-600">{courseToDelete.course_code}</span>
+					</p>
+					<p class="text-sm font-black text-[#443210]">
+						ชื่อรายวิชา: <span class="text-gray-600">{courseToDelete.course_name}</span>
+					</p>
+				</div>
+				<p
+					class="mt-4 rounded-xl border border-rose-100 bg-rose-50 p-3 text-xs font-bold text-rose-500"
+				>
+					คำเตือน: การลบข้อมูลนี้จะเป็นการลบถาวรออกจากระบบฐานข้อมูลหลักสูตร และข้อมูลการจับคู่ทักษะ
+					(Skill Mapping) ของวิชานี้จะหายไปทั้งหมด ไม่สามารถกู้คืนได้
+				</p>
+			</div>
+
+			<form
+				method="POST"
+				action="?/deleteCourse"
+				use:enhance={() => {
+					return async ({ result }) => {
+						if (result.type === 'success') {
+							isDeleteCourseModalOpen = false; // ปิดป๊อปอัปเมื่อลบสำเร็จ
+							await invalidateAll(); // รีโหลดข้อมูลในตารางใหม่แบบ SPA
+						}
+					};
+				}}
+				class="flex justify-end gap-3 px-6 pb-6"
+			>
+				<input type="hidden" name="course_id" value={courseToDelete.course_id} />
+
+				<button
+					type="button"
+					onclick={() => (isDeleteCourseModalOpen = false)}
+					class="rounded-xl border-2 border-gray-200 bg-white px-4 py-2 text-xs font-bold text-[#443210] transition-colors hover:bg-gray-50"
+					>ยกเลิก</button
+				>
+				<button
+					type="submit"
+					class="rounded-xl border-2 border-rose-600 bg-rose-600 px-5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:border-rose-700 hover:bg-rose-700"
+					>🗑️ ยืนยันลบข้อมูล</button
+				>
 			</form>
 		</div>
 	</div>
