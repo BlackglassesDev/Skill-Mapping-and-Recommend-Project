@@ -1,7 +1,8 @@
 import { redirect,fail } from '@sveltejs/kit';
 import { pool } from '$lib/server/db.js';
 
-
+/**@param {import('./$types').PageServerLoad} props */
+//@ts-ignore
 export async function load({ url }) {
 	const id = url.searchParams.get('curriculum');
 
@@ -41,6 +42,7 @@ export async function load({ url }) {
 	}
 }
 
+/**@type {import('./$types').Actions} */
 export const actions = {
 	call_jobs: async ({request,fetch}) => {
 		const data = await request.formData();
