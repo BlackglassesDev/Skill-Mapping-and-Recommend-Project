@@ -111,7 +111,7 @@
 </div>
 
 <div
-	class="min-h-screen bg-gray-50 bg-[linear-gradient(to_right,#80808018_1px,transparent_1px),linear-gradient(to_bottom,#80808018_1px,transparent_1px)] bg-[size:24px_24px] py-16"
+	class="min-h-screen bg-gray-50 bg-[linear-gradient(to_right,#80808018_1px,transparent_1px),linear-gradient(to_bottom,#80808018_1px,transparent_1px)] bg-size-[24px_24px] py-16"
 >
 	<div class="mx-auto max-w-7xl px-6 lg:px-8">
 		<!-- Header Section -->

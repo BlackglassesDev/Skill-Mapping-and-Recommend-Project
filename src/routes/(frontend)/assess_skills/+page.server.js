@@ -1,6 +1,6 @@
 import { pool } from '$lib/server/db.js';
 import { fail } from '@sveltejs/kit';
-
+/** @type {import('./$types').PageServerLoad} */
 export const load = async ({ locals }) => {
 	// 1. เช็คก่อนว่ามี locals.user ไหม (เข้าสู่ระบบหรือยัง)
 	if (!locals.user) {
@@ -127,6 +127,7 @@ const gradeValues = {
 	F: 0.0
 };
 
+/** @type {import('./$types').Actions} */
 export const actions = {
 	saveCurriculumAndGrades: async ({ request, locals }) => {
 		if (!locals.user?.username) {

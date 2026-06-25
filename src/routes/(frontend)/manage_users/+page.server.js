@@ -26,6 +26,7 @@ export async function load() {
     }
 }
 
+/** @type {import('./$types').Actions} */
 export const actions = {
     updateUser: async ({ request }) => {
         const formData = await request.formData();
