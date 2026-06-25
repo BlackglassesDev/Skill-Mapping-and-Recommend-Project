@@ -9,6 +9,7 @@
     let showModal = $state(false);
     let step = $state(1);
     let backup_email = $state('');
+    let backup_otp = $state('');
     let boxinfo = $state('');
     let message = $state('');
     let isloading = $state(false);
@@ -247,6 +248,7 @@
                         <input
                             type="text"
                             name="otp"
+                            bind:value={backup_otp}
                             maxlength="6"
                             required
                             placeholder="000000"
@@ -289,6 +291,7 @@
                     >
                         <p class="text-xs leading-relaxed font-medium text-gray-500">กำหนดรหัสผ่านใหม่สำหรับเข้าใช้งานระบบ (ต้องมีความยาวอย่างน้อย 8 ตัวอักษร)</p>
                         <input type="hidden" name="email" value={backup_email}>
+                        <input type="hidden" name="otp" value={backup_otp}>
                         <input
                             type="password"
                             name="newPassword"

@@ -2,8 +2,18 @@ import { pool } from '$lib/server/db.js';
 import { json } from '@sveltejs/kit';
 import bcrypt from 'bcrypt';
 
+/** @type {import('./$types').RequestHandler} */
 export async function POST({request}) {
-    const {newPassword, email} = await request.json();
+    const {newPassword, email, otp} = await request.json();
+
+    /** @type {[any, any]} */
+		const [rows] = await pool.execute(
+			`SELECT username FROM users WHERE email = ? AND otp_code = ? AND otp_expires > DATE_ADD(UTC_TIMESTAMP(), INTERVAL 7 HOUR)`,
+			[email, otp]
+		);
+		if (rows.length === 0) {
+			return json({ boxinfo: 'ขั้นตอนดำเนินการไม่ถูกต้อง' }, { status: 400 });
+		}
 
     if(newPassword.length < 8){
             return json({boxinfo: 'กรุณากรอกรหัสผ่าน 8 ตัวขึ้นไป'}, {status: 400});
