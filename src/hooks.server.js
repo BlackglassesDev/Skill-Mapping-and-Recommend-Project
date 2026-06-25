@@ -38,14 +38,59 @@ export const handle = async ({ event, resolve }) => {
     /////////////   check role middleware    /////////////
 
     const userRole = event.locals.user?.role;
-
     const currentPath = event.url.pathname;
+    // check admin page middleware
     const isAdminPage = currentPath.startsWith('/adminPage') ||
         currentPath.startsWith('/manage_users') ||
         currentPath.startsWith('/curriculums_manage') ||
-        currentPath.startsWith('/manage_global_skills');
+        currentPath.startsWith('/manage_global_skills') ||
+        currentPath.startsWith('/admin_dashboard');
     if (isAdminPage) {
-        if (userRole !== 'admin') {
+        if (userRole) {
+            if (userRole !== 'admin') {
+                if (userRole === 'student') {
+                    throw redirect(303, '/');
+                }
+                if (userRole === 'teacher') {
+                    throw redirect(303, '/teacherPage');
+                }
+            }
+        } else {
+            throw redirect(303, '/');
+        }
+    }
+    // check student page middleware
+    const isStudentPage = currentPath.startsWith('/assess_skills') ||
+        currentPath.startsWith('/info_subject') ||
+        currentPath.startsWith('/home') ||
+        currentPath === '/';
+
+    if (isStudentPage) {
+        if (userRole) {
+            if (userRole !== 'student') {
+                if (userRole === 'admin') {
+                    throw redirect(303, '/adminPage');
+                }
+                if (userRole === 'teacher') {
+                    throw redirect(303, '/teacherPage');
+                }
+            }
+        }
+    }
+
+    // check teacher page middleware
+    const isTeacherPage = currentPath.startsWith('/teacherPage');
+    if (isTeacherPage) {
+        if (userRole) {
+            if (userRole !== 'teacher') {
+                if (userRole === 'admin') {
+                    throw redirect(303, '/adminPage');
+                }
+                if (userRole === 'student') {
+                    throw redirect(303, '/');
+                }
+            }
+        } else {
             throw redirect(303, '/');
         }
     }
