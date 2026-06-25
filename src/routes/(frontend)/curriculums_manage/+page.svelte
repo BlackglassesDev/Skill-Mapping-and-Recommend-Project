@@ -15,7 +15,7 @@
 	let selectedCurriculum = $state(curriculumList[0]?.curriculum_id ?? '');
 	let searchQuery = $state(''); // สำหรับเก็บค่าคำค้นหา
 	let currentPage = $state(1); // หน้าปัจจุบันเริ่มต้นที่หน้า 1
-	const itemsPerPage = 10; // จำนวนรายการที่แสดงต่อ 1 หน้า (ปรับเปลี่ยนได้ตามใจชอบ)
+	const itemsPerPage = 10; // จำนวนรายการที่แสดงต่อ 1 หน้า
 
 	let isAddCurriculumModalOpen = $state(false);
 	let isAddCourseModalOpen = $state(false);
@@ -105,7 +105,7 @@
 </script>
 
 <svelte:head>
-	<title>Skill Mapping | Manage Curriculums |</title>
+	<title>แผงควบคุมผู้ดูแลระบบ | Skill Mapping</title>
 </svelte:head>
 
 <div
@@ -116,15 +116,16 @@
 	class:opacity-0={!showMessage}
 >
 	<div
-		class="pointer-events-auto flex max-w-md items-center gap-3 rounded-2xl border border-gray-200 bg-white px-5 py-3.5 text-sm font-semibold text-[#443210] shadow-2xl"
+		class="pointer-events-auto flex max-w-md items-center gap-3 rounded-2xl border border-gray-100 bg-white px-5 py-3.5 text-sm font-semibold text-[#443210] shadow-[0_10px_30px_rgba(68,50,16,0.05)]"
 	>
-		<span class="flex h-6 w-6 items-center justify-center rounded-full bg-[#dca11d]/10 text-base"
+		<span
+			class="flex h-6 w-6 items-center justify-center rounded-full bg-amber-50 text-base text-[#dca11d]"
 			>🔔</span
 		>
-		<span class="flex-1 text-gray-700">{alertMessage}</span>
+		<span class="flex-1 font-medium text-gray-600">{alertMessage}</span>
 		<button
 			onclick={() => (showMessage = false)}
-			class="ml-2 p-1 text-xs text-gray-400 transition-colors hover:text-gray-600"
+			class="ml-2 p-1 text-xs text-gray-400 transition-colors hover:text-[#443210]"
 		>
 			✕
 		</button>
@@ -132,48 +133,50 @@
 </div>
 
 <div
-	class="min-h-screen bg-gray-50 bg-[linear-gradient(to_right,#80808018_1px,transparent_1px),linear-gradient(to_bottom,#80808018_1px,transparent_1px)] bg-[size:24px_24px] py-16"
+	class="min-h-screen bg-gray-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[16px_16px] py-16 selection:bg-amber-100"
 >
-	<div class="mx-auto max-w-7xl px-6 lg:px-8">
-		<div class="mb-8 rounded-3xl border-2 border-gray-100 bg-white p-6 shadow-sm sm:p-8">
+	<div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+		<div class="mb-8 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
 			<div
 				class="flex flex-col items-center gap-5 text-center md:flex-row md:items-start md:gap-6 md:text-left"
 			>
 				<div
-					class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-amber-100 bg-amber-50 text-2xl text-[#dca11d] shadow-sm"
+					class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 text-2xl shadow-sm"
 				>
 					📚
 				</div>
 
-				<div class="flex-1 space-y-1.5">
-					<h1 class="text-2xl font-extrabold tracking-tight text-[#443210] sm:text-3xl">
-						จัดการ<span class="text-[#dca11d]">หลักสูตรและรายวิชา</span>
+				<div class="flex-1 space-y-1">
+					<h1 class="text-2xl font-black tracking-tight text-[#443210] sm:text-3xl">
+						ระบบจัดการ<span class="text-[#dca11d]">หลักสูตรและรายวิชา</span>
 					</h1>
-					<p class="max-w-2xl text-sm leading-relaxed font-medium text-gray-500">
-						Curriculum Management — บริหารจัดการโครงสร้างรายวิชาของแผนก
-						เพื่อนำข้อมูลไปเชื่อมโยงและประเมินผลระดับทักษะ (Skill Mapping)
+					<p class="max-w-2xl text-sm leading-relaxed font-medium text-gray-400">
+						Curriculum Management — บริหารจัดการโครงสร้างรายวิชาของภาควิชา
+						เพื่อนำข้อมูลไปประมวลผลและการจัดทำแผนผังทักษะ (Skill Mapping)
 					</p>
+
 					<div
-						class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-red-100 bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-600"
+						class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-red-100 bg-red-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-red-600 uppercase"
 					>
 						<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500"></span>
 						Admin Mode Only
 					</div>
 				</div>
 
-				<div class="flex w-full shrink-0 flex-col gap-3 pt-2 md:w-auto md:items-end">
+				<div class="flex w-full shrink-0 flex-col gap-2.5 pt-2 md:w-auto md:items-end">
 					<a
 						href={adminPage}
-						class="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-4 py-2.5 text-xs font-bold text-gray-500 shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50 md:w-full"
+						class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 py-2 text-xs font-black text-gray-500 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d] md:w-full"
 					>
 						← กลับหน้าควบคุม
 					</a>
+
 					<button
 						type="button"
 						onclick={() => window.open('/api/export-curriculums', '_blank')}
-						class="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-gray-200 bg-white px-5 py-2.5 text-sm font-bold text-[#443210] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-gray-50 md:w-full"
+						class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
 					>
-						📤 ส่งออกหลักสูตร (Export CSV)
+						📤 ส่งออกข้อมูลรายวิชา (CSV)
 					</button>
 				</div>
 			</div>
@@ -182,22 +185,20 @@
 		<div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
 			<div class="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:max-w-3xl">
 				<div class="flex flex-col gap-1.5">
-					<span class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-						>หลักสูตร / ภาควิชาที่เลือก</span
-					>
+					<span class="pl-1 text-xs font-medium text-gray-400"> หลักสูตร / ภาควิชาที่เลือก </span>
 					<div class="relative">
 						<select
 							bind:value={selectedCurriculum}
-							class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-white py-2.5 pr-10 pl-4 text-sm font-bold text-[#443210] shadow-sm transition-all outline-none focus:border-[#dca11d]"
+							class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pr-10 pl-4 text-sm font-black text-[#443210] shadow-sm transition-all outline-none focus:border-[#dca11d] focus:ring-1 focus:ring-[#dca11d]"
 						>
 							{#each curriculumList as item (item.curriculum_id)}
 								<option value={item.curriculum_id}>{item.curriculum_name}</option>
 							{:else}
-								<option value="">❌ ไม่มีข้อมูลหลักสูตรในระบบ</option>
+								<option value="">❌ ไม่พบข้อมูลหลักสูตรในระบบ</option>
 							{/each}
 						</select>
 						<div
-							class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-xs text-gray-400"
+							class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-[10px] text-gray-400"
 						>
 							▼
 						</div>
@@ -205,18 +206,16 @@
 				</div>
 
 				<div class="flex flex-col gap-1.5">
-					<span class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-						>ค้นหารายวิชา</span
-					>
+					<span class="pl-1 text-xs font-medium text-gray-400"> ค้นหารายวิชา </span>
 					<div class="relative">
 						<input
 							type="text"
 							bind:value={searchQuery}
-							placeholder="พิมพ์รหัสวิชา หรือ ชื่อวิชาที่ต้องการ..."
-							class="w-full rounded-2xl border-2 border-gray-200 bg-white py-2.5 pr-4 pl-10 text-sm font-semibold text-[#443210] placeholder-gray-400 shadow-sm transition-all outline-none focus:border-[#dca11d]"
+							placeholder="พิมพ์รหัสวิชา หรือ ชื่อวิชา..."
+							class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pr-4 pl-10 text-sm font-medium text-[#443210] placeholder-gray-400 shadow-sm transition-all outline-none focus:border-[#dca11d] focus:ring-1 focus:ring-[#dca11d]"
 						/>
 						<div
-							class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-base text-gray-400"
+							class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-sm text-gray-400"
 						>
 							🔍
 						</div>
@@ -233,11 +232,11 @@
 				</div>
 			</div>
 
-			<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+			<div class="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-end">
 				<button
 					type="button"
 					onclick={() => (isAddCourseModalOpen = true)}
-					class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#634c20] px-6 py-3 text-sm font-black text-white shadow-[0_4px_12px_rgba(68,50,16,0.15)] transition-all duration-300 hover:-translate-y-1 hover:bg-[#2d210a] hover:shadow-[0_8px_20px_rgba(68,50,16,0.25)] sm:w-auto"
+					class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#443210] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d] sm:w-auto"
 				>
 					➕ เพิ่มรายวิชาใหม่
 				</button>
@@ -245,46 +244,42 @@
 				<button
 					type="button"
 					onclick={() => (isAddCurriculumModalOpen = true)}
-					class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-[#634c20] px-6 py-3 text-sm font-black text-white shadow-[0_4px_12px_rgba(68,50,16,0.15)] transition-all duration-300 hover:-translate-y-1 hover:bg-[#2d210a] hover:shadow-[0_8px_20px_rgba(68,50,16,0.25)] sm:w-auto"
+					class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#443210] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d] sm:w-auto"
 				>
 					➕ เพิ่มหลักสูตร
 				</button>
 			</div>
 		</div>
 
-		<div
-			class="overflow-hidden rounded-[28px] border-2 border-gray-200/80 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
-		>
+		<div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
 			<div class="overflow-x-auto">
 				<table class="w-full border-collapse text-left text-sm text-gray-500">
 					<thead
-						class="border-b-2 border-gray-100 bg-gray-50/70 text-xs font-black tracking-wider text-gray-400 uppercase"
+						class="border-b border-gray-200 bg-gray-50/70 text-xs font-bold tracking-wider text-gray-400 uppercase"
 					>
 						<tr>
-							<th class="w-1/4 px-8 py-5">รหัสวิชา</th>
-							<th class="w-1/2 px-8 py-5">ชื่อรายวิชา (TH / EN)</th>
-							<th class="w-1/4 px-8 py-5">โครงสร้างหลักสูตร</th>
-							<th class="px-8 py-5 text-right">การจัดการ</th>
+							<th class="w-1/4 px-6 py-4 font-bold">รหัสวิชา</th>
+							<th class="w-1/2 px-6 py-4 font-bold">ชื่อรายวิชา (TH / EN)</th>
+							<th class="w-1/4 px-6 py-4 font-bold">โครงสร้างหลักสูตร</th>
+							<th class="px-6 py-4 text-center font-bold">การจัดการ</th>
 						</tr>
 					</thead>
-					<tbody class="divide-y divide-gray-100 font-medium text-[#443210]">
+					<tbody class="divide-y divide-gray-100 font-medium text-gray-700">
 						{#each paginatedCourses as course (course.course_id)}
 							<tr
-								class="transition-colors duration-200 odd:bg-white even:bg-gray-50/40 hover:bg-amber-50/30"
+								class="transition-colors duration-150 odd:bg-white even:bg-gray-50/30 hover:bg-gray-50"
 							>
-								<td class="px-8 py-5 font-mono font-black tracking-wide text-gray-500">
+								<td class="px-6 py-4 font-mono font-bold tracking-wide text-gray-500">
 									{course.course_code}
 								</td>
-								<td class="px-8 py-5">
-									<div class="space-y-0.5">
-										<span class="block text-sm font-extrabold text-[#443210]"
-											>{course.course_name}</span
-										>
-									</div>
+								<td class="px-6 py-4">
+									<span class="block text-sm font-black text-[#443210]">
+										{course.course_name}
+									</span>
 								</td>
-								<td class="px-8 py-5">
+								<td class="px-6 py-4">
 									<span
-										class="inline-flex items-center rounded-xl border border-amber-100/70 bg-amber-50 px-3 py-1 text-xs font-black text-[#dca11d]"
+										class="inline-flex items-center rounded-lg border border-gray-200 bg-gray-50 px-2.5 py-1 text-xs font-bold text-gray-600"
 									>
 										{curriculumList.find((c) => c.curriculum_id === course.curriculum_id)
 											?.curriculum_name || 'วิศวกรรมคอมพิวเตอร์'}
@@ -294,32 +289,32 @@
 									<div class="flex items-center justify-center gap-2">
 										<button
 											onclick={() => openEditModal(course)}
-											class="cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-600 shadow-sm transition-colors hover:border-[#dca11d] hover:text-[#dca11d]"
+											class="cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-black text-gray-600 shadow-sm transition-all hover:border-[#dca11d] hover:text-[#dca11d]"
 										>
-											✏️ แก้ไข
+											✏️ แก้ไขข้อมูล
 										</button>
 										<button
-											class="cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-rose-500 shadow-sm transition-colors hover:border-rose-400 hover:bg-rose-50/50"
 											onclick={() => openDeleteModal(course)}
+											class="cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-black text-rose-500 shadow-sm transition-all hover:border-rose-400 hover:bg-rose-50/50"
 										>
-											🗑️ ลบวิชาเรียน
+											🗑️ ลบรายวิชา
 										</button>
 									</div>
 								</td>
 							</tr>
 						{:else}
 							<tr>
-								<td colspan="4" class="px-8 py-20">
+								<td colspan="4" class="px-6 py-20">
 									<div class="mx-auto flex max-w-sm flex-col items-center text-center">
 										<div
-											class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gray-50 text-3xl text-gray-400 border border-gray-100 shadow-inner mb-4 animate-pulse"
+											class="flex h-12 w-12 items-center justify-center rounded-xl bg-gray-50 text-xl border border-gray-100 text-gray-400 mb-3"
 										>
 											💨
 										</div>
-										<h3 class="text-base font-black text-[#443210]">ไม่พบข้อมูลรายวิชา</h3>
-										<p class="mt-2 text-xs leading-relaxed font-medium text-gray-400">
-											ไม่พบข้อมูลวิชาตามเงื่อนไขหลักสูตรหรือคำค้นหาดังกล่าว
-											พี่สามารถลองพิมพ์คำอื่นหรือกดปุ่มเพิ่มรายวิชาได้เลยครับ
+										<h3 class="text-sm font-bold text-[#443210]">ไม่พบข้อมูลรายวิชา</h3>
+										<p class="mt-1 text-xs leading-relaxed text-gray-400">
+											ไม่พบข้อมูลที่ตรงกับเงื่อนไขหลักสูตรหรือคำค้นหาของคุณ <br />
+											กรุณาลองระบุคำค้นหาใหม่อีกครั้ง หรือเพิ่มรายวิชาเข้าสู่ระบบ
 										</p>
 									</div>
 								</td>
@@ -331,12 +326,12 @@
 
 			{#if filteredCourses.length > 0}
 				<div
-					class="flex flex-col items-center justify-between gap-4 border-t border-gray-100 bg-gray-50/50 px-8 py-4 sm:flex-row"
+					class="flex flex-col items-center justify-between gap-4 border-t border-gray-200 bg-gray-50/50 px-6 py-4 sm:flex-row"
 				>
-					<span class="text-xs font-bold text-gray-400">
-						แสดงข้อมูลหน้า <span class="text-[#443210]">{currentPage}</span> จากทั้งหมด
-						<span class="text-[#443210]">{totalPages}</span>
-						หน้า (รวม {filteredCourses.length} วิชา)
+					<span class="text-xs font-medium text-gray-400">
+						แสดงข้อมูลหน้า <span class="font-semibold text-gray-700">{currentPage}</span> จากทั้งหมด
+						<span class="font-semibold text-gray-700">{totalPages}</span> หน้า (รวมทั้งสิ้น {filteredCourses.length}
+						รายวิชา)
 					</span>
 
 					<div class="inline-flex items-center gap-1.5">
@@ -344,7 +339,7 @@
 							type="button"
 							onclick={() => (currentPage = 1)}
 							disabled={currentPage === 1}
-							class="rounded-xl border border-gray-200 bg-white p-2 text-xs font-bold text-[#443210] shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
+							class="cursor-pointer rounded-lg border border-gray-200 bg-white p-2 text-xs font-bold text-gray-700 shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
 							title="หน้าแรกสุด"
 						>
 							«
@@ -354,7 +349,7 @@
 							type="button"
 							onclick={() => (currentPage = Math.max(1, currentPage - 1))}
 							disabled={currentPage === 1}
-							class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-[#443210] shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
+							class="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-700 shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
 						>
 							◀ ก่อนหน้า
 						</button>
@@ -363,7 +358,7 @@
 							type="button"
 							onclick={() => (currentPage = Math.min(totalPages, currentPage + 1))}
 							disabled={currentPage === totalPages}
-							class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-[#443210] shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
+							class="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-2 text-xs font-bold text-gray-700 shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
 						>
 							ถัดไป ▶
 						</button>
@@ -372,7 +367,7 @@
 							type="button"
 							onclick={() => (currentPage = totalPages)}
 							disabled={currentPage === totalPages}
-							class="rounded-xl border border-gray-200 bg-white p-2 text-xs font-bold text-[#443210] shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
+							class="cursor-pointer rounded-lg border border-gray-200 bg-white p-2 text-xs font-bold text-gray-700 shadow-sm transition-all hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white"
 							title="หน้าสุดท้าย"
 						>
 							»
@@ -385,488 +380,460 @@
 </div>
 
 {#if isAddCurriculumModalOpen}
-	<div
-		class="fixed inset-0 z-30 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
-	>
-		<div
-			class="w-full max-w-md overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_24px_48px_rgba(0,0,0,0.05)]"
-		>
-			<div class="flex items-center gap-3 border-b-2 border-gray-50 bg-amber-50/30 px-6 py-5">
-				<span
-					class="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-100 bg-amber-50 text-xl text-[#dca11d]"
-					>📚</span
-				>
-				<div>
-					<h2 class="text-lg font-black text-[#443210]">เพิ่มหลักสูตรใหม่</h2>
-					<p class="mt-0.5 text-xs font-bold text-gray-400">ระบุชื่อหลักสูตรเพื่อเริ่มต้นใช้งาน</p>
-				</div>
-			</div>
+    <div class="fixed inset-0 z-30 flex items-center justify-center p-4">
+        <button
+            type="button"
+            class="fixed inset-0 bg-[#443210]/20 backdrop-blur-sm"
+            onclick={() => (isAddCurriculumModalOpen = false)}
+        >
+            ✕
+        </button>
 
-			<form
-				method="POST"
-				action="?/createCurriculum"
-				use:enhance={() => {
-					return async ({ result }) => {
-						if (result.data) {
-							// ดึงข้อความจากเซิร์ฟเวอร์ (เช่น 'ชื่อหลักสูตรนี้มีอยู่แล้ว❌' หรือ 'บันทึกข้อมูลสำเร็จ ✅')
-							alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
-							showMessage = true;
+        <div
+            class="relative w-full max-w-lg overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all"
+        >
+            <div class="border-b border-gray-100 px-6 py-4.5">
+                <h3 class="text-base font-black text-[#443210]">📚 เพิ่มหลักสูตรใหม่</h3>
+            </div>
 
-							// ตั้งเวลาปิดตัวแจ้งเตือนอัตโนมัติภายใน 4 วินาที
-							setTimeout(() => {
-								showMessage = false;
-							}, 4000);
+            <form
+                method="POST"
+                action="?/createCurriculum"
+                use:enhance={() => {
+                    return async ({ result }) => {
+                        if (result.data) {
+                            alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
+                            showMessage = true;
 
-							if (result.data.success === true) {
-								isAddCurriculumModalOpen = false;
-								await invalidateAll(); // รีเฟรชข้อมูลในตารางใหม่
-							}else{
+                            setTimeout(() => {
+                                showMessage = false;
+                            }, 4000);
+
+                            if (result.data.success === true) {
+                                isAddCurriculumModalOpen = false;
+                                await invalidateAll();
+                            } else {
                                 isAddCurriculumModalOpen = true;
                             }
-						}
-					};
-				}}
-				class="space-y-5 p-6"
-			>
-				<div class="flex flex-col gap-1.5">
-					<label
-						for="curriculumName"
-						class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-					>
-						ชื่อหลักสูตร / ภาควิชา <span class="text-red-500">*</span>
-					</label>
-					<input
-						type="text"
-						id="curriculumName"
-						name="curriculum_name"
-						placeholder="เช่น วิศวกรรมคอมพิวเตอร์ (หลักสูตรปรับปรุง 2565)"
-						required
-						class="w-full rounded-2xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-[#443210] placeholder-gray-400 shadow-sm transition-all outline-none focus:border-[#dca11d]"
-					/>
-				</div>
+                        }
+                    };
+                }}
+            >
+                <div
+                    class="max-h-[70vh] space-y-4 overflow-y-auto p-6 text-xs font-bold text-[#443210]"
+                >
+                    <div class="space-y-1.5">
+                        <label for="curriculumName" class="text-gray-400">
+                            ชื่อหลักสูตร / ภาควิชา (Curriculum Name)
+                        </label>
+                        <input
+                            type="text"
+                            id="curriculumName"
+                            name="curriculum_name"
+                            placeholder="เช่น วิศวกรรมคอมพิวเตอร์ (หลักสูตรปรับปรุง พ.ศ. 2565)"
+                            required
+                            class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                        />
+                    </div>
+                </div>
 
-				<div class="flex justify-end gap-3 pt-2">
-					<button
-						type="button"
-						onclick={() => (isAddCurriculumModalOpen = false)}
-						class="cursor-pointer rounded-xl border-2 border-gray-200 bg-white px-4 py-2 text-xs font-bold text-[#443210] transition-colors hover:bg-gray-50"
-					>
-						ยกเลิก
-					</button>
-					<button
-						type="submit"
-						class="cursor-pointer rounded-xl border-2 border-[#634c20] bg-[#634c20] px-5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:border-[#2d210a] hover:bg-[#2d210a]"
-					>
-						💾 บันทึกข้อมูล
-					</button>
-				</div>
-			</form>
-		</div>
-	</div>
+                <div class="flex justify-end gap-3 border-t border-gray-100 p-6">
+                    <button
+                        type="button"
+                        onclick={() => (isAddCurriculumModalOpen = false)}
+                        class="cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black text-gray-500 shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                    >
+                        ยกเลิกข้อมูล
+                    </button>
+                    <button
+                        type="submit"
+                        class="cursor-pointer rounded-xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                    >
+                        💾 บันทึกข้อมูล
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 {/if}
 
 {#if isAddCourseModalOpen}
-	<div
-		class="fixed inset-0 z-30 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
-	>
-		<div
-			class="w-full max-w-lg overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_24px_48px_rgba(0,0,0,0.05)]"
-		>
-			<div class="flex items-center gap-3 border-b-2 border-gray-50 bg-amber-50/30 px-6 py-5">
-				<span
-					class="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-100 bg-amber-50 text-xl text-[#dca11d]"
-					>📝</span
-				>
-				<div>
-					<h2 class="text-lg font-black text-[#443210]">เพิ่มรายวิชาใหม่</h2>
-					<p class="mt-0.5 text-xs font-bold text-gray-400">
-						กรอกข้อมูลรายวิชาเพื่อเชื่อมโยงกับระบบ Skill Mapping
-					</p>
-				</div>
-			</div>
+    <div class="fixed inset-0 z-30 flex items-center justify-center p-4">
+        <button
+            type="button"
+            class="fixed inset-0 bg-[#443210]/20 backdrop-blur-sm"
+            onclick={() => (isAddCourseModalOpen = false)}
+        >
+            ✕
+        </button>
 
-			<form
-				method="POST"
-				action="?/createCourse"
+        <div
+            class="relative w-full max-w-lg overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all"
+        >
+            <div class="border-b border-gray-100 px-6 py-4.5">
+                <h3 class="text-base font-black text-[#443210]">📝 เพิ่มรายวิชาใหม่</h3>
+            </div>
+
+            <form
+                method="POST"
+                action="?/createCourse"
                 use:enhance={() => {
-					return async ({ result }) => {
-						if (result.data) {
-							// ดึงข้อความจากเซิร์ฟเวอร์ (เช่น 'ชื่อหลักสูตรนี้มีอยู่แล้ว❌' หรือ 'บันทึกข้อมูลสำเร็จ ✅')
-							alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
-							showMessage = true;
+                    return async ({ result }) => {
+                        if (result.data) {
+                            alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
+                            showMessage = true;
 
-							// ตั้งเวลาปิดตัวแจ้งเตือนอัตโนมัติภายใน 4 วินาที
-							setTimeout(() => {
-								showMessage = false;
-							}, 4000);
+                            setTimeout(() => {
+                                showMessage = false;
+                            }, 4000);
 
-							if (result.data.success === true) {
-								isAddCourseModalOpen = false;
-								await invalidateAll(); // รีเฟรชข้อมูลในตารางใหม่
-							}else{
+                            if (result.data.success === true) {
+                                isAddCourseModalOpen = false;
+                                await invalidateAll();
+                            } else {
                                 isAddCourseModalOpen = true;
                             }
-						}
-					};
-				}}
-				class="max-h-[75vh] space-y-4 overflow-y-auto p-6"
-			>
-				<div class="flex flex-col gap-1.5">
-					<label
-						for="modalCurriculumId"
-						class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-					>
-						หลักสูตร / ภาควิชาที่สังกัด <span class="text-red-500">*</span>
-					</label>
-					<div class="relative">
-						<select
-							id="modalCurriculumId"
-							name="curriculum_id"
-							required
-							class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-white py-2.5 pr-10 pl-4 text-sm font-bold text-[#443210] shadow-sm transition-all outline-none focus:border-[#dca11d]"
-						>
-							<option value="" disabled selected>-- เลือกหลักสูตรที่วิชานี้สังกัด --</option>
-							{#each curriculumList as item (item.curriculum_id)}
-								<option value={item.curriculum_id}>{item.curriculum_name}</option>
-							{/each}
-						</select>
-						<div
-							class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-xs text-gray-400"
-						>
-							▼
-						</div>
-					</div>
-				</div>
+                        }
+                    };
+                }}
+            >
+                <div
+                    class="max-h-[70vh] space-y-4 overflow-y-auto p-6 text-xs font-bold text-[#443210]"
+                >
+                    <div class="space-y-1.5">
+                        <label for="modalCurriculumId" class="text-gray-400">
+                            หลักสูตร / ภาควิชาที่สังกัด <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <select
+                                id="modalCurriculumId"
+                                name="curriculum_id"
+                                required
+                                class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-black outline-none focus:border-[#dca11d] focus:bg-white"
+                            >
+                                <option value="" disabled selected>-- เลือกหลักสูตรที่รายวิชานี้สังกัด --</option>
+                                {#each curriculumList as item (item.curriculum_id)}
+                                    <option value={item.curriculum_id}>{item.curriculum_name}</option>
+                                {/each}
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-[10px] text-gray-400">
+                                ▼
+                            </div>
+                        </div>
+                    </div>
 
-				<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-					<div class="flex flex-col gap-1.5 sm:col-span-2">
-						<label
-							for="modalCourseCode"
-							class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-						>
-							รหัสวิชา <span class="text-red-500">*</span>
-						</label>
-						<input
-							type="text"
-							id="modalCourseCode"
-							name="course_code"
-							placeholder="เช่น 04113101"
-							required
-							class="w-full rounded-2xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-[#443210] placeholder-gray-400 shadow-sm transition-all outline-none focus:border-[#dca11d]"
-						/>
-					</div>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label for="modalCourseCode" class="text-gray-400">
+                                รหัสวิชา <span class="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="modalCourseCode"
+                                name="course_code"
+                                placeholder="เช่น ENGCE174"
+                                required
+                                class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                            />
+                        </div>
 
-					<div class="flex flex-col gap-1.5">
-						<label
-							for="modalCredits"
-							class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-						>
-							หน่วยกิต <span class="text-red-500">*</span>
-						</label>
-						<input
-							type="number"
-							id="modalCredits"
-							name="credits"
-							min="1"
-							max="10"
-							placeholder="3"
-							required
-							class="w-full rounded-2xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-[#443210] placeholder-gray-400 shadow-sm transition-all outline-none focus:border-[#dca11d]"
-						/>
-					</div>
-				</div>
+                        <div class="space-y-1.5">
+                            <label for="modalCredits" class="text-gray-400">
+                                หน่วยกิต <span class="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id="modalCredits"
+                                name="credits"
+                                min="1"
+                                max="10"
+                                placeholder="3"
+                                required
+                                class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                            />
+                        </div>
+                    </div>
 
-				<div class="flex flex-col gap-1.5">
-					<label
-						for="modalCourseName"
-						class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-					>
-						ชื่อรายวิชา <span class="text-red-500">*</span>
-					</label>
-					<input
-						type="text"
-						id="modalCourseName"
-						name="course_name"
-						placeholder="เช่น Object-Oriented Programming"
-						required
-						class="w-full rounded-2xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-[#443210] placeholder-gray-400 shadow-sm transition-all outline-none focus:border-[#dca11d]"
-					/>
-				</div>
+                    <div class="space-y-1.5">
+                        <label for="modalCourseName" class="text-gray-400">
+                            ชื่อรายวิชา <span class="text-rose-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="modalCourseName"
+                            name="course_name"
+                            placeholder="เช่น Object-Oriented Programming"
+                            required
+                            class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                        />
+                    </div>
 
-				<div class="flex flex-col gap-1.5">
-					<label
-						for="modalDescription"
-						class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-					>
-						คำอธิบายรายวิชา (Description)
-					</label>
-					<textarea
-						id="modalDescription"
-						name="description"
-						rows="3"
-						placeholder="อธิบายเนื้อหาโดยย่อ หรือสมรรถนะรายวิชา..."
-						class="w-full resize-none rounded-2xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-[#443210] placeholder-gray-400 shadow-sm transition-all outline-none focus:border-[#dca11d]"
-					></textarea>
-				</div>
+                    <div class="space-y-1.5">
+                        <label for="modalDescription" class="text-gray-400">
+                            คำอธิบายรายวิชา (Description)
+                        </label>
+                        <textarea
+                            id="modalDescription"
+                            name="description"
+                            rows="3"
+                            placeholder="ระบุเนื้อหาโดยย่อ หรือสมรรถนะรายวิชา..."
+                            class="w-full resize-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                        ></textarea>
+                    </div>
+                </div>
 
-				<div class="flex justify-end gap-3 border-t border-gray-50 pt-3">
-					<button
-						type="button"
-						onclick={() => (isAddCourseModalOpen = false)}
-						class="rounded-xl border-2 border-gray-200 bg-white px-4 py-2 text-xs font-bold text-[#443210] transition-colors hover:bg-gray-50"
-					>
-						ยกเลิก
-					</button>
-					<button
-						type="submit"
-						class="rounded-xl border-2 border-[#634c20] bg-[#634c20] px-5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:border-[#2d210a] hover:bg-[#2d210a]"
-					>
-						💾 บันทึกรายวิชา
-					</button>
-				</div>
-			</form>
-		</div>
-	</div>
+                <div class="flex justify-end gap-3 border-t border-gray-100 p-6">
+                    <button
+                        type="button"
+                        onclick={() => (isAddCourseModalOpen = false)}
+                        class="cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black text-gray-500 shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                    >
+                        ยกเลิกข้อมูล
+                    </button>
+                    <button
+                        type="submit"
+                        class="cursor-pointer rounded-xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                    >
+                        💾 บันทึกข้อมูล
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 {/if}
 
 {#if isEditCourseModalOpen}
-	<div
-		class="fixed inset-0 z-30 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
-	>
-		<div
-			class="w-full max-w-lg overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_24px_48px_rgba(0,0,0,0.05)]"
-		>
-			<div class="flex items-center gap-3 border-b-2 border-gray-50 bg-amber-50/30 px-6 py-5">
-				<span
-					class="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-200 bg-amber-50 text-xl text-[#dca11d]"
-					>✏️</span
-				>
-				<div>
-					<h2 class="text-lg font-black text-[#443210]">แก้ไขข้อมูลรายวิชา</h2>
-					<p class="mt-0.5 text-xs font-bold text-gray-400">
-						อัปเดตข้อมูลรายละเอียดวิชาในระบบ Skill Mapping
-					</p>
-				</div>
-			</div>
+    <div class="fixed inset-0 z-30 flex items-center justify-center p-4">
+        <button
+            type="button"
+            class="fixed inset-0 bg-[#443210]/20 backdrop-blur-sm"
+            onclick={() => (isEditCourseModalOpen = false)}
+        >
+            ✕
+        </button>
 
-			<form
-				method="POST"
-				action="?/updateCourse"
-				use:enhance={() => {
-					return async ({ result }) => {
-						if (result.data) {
-							alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
-							showMessage = true;
+        <div
+            class="relative w-full max-w-lg overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all"
+        >
+            <div class="border-b border-gray-100 px-6 py-4.5">
+                <h3 class="text-base font-black text-[#443210]">✏️ แก้ไขข้อมูลรายวิชา</h3>
+            </div>
 
-							setTimeout(() => {
-								showMessage = false;
-							}, 4000);
+            <form
+                method="POST"
+                action="?/updateCourse"
+                use:enhance={() => {
+                    return async ({ result }) => {
+                        if (result.data) {
+                            alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
+                            showMessage = true;
 
-							if (result.data.success === true) {
-								isEditCourseModalOpen = false;
-								await invalidateAll();
-							}
-						}
-					};
-				}}
-				class="max-h-[75vh] space-y-4 overflow-y-auto p-6"
-			>
-				<input type="hidden" name="course_id" value={courseToEdit.course_id} />
+                            setTimeout(() => {
+                                showMessage = false;
+                            }, 4000);
 
-				<div class="flex flex-col gap-1.5">
-					<label
-						for="editCurriculumId"
-						class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-					>
-						หลักสูตร / ภาควิชาที่สังกัด <span class="text-red-500">*</span>
-					</label>
-					<div class="relative">
-						<select
-							id="editCurriculumId"
-							name="curriculum_id"
-							bind:value={courseToEdit.curriculum_id}
-							required
-							class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-white py-2.5 pr-10 pl-4 text-sm font-bold text-[#443210] shadow-sm transition-all outline-none focus:border-[#dca11d]"
-						>
-							<option value="" disabled>-- เลือกหลักสูตรที่วิชานี้สังกัด --</option>
-							{#each curriculumList as item (item.curriculum_id)}
-								<option value={item.curriculum_id}>{item.curriculum_name}</option>
-							{/each}
-						</select>
-						<div
-							class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-xs text-gray-400"
-						>
-							▼
-						</div>
-					</div>
-				</div>
+                            if (result.data.success === true) {
+                                isEditCourseModalOpen = false;
+                                await invalidateAll();
+                            }
+                        }
+                    };
+                }}
+            >
+                <div
+                    class="max-h-[70vh] space-y-4 overflow-y-auto p-6 text-xs font-bold text-[#443210]"
+                >
+                    <input type="hidden" name="course_id" value={courseToEdit.course_id} />
 
-				<div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-					<div class="flex flex-col gap-1.5 sm:col-span-2">
-						<label
-							for="editCourseCode"
-							class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-						>
-							รหัสวิชา <span class="text-red-500">*</span>
-						</label>
-						<input
-							type="text"
-							id="editCourseCode"
-							name="course_code"
-							bind:value={courseToEdit.course_code}
-							placeholder="เช่น 04113101"
-							required
-							class="w-full rounded-2xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-[#443210] placeholder-gray-400 shadow-sm transition-all outline-none focus:border-[#dca11d]"
-						/>
-					</div>
+                    <div class="space-y-1.5">
+                        <label for="editCurriculumId" class="text-gray-400">
+                            หลักสูตร / ภาควิชาที่สังกัด <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <select
+                                id="editCurriculumId"
+                                name="curriculum_id"
+                                bind:value={courseToEdit.curriculum_id}
+                                required
+                                class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-black outline-none focus:border-[#dca11d] focus:bg-white"
+                            >
+                                <option value="" disabled>-- เลือกหลักสูตรที่รายวิชานี้สังกัด --</option>
+                                {#each curriculumList as item (item.curriculum_id)}
+                                    <option value={item.curriculum_id}>{item.curriculum_name}</option>
+                                {/each}
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-[10px] text-gray-400">
+                                ▼
+                            </div>
+                        </div>
+                    </div>
 
-					<div class="flex flex-col gap-1.5">
-						<label
-							for="editCredits"
-							class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-						>
-							หน่วยกิต <span class="text-red-500">*</span>
-						</label>
-						<input
-							type="number"
-							id="editCredits"
-							name="credits"
-							bind:value={courseToEdit.credits}
-							min="1"
-							max="10"
-							required
-							class="w-full rounded-2xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-[#443210] shadow-sm transition-all outline-none focus:border-[#dca11d]"
-						/>
-					</div>
-				</div>
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label for="editCourseCode" class="text-gray-400">
+                                รหัสวิชา <span class="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="editCourseCode"
+                                name="course_code"
+                                bind:value={courseToEdit.course_code}
+                                placeholder="เช่น 04113101"
+                                required
+                                class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                            />
+                        </div>
 
-				<div class="flex flex-col gap-1.5">
-					<label
-						for="editCourseName"
-						class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-					>
-						ชื่อรายวิชา <span class="text-red-500">*</span>
-					</label>
-					<input
-						type="text"
-						id="editCourseName"
-						name="course_name"
-						bind:value={courseToEdit.course_name}
-						placeholder="เช่น Object-Oriented Programming"
-						required
-						class="w-full rounded-2xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-[#443210] placeholder-gray-400 shadow-sm transition-all outline-none focus:border-[#dca11d]"
-					/>
-				</div>
+                        <div class="space-y-1.5">
+                            <label for="editCredits" class="text-gray-400">
+                                หน่วยกิต <span class="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id="editCredits"
+                                name="credits"
+                                bind:value={courseToEdit.credits}
+                                min="1"
+                                max="10"
+                                placeholder="3"
+                                required
+                                class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                            />
+                        </div>
+                    </div>
 
-				<div class="flex flex-col gap-1.5">
-					<label
-						for="editDescription"
-						class="pl-1 text-xs font-bold tracking-wider text-gray-400 uppercase"
-					>
-						คำอธิบายรายวิชา (Description)
-					</label>
-					<textarea
-						id="editDescription"
-						name="description"
-						bind:value={courseToEdit.description}
-						rows="3"
-						placeholder="อธิบายเนื้อหาโดยย่อ หรือสมรรถนะรายวิชา..."
-						class="w-full resize-none rounded-2xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-[#443210] placeholder-gray-400 shadow-sm transition-all outline-none focus:border-[#dca11d]"
-					></textarea>
-				</div>
+                    <div class="space-y-1.5">
+                        <label for="editCourseName" class="text-gray-400">
+                            ชื่อรายวิชา <span class="text-rose-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="editCourseName"
+                            name="course_name"
+                            bind:value={courseToEdit.course_name}
+                            placeholder="เช่น Object-Oriented Programming"
+                            required
+                            class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                        />
+                    </div>
 
-				<div class="flex justify-end gap-3 border-t border-gray-50 pt-3">
-					<button
-						type="button"
-						onclick={() => (isEditCourseModalOpen = false)}
-						class="rounded-xl border-2 border-gray-200 bg-white px-4 py-2 text-xs font-bold text-[#443210] transition-colors hover:bg-gray-50"
-					>
-						ยกเลิก
-					</button>
-					<button
-						type="submit"
-						class="rounded-xl border-2 border-[#634c20] bg-[#634c20] px-5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:border-[#2d210a] hover:bg-[#2d210a]"
-					>
-						💾 บันทึกการแก้ไข
-					</button>
-				</div>
-			</form>
-		</div>
-	</div>
+                    <div class="space-y-1.5">
+                        <label for="editDescription" class="text-gray-400">
+                            คำอธิบายรายวิชา (Description)
+                        </label>
+                        <textarea
+                            id="editDescription"
+                            name="description"
+                            bind:value={courseToEdit.description}
+                            rows="3"
+                            placeholder="ระบุเนื้อหาโดยย่อ หรือสมรรถนะรายวิชา..."
+                            class="w-full resize-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 border-t border-gray-100 p-6">
+                    <button
+                        type="button"
+                        onclick={() => (isEditCourseModalOpen = false)}
+                        class="cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black text-gray-500 shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                    >
+                        ยกเลิกข้อมูล
+                    </button>
+                    <button
+                        type="submit"
+                        class="cursor-pointer rounded-xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                    >
+                        💾 บันทึกการแก้ไข
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 {/if}
 
 {#if isDeleteCourseModalOpen}
-	<div
-		class="fixed inset-0 z-30 flex items-center justify-center bg-slate-900/40 p-4 backdrop-blur-sm"
-	>
-		<div
-			class="w-full max-w-md overflow-hidden rounded-[28px] border-2 border-rose-200 bg-white shadow-[0_24px_48px_rgba(225,29,72,0.08)]"
-		>
-			<div class="flex items-center gap-3 border-b-2 border-rose-50 bg-rose-50/50 px-6 py-5">
-				<span
-					class="flex h-10 w-10 items-center justify-center rounded-xl border border-rose-200 bg-rose-100 text-xl text-rose-600"
-					>⚠️</span
-				>
-				<div>
-					<h2 class="text-lg font-black text-rose-700">ยืนยันการลบรายวิชา</h2>
-					<p class="mt-0.5 text-xs font-bold text-rose-400">โปรดตรวจสอบข้อมูลก่อนกดยืนยัน</p>
-				</div>
-			</div>
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <button
+            type="button"
+            class="fixed inset-0 bg-[#443210]/20 backdrop-blur-sm"
+            onclick={() => (isDeleteCourseModalOpen = false)}
+        >
+            ✕
+        </button>
 
-			<div class="p-6">
-				<div class="space-y-2 rounded-2xl border-2 border-gray-100 bg-gray-50/50 p-4">
-					<p class="text-xs font-medium text-gray-400">รายวิชาที่เลือก:</p>
-					<p class="text-sm font-black text-[#443210]">
-						รหัสวิชา: <span class="font-mono text-gray-600">{courseToDelete.course_code}</span>
-					</p>
-					<p class="text-sm font-black text-[#443210]">
-						ชื่อรายวิชา: <span class="text-gray-600">{courseToDelete.course_name}</span>
-					</p>
-				</div>
-				<p
-					class="mt-4 rounded-xl border border-rose-100 bg-rose-50 p-3 text-xs font-bold text-rose-500"
-				>
-					คำเตือน: การลบข้อมูลนี้จะเป็นการลบถาวรออกจากระบบฐานข้อมูลหลักสูตร และข้อมูลการจับคู่ทักษะ
-					(Skill Mapping) ของวิชานี้จะหายไปทั้งหมด ไม่สามารถกู้คืนได้
-				</p>
-			</div>
+        <div
+            class="relative w-full max-w-md overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all"
+        >
+            <div class="border-b border-gray-100 px-6 py-4.5">
+                <h3 class="text-base font-black text-[#443210]">🚫 ยืนยันการลบรายวิชา</h3>
+            </div>
 
-			<form
-				method="POST"
-				action="?/deleteCourse"
-				use:enhance={() => {
-					return async ({ result }) => {
-						if (result.data) {
-							alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
-							showMessage = true;
+            <div class="p-6">
+                <div class="flex items-center gap-4 rounded-2xl border border-amber-100 bg-amber-50/60 p-4">
+                    <span class="text-3xl">⚠️</span>
+                    <p class="text-xs leading-relaxed font-bold text-[#443210]">
+                        คุณกำลังทำรายการลบรายวิชาออกจากระบบสารสนเทศหลักสูตร 
+                        โปรดตรวจสอบข้อมูลความถูกต้องก่อนทำการยืนยัน
+                    </p>
+                </div>
 
-							setTimeout(() => {
-								showMessage = false;
-							}, 4000);
+                <div class="mt-5 space-y-1.5 rounded-2xl border-2 border-gray-100 bg-gray-50/50 p-4">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase">
+                        รายวิชาที่เลือกทำรายการ:
+                    </p>
+                    <p class="text-xs font-black text-[#443210]">
+                        รหัสวิชา: <span class="font-mono text-gray-600">{courseToDelete.course_code}</span>
+                    </p>
+                    <p class="text-xs font-black text-[#443210]">
+                        ชื่อรายวิชา: <span class="text-gray-600">{courseToDelete.course_name}</span>
+                    </p>
+                </div>
 
-							if (result.data.success === true) {
-								isDeleteCourseModalOpen = false; // ปิดป๊อปอัปเมื่อลบสำเร็จ
-								await invalidateAll(); // รีโหลดข้อมูลในตารางใหม่แบบ SPA
-							}
-						}
-					};
-				}}
-				class="flex justify-end gap-3 px-6 pb-6"
-			>
-				<input type="hidden" name="course_id" value={courseToDelete.course_id} />
+                <p class="mt-4 rounded-xl border border-rose-100 bg-rose-50 p-3 text-[11px] leading-relaxed font-black text-rose-500">
+                    คำเตือน: การลบข้อมูลนี้จะเป็นการลบถาวรออกจากระบบฐานข้อมูล โดยระบบจะถอนรายวิชานี้รวมถึงแผนผังทักษะ (Skill Mapping) ทั้งหมดที่เกี่ยวข้องโดยทันทีและไม่สามารถกู้คืนได้
+                </p>
+            </div>
 
-				<button
-					type="button"
-					onclick={() => (isDeleteCourseModalOpen = false)}
-					class="rounded-xl border-2 border-gray-200 bg-white px-4 py-2 text-xs font-bold text-[#443210] transition-colors hover:bg-gray-50"
-					>ยกเลิก</button
-				>
-				<button
-					type="submit"
-					class="rounded-xl border-2 border-rose-600 bg-rose-600 px-5 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:border-rose-700 hover:bg-rose-700"
-					>🗑️ ยืนยันลบข้อมูล</button
-				>
-			</form>
-		</div>
-	</div>
+            <form
+                method="POST"
+                action="?/deleteCourse"
+                use:enhance={() => {
+                    return async ({ result }) => {
+                        if (result.data) {
+                            alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
+                            showMessage = true;
+
+                            setTimeout(() => {
+                                showMessage = false;
+                            }, 4000);
+
+                            if (result.data.success === true) {
+                                isDeleteCourseModalOpen = false;
+                                await invalidateAll();
+                            }
+                        }
+                    };
+                }}
+                class="flex justify-end gap-3 px-6 pb-6"
+            >
+                <input type="hidden" name="course_id" value={courseToDelete.course_id} />
+
+                <button
+                    type="button"
+                    onclick={() => (isDeleteCourseModalOpen = false)}
+                    class="cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black text-gray-500 shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                >
+                    ยกเลิก
+                </button>
+                
+                <button
+                    type="submit"
+                    class="cursor-pointer rounded-xl border border-rose-200 bg-rose-500 px-5 py-2.5 text-xs font-black text-white shadow-sm transition-colors hover:bg-rose-600"
+                >
+                    💥 ยืนยันการลบถาวร
+                </button>
+            </form>
+        </div>
+    </div>
 {/if}

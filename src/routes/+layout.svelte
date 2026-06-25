@@ -41,7 +41,10 @@
 <svelte:head><link rel="icon" href={favicon} /></svelte:head>
 
 {#if isPageNoNav}
+<div class="bg-gray-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-[size:16px_16px] selection:bg-amber-100">
     {@render children()}
+</div>
+    
 {:else if sid}
     <nav class="sticky top-0 z-50 bg-[#443210] p-4 text-white shadow-md">
         <div class="mx-auto flex max-w-7xl items-center justify-between">
@@ -63,7 +66,7 @@
                     {/if}
 
                     {#if sid.role === 'admin'}
-                        <a href={adminPage} class="transition-colors hover:text-[#dca11d]">หน้าหลักแอดมิน</a>
+                        <a href={adminPage} class="transition-colors hover:text-[#dca11d]">แผงควบคุมหลัก</a>
                         <a href={curriculum} class="transition-colors hover:text-[#dca11d]">ข้อมูลหลักสูตร</a>
                     {/if}
 
@@ -137,8 +140,7 @@
                 {/if}
 
                 {#if sid.role === 'admin'}
-                    <a href={adminPage} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}>หน้าหลักแอดมิน</a>
-                    <a href={homePath} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}>หน้าหลักแอดมิน</a>
+                    <a href={adminPage} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}>แผงควบคุมหลัก</a>
                     <a href={curriculum} class="block text-sm hover:text-[#dca11d]" onclick={toggleMenu}>ข้อมูลหลักสูตร</a>
                 {/if}
 
@@ -173,7 +175,7 @@
         {/if}
     </nav>
 
-    <main class="min-h-screen bg-[#fcfcfc]">
+    <main class="bg-gray-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-[size:16px_16px] selection:bg-amber-100">
         {@render children()}
     </main>
 
@@ -244,7 +246,7 @@
         {/if}
     </nav>
 
-    <main class="min-h-screen bg-[#fcfcfc]">
+    <main class="bg-gray-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-[size:16px_16px]  selection:bg-amber-100">
         {@render children()}
     </main>
 
