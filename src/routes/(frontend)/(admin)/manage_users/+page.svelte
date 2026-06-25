@@ -142,7 +142,7 @@
 
 					<button
 						type="button"
-						onclick={() => window.open('/api/export-users', '_blank')}
+						onclick={() => window.open('/api/export-users-csv', '_blank')}
 						class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
 					>
 						📥 ส่งออกข้อมูล (Export CSV)
