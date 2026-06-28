@@ -1,81 +1,88 @@
 <script>
-    // 1. ตัวแปรสำหรับระบบแจ้งเตือน (Toast Message) ตามต้นแบบ
-    let showMessage = false;
-    let alertMessage = "";
+    // --- 1. สเตตัสและตัวแปรหลัก (Svelte 5 State Runes) ---
+    let showMessage = $state(false);
+    let alertMessage = $state("");
+    let searchQuery = $state("");
+    let currentPage = $state(1);
+    let selectedCurriculum = $state("cpe_67");
+    
+    const itemsPerPage = 5; // แสดงหน้าละ 5 รายวิชา
+    const adminPage = "/adminPage"; // ลิงก์กลับหน้าควบคุม
 
+    // ฟังก์ชันเรียกกล่องแจ้งเตือน 🔔 สไลด์ด้านบน
     function triggerAlert(msg) {
         alertMessage = msg;
         showMessage = true;
-        setTimeout(() => { showMessage = false; }, 3000); // หายไปใน 3 วินาที
+        setTimeout(() => { showMessage = false; }, 3000);
     }
 
-    // 2. ข้อมูลหลักสูตร (สำหรับตัวเลือก Select)
-    let selectedCurriculum = "cpe_67";
-    let curriculumList = [
-        { curriculum_id: "cpe_67", curriculum_name: "วิศวรรคมคอมพิวเตอร์ (หลักสูตร 2567)" },
+    // --- 2. ข้อมูลจำลองหลักสูตร ---
+    let curriculumList = $state([
+        { curriculum_id: "cpe_67", curriculum_name: "วิศวกรรมคอมพิวเตอร์ (หลักสูตร 2567)" },
         { curriculum_id: "ee_67", curriculum_name: "วิศวกรรมไฟฟ้า (หลักสูตร 2567)" }
-    ];
+    ]);
 
-    // 3. คลังข้อมูลรายวิชา (จำลองรองรับข้อมูลจำนวนเยอะเพื่อทดสอบระบบ Pagination)
-    let courses = [
+    // --- 3. ข้อมูลจำลองรายวิชาภายในระบบ ---
+    let courses = $state([
         { course_id: 1, course_code: "CPE-101", course_name: "Computer Programming", curriculum_id: "cpe_67" },
-        { course_id: 2, course_code: "CPE-221", course_name: "Database Systems", curriculum_id: "cpe_67" },
-        { course_id: 3, course_code: "CPE-342", course_name: "Artificial Intelligence", curriculum_id: "cpe_67" },
-        { course_id: 4, course_code: "CPE-491", course_name: "Computer Engineering Project I", curriculum_id: "cpe_67" },
-        { course_id: 5, course_code: "CPE-212", course_name: "Data Structures and Algorithms", curriculum_id: "cpe_67" },
-        { course_id: 6, course_code: "CPE-325", course_name: "Operating Systems", curriculum_id: "cpe_67" },
-        { course_id: 7, course_code: "EE-101", course_name: "Electric Circuit Analysis", curriculum_id: "ee_67" }
-    ];
+        { course_id: 2, course_code: "CPE-212", course_name: "Data Structures and Algorithms", curriculum_id: "cpe_67" },
+        { course_id: 3, course_code: "CPE-221", course_name: "Database Systems", curriculum_id: "cpe_67" },
+        { course_id: 4, course_code: "CPE-325", course_name: "Operating Systems", curriculum_id: "cpe_67" },
+        { course_id: 5, course_code: "CPE-342", course_name: "Artificial Intelligence", curriculum_id: "cpe_67" },
+        { course_id: 6, course_code: "CPE-491", course_name: "Computer Engineering Project I", curriculum_id: "cpe_67" },
+        { course_id: 7, course_code: "EE-101", course_name: "Electric Circuit Analysis", curriculum_id: "ee_67" },
+        { course_id: 8, course_code: "EE-204", course_name: "Digital Circuit Design", curriculum_id: "ee_67" }
+    ]);
 
-    // 4. สเตตัสและตัวแปรค้นหา / แบ่งหน้า
-    let searchQuery = "";
-    let currentPage = 1;
-    const itemsPerPage = 3; // กำหนดให้แสดงหน้าละ 3 แถวตามต้นแบบกรณีข้อมูลเยอะ
-    let adminPage = "/adminPage";
-
-    // 5. ⚡️ REACTIVE LOGIC: ระบบกรองค้นหาตามสิทธิ์หลักสูตรและคีย์เวิร์ด (ทำงานจริง)
-    $: filteredCourses = courses.filter(course => {
-        // กรองด้วยหลักสูตรที่เลือกก่อน
-        if (course.curriculum_id !== selectedCurriculum) return false;
-        
-        // กรองด้วยช่องค้นหา (รหัสวิชา หรือ ชื่อวิชา)
-        const query = searchQuery.toLowerCase().trim();
-        return (
-            course.course_code.toLowerCase().includes(query) ||
-            course.course_name.toLowerCase().includes(query)
-        );
-    });
-
-    // 6. ⚡️ REACTIVE LOGIC: คำนวณระบบแบ่งหน้าถัดไป (Pagination)
-    $: totalPages = Math.ceil(filteredCourses.length / itemsPerPage) || 1;
-    $: paginatedCourses = filteredCourses.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
+    // --- 4. ⚡️ ระบบ Reactive คำนวณอัตโนมัติ (Svelte 5 Derived Runes) ---
+    // กรองวิชาตามคีย์เวิร์ด และหลักสูตรที่เลือก
+    let filteredCourses = $derived(
+        courses.filter(course => {
+            if (course.curriculum_id !== selectedCurriculum) return false;
+            
+            const query = searchQuery.toLowerCase().trim();
+            return (
+                course.course_code.toLowerCase().includes(query) ||
+                course.course_name.toLowerCase().includes(query)
+            );
+        })
     );
 
-    // รีเซ็ตหน้ากลับไปหน้า 1 เสมอเมื่อเปลี่ยนหลักสูตรหรือค้นหาใหม่
-    $: if (searchQuery || selectedCurriculum) {
-        currentPage = 1;
-    }
+    // คำนวณจำนวนหน้าทั้งหมด
+    let totalPages = $derived(Math.ceil(filteredCourses.length / itemsPerPage) || 1);
 
-    // 7. ฟังก์ชันฟังก์ชันปุ่มคำสั่ง (CRUD Actions)
+    // หั่นข้อมูลแสดงเฉพาะหน้าปัจจุบัน (Pagination)
+    let paginatedCourses = $derived(
+        filteredCourses.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+    );
+
+    // รีเซ็ตหน้ากลับไปหน้า 1 เสมอเมื่อมีการพิมพ์ค้นหาหรือเปลี่ยนหลักสูตร
+    $effect(() => {
+        if (searchQuery || selectedCurriculum) {
+            currentPage = 1;
+        }
+    });
+
+    // --- 5. ฟังก์ชันคำสั่งการจัดการ (CRUD Actions) ---
     function openEditModal(course) {
-        triggerAlert(`✏️ เปิดหน้าต่างแก้ไขวิชา: ${course.course_code}`);
+        triggerAlert(`✏️ กำลังแก้ไขรายวิชา: ${course.course_code} - ${course.course_name}`);
     }
 
     function openDeleteModal(course) {
-        if (confirm(`🗑️ คุณแน่ใจหรือไม่ที่จะลบวิชา ${course.course_code} ออกจากระบบ?`)) {
+        if (confirm(`🗑️ คุณต้องการลบรายวิชา [${course.course_code}] ใช่หรือไม่? ข้อมูลนี้จะหายไปจากระบบ`)) {
             courses = courses.filter(c => c.course_id !== course.course_id);
-            triggerAlert(`🗑️ ลบรายวิชาสำเร็จเรียบร้อยแล้ว`);
+            triggerAlert(`🗑️ ลบรายวิชา ${course.course_code} สำเร็จเรียบร้อยแล้ว`);
         }
     }
 
     function exportCSV() {
-        triggerAlert(`📤 กำลังส่งออกไฟล์ CSV ของหลักสูตรที่เลือก...`);
+        const currentCurriculumName = curriculumList.find(c => c.curriculum_id === selectedCurriculum)?.curriculum_name || "หลักสูตร";
+        triggerAlert(`📤 ส่งออกข้อมูลไฟล์ CSV ของ: ${currentCurriculumName}`);
         window.open('/api/export-curriculums', '_blank');
     }
 </script>
 
+<!-- 🔔 กล่องแจ้งเตือนสไลด์บน (Toast Alert) คงเอกลักษณ์ตามต้นแบบ -->
 <div
     class="pointer-events-none fixed top-6 right-0 left-0 z-50 flex justify-center p-4 transition-all duration-500 ease-out"
     class:translate-y-0={showMessage}
@@ -97,11 +104,13 @@
     </div>
 </div>
 
+<!-- 🌐 พื้นหลังจุดไข่ปลาและ Layout ควบคุมตามต้นแบบ -->
 <div
     class="min-h-screen bg-gray-50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-[size:16px_16px] py-16 selection:bg-amber-100"
 >
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
+        <!-- ส่วนหัวข้อหลัก (Header Panel) -->
         <div class="mb-8 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex flex-col items-center gap-5 text-center md:flex-row md:items-start md:gap-6 md:text-left">
                 <div class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 text-2xl shadow-sm">
@@ -141,9 +150,11 @@
             </div>
         </div>
 
+        <!-- แถบตัวกรองและปุ่มจัดการข้อมูล (Filters & Actions) -->
         <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div class="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:max-w-3xl">
                 
+                <!-- ตัวเลือกหลักสูตรต้นแบบกรองได้จริง -->
                 <div class="flex flex-col gap-1.5">
                     <span class="pl-1 text-xs font-medium text-gray-400"> หลักสูตร / ภาควิชาที่เลือก </span>
                     <div class="relative">
@@ -163,8 +174,9 @@
                     </div>
                 </div>
 
+                <!-- ช่องค้นหารายวิชาแบบ Reactive กรองข้อมูลสดทันที -->
                 <div class="flex flex-col gap-1.5">
-                    <span class="pl-1 text-xs font-medium text-gray-400"> ค้นหารายวิชา (กรองสด) </span>
+                    <span class="pl-1 text-xs font-medium text-gray-400"> ค้นหารายวิชา </span>
                     <div class="relative">
                         <input
                             type="text"
@@ -188,25 +200,19 @@
                 </div>
             </div>
 
+            <!-- ปุ่มคำสั่งเพิ่มข้อมูลในสไตล์ธีมสีหลักน้ำตาลทองเหลือง -->
             <div class="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-end">
                 <button
                     type="button"
-                    onclick={() => triggerAlert('➕ เปิด Modal เพิ่มรายวิชาใหม่')}
+                    onclick={() => triggerAlert('➕ เปิดหน้าต่าง Pop-up เพิ่มรายวิชาใหม่')}
                     class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#443210] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d] sm:w-auto"
                 >
                     ➕ เพิ่มรายวิชาใหม่
                 </button>
-
-                <button
-                    type="button"
-                    onclick={() => triggerAlert('➕ เปิด Modal เพิ่มหลักสูตรต้นทาง')}
-                    class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#443210] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d] sm:w-auto"
-                >
-                    ➕ เพิ่มหลักสูตร
-                </button>
             </div>
         </div>
 
+        <!-- โครงสร้างตารางรายวิชา (Data Table) -->
         <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
             <div class="overflow-x-auto">
                 <table class="w-full border-collapse text-left text-sm text-gray-500">
@@ -221,7 +227,7 @@
                     <tbody class="divide-y divide-gray-100 font-medium text-gray-700">
                         {#each paginatedCourses as course (course.course_id)}
                             <tr class="transition-colors duration-150 odd:bg-white even:bg-gray-50/30 hover:bg-gray-50">
-                                <td class="px-6 py-4 font-mono font-bold tracking-wide text-[#dca11d]">
+                                <td class="px-6 py-4 font-mono font-bold tracking-wide text-gray-500">
                                     {course.course_code}
                                 </td>
                                 <td class="px-6 py-4">
@@ -260,7 +266,8 @@
                                         </div>
                                         <h3 class="text-sm font-bold text-[#443210]">ไม่พบข้อมูลรายวิชา</h3>
                                         <p class="mt-1 text-xs leading-relaxed text-gray-400">
-                                            ไม่พบข้อมูลที่ตรงกับเงื่อนไขหลักสูตรหรือคำค้นหาของคุณ <br /> กรุณาลองระบุคำค้นหาใหม่อีกครั้ง หรือเพิ่มรายวิชาเข้าสู่ระบบ
+                                            ไม่พบข้อมูลที่ตรงกับเงื่อนไขหลักสูตรหรือคำค้นหาของคุณ <br />
+                                            กรุณาลองระบุคำค้นหาใหม่อีกครั้ง หรือเพิ่มรายวิชาเข้าสู่ระบบ
                                         </p>
                                     </div>
                                 </td>
@@ -270,6 +277,7 @@
                 </table>
             </div>
 
+            <!-- 📄 แถบระบบควบคุมการสลับหน้าเพจ (Pagination System) -->
             {#if filteredCourses.length > 0}
                 <div class="flex flex-col items-center justify-between gap-4 border-t border-gray-200 bg-gray-50/50 px-6 py-4 sm:flex-row">
                     <span class="text-xs font-medium text-gray-400">
