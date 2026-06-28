@@ -1,4 +1,5 @@
 <script>
+//@ts-nocheck
     import { enhance } from "$app/forms";
     import { invalidateAll } from "$app/navigation";
 

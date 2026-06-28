@@ -8,6 +8,7 @@ export async function load({locals}) {
     }
     try{
         const [userRows] = await pool.query('SELECT id, curriculum_id FROM users WHERE username = ?',[locals.user.username]);
+        //@ts-ignore
         const user = userRows[0];
 
         const [coursesRows] = await pool.execute(
