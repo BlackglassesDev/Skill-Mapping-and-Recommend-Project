@@ -1,13 +1,18 @@
 <script>
+    import { enhance } from "$app/forms";
+    import { invalidateAll } from "$app/navigation";
+
+    let { data } = $props();
     // --- 1. สเตตัสและตัวแปรหลัก (Svelte 5 State Runes) ---
     let showMessage = $state(false);
     let alertMessage = $state("");
     let searchQuery = $state("");
     let currentPage = $state(1);
-    let selectedCurriculum = $state("cpe_67");
+    let selectedCurriculum = $state(data.user?.curriculum_id || "");
+    let curriculumList = $derived(Array.isArray(data.curriculums) ? data.curriculums : []);
     
     const itemsPerPage = 5; // แสดงหน้าละ 5 รายวิชา
-    const adminPage = "/adminPage"; // ลิงก์กลับหน้าควบคุม
+    const teacherPage = "/teacherPage"; // ลิงก์กลับหน้าควบคุม
 
     // ฟังก์ชันเรียกกล่องแจ้งเตือน 🔔 สไลด์ด้านบน
     function triggerAlert(msg) {
@@ -16,23 +21,44 @@
         setTimeout(() => { showMessage = false; }, 3000);
     }
 
-    // --- 2. ข้อมูลจำลองหลักสูตร ---
-    let curriculumList = $state([
-        { curriculum_id: "cpe_67", curriculum_name: "วิศวกรรมคอมพิวเตอร์ (หลักสูตร 2567)" },
-        { curriculum_id: "ee_67", curriculum_name: "วิศวกรรมไฟฟ้า (หลักสูตร 2567)" }
-    ]);
+    /**@type {any}*/
+    let courses = $state([]);
+    $effect(() => {
+        courses = Array.isArray(data.courses) ? data.courses : [];
+    });
 
-    // --- 3. ข้อมูลจำลองรายวิชาภายในระบบ ---
-    let courses = $state([
-        { course_id: 1, course_code: "CPE-101", course_name: "Computer Programming", curriculum_id: "cpe_67" },
-        { course_id: 2, course_code: "CPE-212", course_name: "Data Structures and Algorithms", curriculum_id: "cpe_67" },
-        { course_id: 3, course_code: "CPE-221", course_name: "Database Systems", curriculum_id: "cpe_67" },
-        { course_id: 4, course_code: "CPE-325", course_name: "Operating Systems", curriculum_id: "cpe_67" },
-        { course_id: 5, course_code: "CPE-342", course_name: "Artificial Intelligence", curriculum_id: "cpe_67" },
-        { course_id: 6, course_code: "CPE-491", course_name: "Computer Engineering Project I", curriculum_id: "cpe_67" },
-        { course_id: 7, course_code: "EE-101", course_name: "Electric Circuit Analysis", curriculum_id: "ee_67" },
-        { course_id: 8, course_code: "EE-204", course_name: "Digital Circuit Design", curriculum_id: "ee_67" }
-    ]);
+    let isAddCourseModalOpen = $state(false);
+    let isEditCourseModalOpen = $state(false);
+    let courseToEdit = $state({
+        course_id: "",
+        course_code: "",
+        course_name: "",
+        credits: 3,
+        description: "",
+        curriculum_id: ""
+    });
+
+    let isDeleteCourseModalOpen = $state(false);
+    let courseToDelete = $state({
+        course_id: "",
+        course_code: "",
+        course_name: ""
+    });
+
+    function openEditModal(course) {
+        courseToEdit = { ...course };
+        isEditCourseModalOpen = true;
+    }
+
+    function openDeleteModal(course) {
+        if (!course) return;
+        courseToDelete = {
+            course_id: course.course_id || "",
+            course_code: course.course_code || "",
+            course_name: course.course_name || ""
+        };
+        isDeleteCourseModalOpen = true;
+    }
 
     // --- 4. ⚡️ ระบบ Reactive คำนวณอัตโนมัติ (Svelte 5 Derived Runes) ---
     // กรองวิชาตามคีย์เวิร์ด และหลักสูตรที่เลือก
@@ -62,18 +88,6 @@
             currentPage = 1;
         }
     });
-
-    // --- 5. ฟังก์ชันคำสั่งการจัดการ (CRUD Actions) ---
-    function openEditModal(course) {
-        triggerAlert(`✏️ กำลังแก้ไขรายวิชา: ${course.course_code} - ${course.course_name}`);
-    }
-
-    function openDeleteModal(course) {
-        if (confirm(`🗑️ คุณต้องการลบรายวิชา [${course.course_code}] ใช่หรือไม่? ข้อมูลนี้จะหายไปจากระบบ`)) {
-            courses = courses.filter(c => c.course_id !== course.course_id);
-            triggerAlert(`🗑️ ลบรายวิชา ${course.course_code} สำเร็จเรียบร้อยแล้ว`);
-        }
-    }
 
     function exportCSV() {
         const currentCurriculumName = curriculumList.find(c => c.curriculum_id === selectedCurriculum)?.curriculum_name || "หลักสูตร";
@@ -125,15 +139,15 @@
                         Curriculum Management — บริหารจัดการโครงสร้างรายวิชาของภาควิชา เพื่อนำข้อมูลไปประมวลผลและการจัดทำแผนผังทักษะ (Skill Mapping)
                     </p>
 
-                    <div class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-red-100 bg-red-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-red-600 uppercase">
-                        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500"></span>
-                        Admin Mode Only
+                    <div class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-500 bg-amber-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-amber-600 uppercase">
+                        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-200"></span>
+                        Teacher Mode Only
                     </div>
                 </div>
 
                 <div class="flex w-full shrink-0 flex-col gap-2.5 pt-2 md:w-auto md:items-end">
                     <a
-                        href={adminPage}
+                        href={teacherPage}
                         class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-gray-200 bg-white px-4 py-2 text-xs font-black text-gray-500 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d] md:w-full"
                     >
                         ← กลับหน้าควบคุม
@@ -153,27 +167,6 @@
         <!-- แถบตัวกรองและปุ่มจัดการข้อมูล (Filters & Actions) -->
         <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div class="grid flex-1 grid-cols-1 gap-4 sm:grid-cols-2 lg:max-w-3xl">
-                
-                <!-- ตัวเลือกหลักสูตรต้นแบบกรองได้จริง -->
-                <div class="flex flex-col gap-1.5">
-                    <span class="pl-1 text-xs font-medium text-gray-400"> หลักสูตร / ภาควิชาที่เลือก </span>
-                    <div class="relative">
-                        <select
-                            bind:value={selectedCurriculum}
-                            class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white py-2.5 pr-10 pl-4 text-sm font-black text-[#443210] shadow-sm transition-all outline-none focus:border-[#dca11d] focus:ring-1 focus:ring-[#dca11d]"
-                        >
-                            {#each curriculumList as item (item.curriculum_id)}
-                                <option value={item.curriculum_id}>{item.curriculum_name}</option>
-                            {:else}
-                                <option value="">❌ ไม่พบข้อมูลหลักสูตรในระบบ</option>
-                            {/each}
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-[10px] text-gray-400">
-                            ▼
-                        </div>
-                    </div>
-                </div>
-
                 <!-- ช่องค้นหารายวิชาแบบ Reactive กรองข้อมูลสดทันที -->
                 <div class="flex flex-col gap-1.5">
                     <span class="pl-1 text-xs font-medium text-gray-400"> ค้นหารายวิชา </span>
@@ -204,7 +197,7 @@
             <div class="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-end">
                 <button
                     type="button"
-                    onclick={() => triggerAlert('➕ เปิดหน้าต่าง Pop-up เพิ่มรายวิชาใหม่')}
+                    onclick={() => (isAddCourseModalOpen = true)}
                     class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#443210] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d] sm:w-auto"
                 >
                     ➕ เพิ่มรายวิชาใหม่
@@ -329,3 +322,364 @@
         </div>
     </div>
 </div>
+
+{#if isAddCourseModalOpen}
+    <div class="fixed inset-0 z-30 flex items-center justify-center p-4">
+        <button
+            type="button"
+            class="fixed inset-0 bg-[#443210]/20 backdrop-blur-sm"
+            onclick={() => (isAddCourseModalOpen = false)}
+        >
+            ✕
+        </button>
+
+        <div
+            class="relative w-full max-w-lg overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all"
+        >
+            <div class="border-b border-gray-100 px-6 py-4.5">
+                <h3 class="text-base font-black text-[#443210]">📝 เพิ่มรายวิชาใหม่</h3>
+            </div>
+
+            <form
+                method="POST"
+                action="?/createCourse"
+                use:enhance={() => {
+                    return async ({ result }) => {
+                        if (result.data) {
+                            alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
+                            showMessage = true;
+
+                            setTimeout(() => {
+                                showMessage = false;
+                            }, 4000);
+
+                            if (result.data.success === true) {
+                                isAddCourseModalOpen = false;
+                                await invalidateAll();
+                            } else {
+                                isAddCourseModalOpen = true;
+                            }
+                        }
+                    };
+                }}
+            >
+                <div
+                    class="max-h-[70vh] space-y-4 overflow-y-auto p-6 text-xs font-bold text-[#443210]"
+                >
+                <input type="hidden" name="curriculum_id" value={data.user.curriculum_id} />
+
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label for="modalCourseCode" class="text-gray-400">
+                                รหัสวิชา <span class="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="modalCourseCode"
+                                name="course_code"
+                                placeholder="เช่น ENGCE174"
+                                required
+                                class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                            />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label for="modalCredits" class="text-gray-400">
+                                หน่วยกิต <span class="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id="modalCredits"
+                                name="credits"
+                                min="1"
+                                max="10"
+                                placeholder="3"
+                                required
+                                class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label for="modalCourseName" class="text-gray-400">
+                            ชื่อรายวิชา <span class="text-rose-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="modalCourseName"
+                            name="course_name"
+                            placeholder="เช่น Object-Oriented Programming"
+                            required
+                            class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                        />
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label for="modalDescription" class="text-gray-400">
+                            คำอธิบายรายวิชา (Description)
+                        </label>
+                        <textarea
+                            id="modalDescription"
+                            name="description"
+                            rows="3"
+                            placeholder="ระบุเนื้อหาโดยย่อ หรือสมรรถนะรายวิชา..."
+                            class="w-full resize-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 border-t border-gray-100 p-6">
+                    <button
+                        type="button"
+                        onclick={() => (isAddCourseModalOpen = false)}
+                        class="cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black text-gray-500 shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                    >
+                        ยกเลิกข้อมูล
+                    </button>
+                    <button
+                        type="submit"
+                        class="cursor-pointer rounded-xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                    >
+                        💾 บันทึกข้อมูล
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{/if}
+
+{#if isEditCourseModalOpen}
+    <div class="fixed inset-0 z-30 flex items-center justify-center p-4">
+        <button
+            type="button"
+            class="fixed inset-0 bg-[#443210]/20 backdrop-blur-sm"
+            onclick={() => (isEditCourseModalOpen = false)}
+        >
+            ✕
+        </button>
+
+        <div
+            class="relative w-full max-w-lg overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all"
+        >
+            <div class="border-b border-gray-100 px-6 py-4.5">
+                <h3 class="text-base font-black text-[#443210]">✏️ แก้ไขข้อมูลรายวิชา</h3>
+            </div>
+
+            <form
+                method="POST"
+                action="?/updateCourse"
+                use:enhance={() => {
+                    return async ({ result }) => {
+                        if (result.data) {
+                            alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
+                            showMessage = true;
+
+                            setTimeout(() => {
+                                showMessage = false;
+                            }, 4000);
+
+                            if (result.data.success === true) {
+                                isEditCourseModalOpen = false;
+                                await invalidateAll();
+                            }
+                        }
+                    };
+                }}
+            >
+                <div
+                    class="max-h-[70vh] space-y-4 overflow-y-auto p-6 text-xs font-bold text-[#443210]"
+                >
+                    <input type="hidden" name="course_id" value={courseToEdit.course_id} />
+
+                    <div class="space-y-1.5">
+                        <label for="editCurriculumId" class="text-gray-400">
+                            หลักสูตร / ภาควิชาที่สังกัด <span class="text-rose-500">*</span>
+                        </label>
+                        <div class="relative">
+                            <select
+                                id="editCurriculumId"
+                                name="curriculum_id"
+                                bind:value={courseToEdit.curriculum_id}
+                                required
+                                class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-black outline-none focus:border-[#dca11d] focus:bg-white"
+                            >
+                                <option value="" disabled>-- เลือกหลักสูตรที่รายวิชานี้สังกัด --</option>
+                                {#each curriculumList as item (item.curriculum_id)}
+                                    <option value={item.curriculum_id}>{item.curriculum_name}</option>
+                                {/each}
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-[10px] text-gray-400">
+                                ▼
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                        <div class="space-y-1.5 sm:col-span-2">
+                            <label for="editCourseCode" class="text-gray-400">
+                                รหัสวิชา <span class="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="editCourseCode"
+                                name="course_code"
+                                bind:value={courseToEdit.course_code}
+                                placeholder="เช่น 04113101"
+                                required
+                                class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                            />
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <label for="editCredits" class="text-gray-400">
+                                หน่วยกิต <span class="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="number"
+                                id="editCredits"
+                                name="credits"
+                                bind:value={courseToEdit.credits}
+                                min="1"
+                                max="10"
+                                placeholder="3"
+                                required
+                                class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label for="editCourseName" class="text-gray-400">
+                            ชื่อรายวิชา <span class="text-rose-500">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            id="editCourseName"
+                            name="course_name"
+                            bind:value={courseToEdit.course_name}
+                            placeholder="เช่น Object-Oriented Programming"
+                            required
+                            class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                        />
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label for="editDescription" class="text-gray-400">
+                            คำอธิบายรายวิชา (Description)
+                        </label>
+                        <textarea
+                            id="editDescription"
+                            name="description"
+                            bind:value={courseToEdit.description}
+                            rows="3"
+                            placeholder="ระบุเนื้อหาโดยย่อ หรือสมรรถนะรายวิชา..."
+                            class="w-full resize-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                        ></textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 border-t border-gray-100 p-6">
+                    <button
+                        type="button"
+                        onclick={() => (isEditCourseModalOpen = false)}
+                        class="cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black text-gray-500 shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                    >
+                        ยกเลิกข้อมูล
+                    </button>
+                    <button
+                        type="submit"
+                        class="cursor-pointer rounded-xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                    >
+                        💾 บันทึกการแก้ไข
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+{/if}
+
+{#if isDeleteCourseModalOpen}
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <button
+            type="button"
+            class="fixed inset-0 bg-[#443210]/20 backdrop-blur-sm"
+            onclick={() => (isDeleteCourseModalOpen = false)}
+        >
+            ✕
+        </button>
+
+        <div
+            class="relative w-full max-w-md overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all"
+        >
+            <div class="border-b border-gray-100 px-6 py-4.5">
+                <h3 class="text-base font-black text-[#443210]">🚫 ยืนยันการลบรายวิชา</h3>
+            </div>
+
+            <div class="p-6">
+                <div class="flex items-center gap-4 rounded-2xl border border-amber-100 bg-amber-50/60 p-4">
+                    <span class="text-3xl">⚠️</span>
+                    <p class="text-xs leading-relaxed font-bold text-[#443210]">
+                        คุณกำลังทำรายการลบรายวิชาออกจากระบบสารสนเทศหลักสูตร 
+                        โปรดตรวจสอบข้อมูลความถูกต้องก่อนทำการยืนยัน
+                    </p>
+                </div>
+
+                <div class="mt-5 space-y-1.5 rounded-2xl border-2 border-gray-100 bg-gray-50/50 p-4">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase">
+                        รายวิชาที่เลือกทำรายการ:
+                    </p>
+                    <p class="text-xs font-black text-[#443210]">
+                        รหัสวิชา: <span class="font-mono text-gray-600">{courseToDelete.course_code}</span>
+                    </p>
+                    <p class="text-xs font-black text-[#443210]">
+                        ชื่อรายวิชา: <span class="text-gray-600">{courseToDelete.course_name}</span>
+                    </p>
+                </div>
+
+                <p class="mt-4 rounded-xl border border-rose-100 bg-rose-50 p-3 text-[11px] leading-relaxed font-black text-rose-500">
+                    คำเตือน: การลบข้อมูลนี้จะเป็นการลบถาวรออกจากระบบฐานข้อมูล โดยระบบจะถอนรายวิชานี้รวมถึงแผนผังทักษะ (Skill Mapping) ทั้งหมดที่เกี่ยวข้องโดยทันทีและไม่สามารถกู้คืนได้
+                </p>
+            </div>
+
+            <form
+                method="POST"
+                action="?/deleteCourse"
+                use:enhance={() => {
+                    return async ({ result }) => {
+                        if (result.data) {
+                            alertMessage = result.data.message ?? 'เกิดข้อผิดพลาด';
+                            showMessage = true;
+
+                            setTimeout(() => {
+                                showMessage = false;
+                            }, 4000);
+
+                            if (result.data.success === true) {
+                                isDeleteCourseModalOpen = false;
+                                await invalidateAll();
+                            }
+                        }
+                    };
+                }}
+                class="flex justify-end gap-3 px-6 pb-6"
+            >
+                <input type="hidden" name="course_id" value={courseToDelete.course_id} />
+
+                <button
+                    type="button"
+                    onclick={() => (isDeleteCourseModalOpen = false)}
+                    class="cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black text-gray-500 shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
+                >
+                    ยกเลิก
+                </button>
+                
+                <button
+                    type="submit"
+                    class="cursor-pointer rounded-xl border border-rose-200 bg-rose-500 px-5 py-2.5 text-xs font-black text-white shadow-sm transition-colors hover:bg-rose-600"
+                >
+                    💥 ยืนยันการลบถาวร
+                </button>
+            </form>
+        </div>
+    </div>
+{/if}
