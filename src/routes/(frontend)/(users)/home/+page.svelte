@@ -44,11 +44,11 @@
         
         <section class="space-y-6 text-center max-w-3xl mx-auto">
             <h1 class="text-3xl font-extrabold tracking-tight text-[#443210] sm:text-4xl md:text-5xl leading-tight">
-                หลักสูตร <br />
-                <span class="bg-gradient-to-r from-[#443210] to-[#dca11d] bg-clip-text text-transparent">และเส้นทางอาชีพของคุณ</span>
+                หลักสูตร 
+                <span class="bg-gradient-to-r from-[#443210] to-[#dca11d] bg-clip-text text-transparent">{data.curriculum_name}</span>
             </h1>
             <p class="text-base text-gray-600 max-w-xl mx-auto font-medium">
-                {curriculum_name}
+                อ้างอิงตามโครงสร้างหลักสูตร มทร.ล้านนา
             </p>
 
             <div class="flex flex-wrap justify-center gap-8 pt-12 md:gap-16">
@@ -111,7 +111,7 @@
 
                             <div class="flex-1 rounded-xl border border-gray-200/80 bg-white px-5 py-4 text-base font-bold text-[#443210]/90 shadow-sm transition-all duration-300 group-hover:-translate-y-0.5 group-hover:border-[#DCA11D]/40 group-hover:text-[#443210] group-hover:shadow-md md:text-lg flex justify-between items-center">
                                 <span>{job.name_job}</span>
-                                <span class="text-xs text-amber-600 opacity-0 group-hover:opacity-100 transition-opacity font-medium flex items-center gap-1">
+                                <span class="text-xs text-[#DCA11D] opacity-0 group-hover:opacity-100 transition-opacity font-medium flex items-center gap-1">
                                     ดูทักษะ <span class="text-[10px]">➔</span>
                                 </span>
                             </div>

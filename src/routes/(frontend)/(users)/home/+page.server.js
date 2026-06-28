@@ -30,11 +30,13 @@ export async function load({ url }) {
 				'SELECT curriculum_name FROM curriculum WHERE curriculum_id = ?',[id]
 			);
 
+			const curriculum_name = Curriculum_name[0]?.curriculum_name || 'Unknown Curriculum';
+
 			return {
 				courses: rows,
 				jobs: jobRows,
 				course_skills: course_skills,
-				curriculum_name: Curriculum_name
+				curriculum_name: curriculum_name
 			};
 		}catch(error){
 			console.log('Error: Check Curriculum', error);
