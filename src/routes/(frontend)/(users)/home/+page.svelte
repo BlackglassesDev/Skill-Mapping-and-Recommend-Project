@@ -44,7 +44,7 @@
         
         <section class="space-y-6 text-center max-w-3xl mx-auto">
             <h1 class="text-3xl font-extrabold tracking-tight text-[#443210] sm:text-4xl md:text-5xl leading-tight">
-                เตรียมความพร้อมทักษะ <br />
+                หลักสูตร <br />
                 <span class="bg-gradient-to-r from-[#443210] to-[#dca11d] bg-clip-text text-transparent">และเส้นทางอาชีพของคุณ</span>
             </h1>
             <p class="text-base text-gray-600 max-w-xl mx-auto font-medium">
