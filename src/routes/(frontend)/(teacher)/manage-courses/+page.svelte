@@ -139,8 +139,8 @@
                         Curriculum Management — บริหารจัดการโครงสร้างรายวิชาของภาควิชา เพื่อนำข้อมูลไปประมวลผลและการจัดทำแผนผังทักษะ (Skill Mapping)
                     </p>
 
-                    <div class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-500 bg-amber-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-amber-600 uppercase">
-                        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-200"></span>
+                    <div class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-amber-600 uppercase">
+                        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500"></span>
                         Teacher Mode Only
                     </div>
                 </div>
