@@ -13,7 +13,6 @@
     let displayCourses = $derived(allcourses_more ? allcourses : courses);
     let jobs = $derived(Array.isArray(data.jobs) ? data.jobs.slice(0, 5) : []);
     let alljobs = $derived(Array.isArray(data.jobs) ? data.jobs : []);
-    let curriculum_name = $derived(Array.isArray(data.curriculum_name) ? data.curriculum_name : []);
     let boxinfo = $state('');
     let job_skill_Modal = $state(false);
     let jobs_more = $state(false);
