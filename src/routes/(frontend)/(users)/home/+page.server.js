@@ -26,10 +26,15 @@ export async function load({ url }) {
 				WHERE c.curriculum_id = ?`,[id]
 			);
 
+			const [Curriculum_name] = await pool.execute(
+				'SELECT curriculum_name FROM curriculum WHERE curriculum_id = ?',[id]
+			);
+
 			return {
 				courses: rows,
 				jobs: jobRows,
-				course_skills: course_skills
+				course_skills: course_skills,
+				curriculum_name: Curriculum_name
 			};
 		}catch(error){
 			console.log('Error: Check Curriculum', error);

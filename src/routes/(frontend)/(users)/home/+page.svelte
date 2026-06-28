@@ -13,6 +13,7 @@
     let displayCourses = $derived(allcourses_more ? allcourses : courses);
     let jobs = $derived(Array.isArray(data.jobs) ? data.jobs.slice(0, 5) : []);
     let alljobs = $derived(Array.isArray(data.jobs) ? data.jobs : []);
+    let curriculum_name = $derived(Array.isArray(data.curriculum_name) ? data.curriculum_name : []);
     let boxinfo = $state('');
     let job_skill_Modal = $state(false);
     let jobs_more = $state(false);
@@ -47,7 +48,7 @@
                 <span class="bg-gradient-to-r from-[#443210] to-[#dca11d] bg-clip-text text-transparent">และเส้นทางอาชีพของคุณ</span>
             </h1>
             <p class="text-base text-gray-600 max-w-xl mx-auto font-medium">
-                สำรวจอาชีพในสายงาน และประเมินช่องว่างทักษะของคุณ อ้างอิงตามโครงสร้างหลักสูตร มทร.ล้านนา
+                {curriculum_name}
             </p>
 
             <div class="flex flex-wrap justify-center gap-8 pt-12 md:gap-16">
