@@ -97,6 +97,8 @@
     }
 </script>
 
+<svelte:head>Teachers | Skill Mapping</svelte:head>
+
 <!-- 🔔 กล่องแจ้งเตือนสไลด์บน (Toast Alert) คงเอกลักษณ์ตามต้นแบบ -->
 <div
     class="pointer-events-none fixed top-6 right-0 left-0 z-50 flex justify-center p-4 transition-all duration-500 ease-out"
