@@ -97,7 +97,7 @@
     }
 </script>
 
-<svelte:head>Teachers | Skill Mapping</svelte:head>
+<svelte:head><title>Teachers | Skill Mapping</title></svelte:head>
 
 <!-- 🔔 กล่องแจ้งเตือนสไลด์บน (Toast Alert) คงเอกลักษณ์ตามต้นแบบ -->
 <div
