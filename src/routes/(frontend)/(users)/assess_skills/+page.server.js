@@ -13,7 +13,9 @@ export const load = async ({ locals }) => {
 			savedGrades: [],
 			passedSkillsCount: [],
 			completedCoursesCount: [],
-			jobs: []
+			jobs: [],
+			jobSkills: [],
+			studentSkills: []
 		};
 	}
 
@@ -45,6 +47,10 @@ export const load = async ({ locals }) => {
 		let completedCoursesCount = 0;
 		let passedSkillsCount = 0;
 		let jobRows = [];
+		let jobSkillRows = [];
+		let studentSkillRows = [];
+		let highestSkill = null;
+		let secondSkill = null;
 		if (userId) {
 			// เอาคำว่า const ออก แล้วเปลี่ยนไปยัดค่าใส่ตัวแปร savedGrades ตรงๆ เลยครับ
 			const [gradeRows] = await pool.execute(
@@ -61,6 +67,39 @@ export const load = async ({ locals }) => {
 				[userId]
 			);
 
+			// ดึง "ระดับทักษะที่นักศึกษาสะสมได้" แยกตามแต่ละทักษะ (เก็บค่าสูงสุดจากวิชาที่ผ่าน)
+			const [fetchedStudentSkills] = await pool.execute(
+				`SELECT cs.skill_id, MAX(ROUND(cs.skill_level * (sg.grade_point / 4.0), 0)) AS achieved_level
+                FROM student_grades sg
+                INNER JOIN course_skills cs ON sg.course_id = cs.course_id
+                WHERE sg.user_id = ?
+                AND sg.grade_letter NOT IN ('NOT_TAKEN', 'F')
+                GROUP BY cs.skill_id`,
+				[userId]
+			);
+			//@ts-ignore
+			studentSkillRows = fetchedStudentSkills;
+
+			// ดึงทักษะตัวท็อป 2 อันดับแรกมาพร้อมกันเลย
+			const [topTwoSkills] = await pool.execute(
+				`SELECT 
+					cs.skill_id,
+					s.skill_name,
+					ROUND(cs.skill_level * (sg.grade_point / 4.0), 0) AS achieved_level
+				FROM student_grades sg
+				INNER JOIN course_skills cs ON sg.course_id = cs.course_id
+				INNER JOIN skills s ON cs.skill_id = s.skill_id
+				WHERE sg.user_id = ?
+				AND sg.grade_letter NOT IN ('NOT_TAKEN', 'F')
+				ORDER BY achieved_level DESC, cs.skill_id ASC
+				LIMIT 2`,
+				[userId]
+			);
+			//@ts-ignore
+			highestSkill = topTwoSkills[0] || null;
+			//@ts-ignore
+			secondSkill = topTwoSkills[1] || null;
+
 			if (userCurriculumId) {
 				const [countRows] = await pool.execute(
 					`SELECT COUNT(*) AS total
@@ -76,6 +115,18 @@ export const load = async ({ locals }) => {
 				);
 				//@ts-ignore
 				jobRows = fetchedJobs;
+
+				// ดึง "ระดับทักษะที่แต่ละอาชีพต้องการ" พร้อมชื่อทักษะ เฉพาะอาชีพในหลักสูตรของผู้ใช้
+				const [fetchedJobSkills] = await pool.execute(
+					`SELECT js.job_id, js.skill_id, js.level_skill, s.skill_name
+                    FROM job_skills js
+                    INNER JOIN skills s ON js.skill_id = s.skill_id
+                    INNER JOIN job j ON js.job_id = j.job_id
+                    WHERE j.curriculum_id = ?`,
+					[userCurriculumId]
+				);
+				//@ts-ignore
+				jobSkillRows = fetchedJobSkills;
 
 				// @ts-ignore
 				completedCoursesCount = countRows[0] ? countRows[0].total : 0;
@@ -98,7 +149,11 @@ export const load = async ({ locals }) => {
 			completedCoursesCount: completedCoursesCount,
 			passedSkillsCount: passedSkillsCount,
 			jobs: jobRows,
-			curriculum: JSON.parse(JSON.stringify(curriculumRows)) // รายชื่อหลักสูตรทั้งหมดในตาราง curriculum
+			jobSkills: JSON.parse(JSON.stringify(jobSkillRows)), // ระดับทักษะที่อาชีพต้องการ
+			studentSkills: JSON.parse(JSON.stringify(studentSkillRows)), // ระดับทักษะที่นักศึกษาสะสมได้
+			curriculum: JSON.parse(JSON.stringify(curriculumRows)), // รายชื่อหลักสูตรทั้งหมดในตาราง curriculum
+			highestSkill: highestSkill, // อันดับ 1 (ทักษะเด่นสุด)
+			secondSkill: secondSkill   // อันดับ 2 (ทักษะรอง)
 		};
 	} catch (error) {
 		console.error('Error fetching user curriculum:', error);
@@ -111,7 +166,11 @@ export const load = async ({ locals }) => {
 			savedGrades: [],
 			completedCoursesCount: [],
 			passedSkillsCount: [],
-			jobs: []
+			jobs: [],
+			jobSkills: [],
+			studentSkills: [],
+			highestSkill: null,
+			secondSkill: null
 		};
 	}
 };

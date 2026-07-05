@@ -34,6 +34,52 @@
               allCourses.filter((course) => String(course.curriculum_id) === String(selectedCurriculumId))
             : []
     );
+
+    // 🎯 3. ข้อมูลทักษะสำหรับเปรียบเทียบ
+    let allJobSkills = $derived(Array.isArray(data?.jobSkills) ? data.jobSkills : []);
+    let studentSkills = $derived(Array.isArray(data?.studentSkills) ? data.studentSkills : []);
+
+    // แมพระดับทักษะที่นักศึกษาสะสมได้ ตาม skill_id
+    let studentSkillMap = $derived.by(() => {
+        const map = new Map();
+        for (const s of studentSkills) {
+            map.set(Number(s.skill_id), Number(s.achieved_level) || 0);
+        }
+        return map;
+    });
+
+    // 🎯 4. เปรียบเทียบทักษะของนักศึกษากับอาชีพที่เลือก
+    let skillComparison = $derived.by(() => {
+        if (!selectedCareerId) return [];
+        // @ts-ignore
+        const required = allJobSkills.filter(
+            // @ts-ignore
+            (js) => String(js.job_id) === String(selectedCareerId)
+        );
+        return required.map((js) => {
+            const requiredLevel = Number(js.level_skill) || 0;
+            const achievedLevel = studentSkillMap.get(Number(js.skill_id)) ?? 0;
+            const diff = achievedLevel - requiredLevel;
+            let status = 'gap';
+            if (achievedLevel === 0) status = 'missing';
+            else if (diff >= 0) status = 'met';
+            else status = 'gap';
+            return {
+                skill_id: js.skill_id,
+                skill_name: js.skill_name,
+                requiredLevel,
+                achievedLevel,
+                diff,
+                status
+            };
+        });
+    });
+
+    let matchedCount = $derived(skillComparison.filter((s) => s.status === 'met').length);
+    let gapCount = $derived(skillComparison.filter((s) => s.status === 'gap').length);
+    let missingCount = $derived(skillComparison.filter((s) => s.status === 'missing').length);
+    let topSkill = $derived(data?.highestSkill);
+    let secondSkill = $derived(data?.secondSkill);
 </script>
 
 <svelte:head>
@@ -136,8 +182,9 @@
 
                     {#if filteredCourses.length > 0}
                         <div class="max-h-[35vh] space-y-2 overflow-y-auto pr-1 scrollbar-thin">
-                            {#each filteredCourses as course (course.course_code)}
+                            {#each filteredCourses as course (course.course_id)}
                                 {@const oldGrade = data.savedGrades?.find(
+                                    //@ts-ignore
                                     (g) => g.course_id === course.course_id
                                 )?.grade_letter}
                                 <div class="flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50/40 p-4 shadow-sm transition-colors hover:bg-amber-50/20 hover:border-amber-200/50">
@@ -244,14 +291,22 @@
                         <span class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[#DCA11D] animate-pulse"></span>
                         <p class="text-sm font-bold text-gray-500">
                             ทักษะที่โดดเด่นที่สุด: 
-                            <span class="block text-base font-extrabold text-[#443210] mt-0.5">รอกรอกยังไม่ได้ทำ</span>
+                            <span class="block text-base font-extrabold text-[#443210] mt-0.5">{topSkill?.skill_name || 'ไม่พบข้อมูล'}
+                                <span class="shrink-0 rounded-md border border-amber-400 bg-[#443210]/90 px-2.5 py-1 mx-4 text-[11px] font-bold text-[#dca11d]">
+                                    Level: {topSkill?.achieved_level || 'ไม่พบข้อมูล'}
+                                </span>
+                            </span>
                         </p>
                     </div>
                     <div class="flex items-start gap-2.5 border-t border-gray-100 pt-2.5">
                         <span class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full bg-[#443210]/40"></span>
                         <p class="text-sm font-bold text-gray-500">
                             ทักษะที่เป็นรองย่อย: 
-                            <span class="block text-base font-bold text-[#443210]/80 mt-0.5">รอกรอกยังไม่ได้ทำ</span>
+                            <span class="block text-base font-extrabold text-[#443210] mt-0.5">{secondSkill?.skill_name || 'ไม่พบข้อมูล'}
+                                <span class="shrink-0 rounded-md border border-amber-400 bg-[#443210]/90 px-2.5 py-1 mx-4 text-[11px] font-bold text-[#dca11d]">
+                                    Level: {secondSkill?.achieved_level || 'ไม่พบข้อมูล'}
+                                </span>
+                            </span>
                         </p>
                     </div>
                 </div>
@@ -286,12 +341,77 @@
                 </div>
 
                 <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all hover:border-amber-500/20">
-                    <h3 class="text-xs font-bold tracking-wider text-gray-400 uppercase">
-                        ทักษะ/สมรรถนะที่ต้องศึกษาเพิ่ม (Skill Gaps)
-                    </h3>
-                    <p class="mt-3 text-lg font-bold tracking-tight text-[#DCA11D] md:text-xl">
-                        รอกรอกยังไม่ได้ทำ
-                    </p>
+                    <div class="flex items-center justify-between gap-3">
+                        <h3 class="text-xs font-bold tracking-wider text-gray-400 uppercase">
+                            ทักษะ/สมรรถนะที่ต้องศึกษาเพิ่ม (Skill Gaps)
+                        </h3>
+                        {#if selectedCareerId}
+                            <div class="flex gap-2 text-[10px] font-bold">
+                                <span class="rounded-full bg-green-100 px-2 py-0.5 text-green-700">ตรง {matchedCount}</span>
+                                <span class="rounded-full bg-amber-100 px-2 py-0.5 text-amber-700">ขาด {gapCount}</span>
+                                <span class="rounded-full bg-red-100 px-2 py-0.5 text-red-700">ยังไม่มี {missingCount}</span>
+                            </div>
+                        {/if}
+                    </div>
+
+                    {#if !selectedCareerId}
+                        <p class="mt-3 text-sm font-medium text-gray-400 italic">
+                            กรุณาเลือกตำแหน่งงานเป้าหมายด้านบน เพื่อเริ่มเปรียบเทียบช่องว่างทักษะ
+                        </p>
+                    {:else if skillComparison.length === 0}
+                        <p class="mt-3 text-sm font-medium text-gray-400 italic">
+                            ไม่พบข้อมูลทักษะที่ต้องการสำหรับอาชีพนี้
+                        </p>
+                    {:else}
+                        <ul class="mt-4 space-y-2.5">
+                            {#each skillComparison as sk (sk.skill_id)}
+                                {@const pct = sk.requiredLevel > 0 ? Math.min(100, Math.round((sk.achievedLevel / sk.requiredLevel) * 100)) : 0}
+                                <li class="rounded-xl border border-gray-100 bg-gray-50/40 p-4 transition-colors hover:bg-amber-50/20">
+                                    <div class="flex items-center justify-between gap-3">
+                                        <div class="min-w-0 flex-1">
+                                            <p class="truncate text-sm font-bold text-[#443210]">
+                                                {sk.skill_name}
+                                            </p>
+                                            <p class="mt-0.5 text-xs font-medium text-gray-500">
+                                                ระดับที่มี: <span class="font-bold text-[#443210]">{sk.achievedLevel}</span>
+                                                / ระดับที่ต้องการ: <span class="font-bold text-[#DCA11D]">{sk.requiredLevel}</span>
+                                            </p>
+                                        </div>
+                                        <div class="shrink-0">
+                                            {#if sk.status === 'met'}
+                                                {#if sk.diff > 0}
+                                                    <span class="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-[11px] font-bold text-green-700">
+                                                        ✓ เกิน {sk.diff} ระดับ
+                                                    </span>
+                                                {:else}
+                                                    <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-1 text-[11px] font-bold text-green-700">
+                                                        ✓ ตรงเกณฑ์
+                                                    </span>
+                                                {/if}
+                                            {:else if sk.status === 'gap'}
+                                                <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-1 text-[11px] font-bold text-amber-700">
+                                                    ต้องเพิ่ม {Math.abs(sk.diff)} ระดับ
+                                                </span>
+                                            {:else}
+                                                <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-1 text-[11px] font-bold text-red-700">
+                                                    ยังไม่มีทักษะนี้
+                                                </span>
+                                            {/if}
+                                        </div>
+                                    </div>
+                                    <div class="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-gray-200">
+                                        <div
+                                            class="h-full rounded-full transition-all duration-500"
+                                            class:bg-green-500={sk.status === 'met'}
+                                            class:bg-amber-500={sk.status === 'gap'}
+                                            class:bg-red-400={sk.status === 'missing'}
+                                            style="width: {pct}%"
+                                        ></div>
+                                    </div>
+                                </li>
+                            {/each}
+                        </ul>
+                    {/if}
                 </div>
             </div>
 
