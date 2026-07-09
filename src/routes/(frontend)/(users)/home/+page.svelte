@@ -204,25 +204,43 @@
 
 {#if job_skill_Modal}
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
-        <div class="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl modal-content mx-4">
+        <div class="w-full max-w-lg rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl modal-content mx-4">
             <h2 class="pb-4 text-center text-xl font-bold text-[#443210] border-b border-gray-100">🎯 ทักษะสำคัญที่ต้องมี</h2>
-            
+
             {#if boxinfo}
                 <div class="my-3 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-center text-sm font-semibold text-amber-900">
                     {boxinfo}
                 </div>
             {/if}
 
-            <div class="mt-4 max-h-[40vh] overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+            <div class="mt-4 max-h-[45vh] overflow-y-auto space-y-3 pr-1 custom-scrollbar">
                 {#each selectedJobSkills as item, i (i)}
-                    <div class="group rounded-xl border border-gray-100 bg-gray-50/50 p-3.5 transition-all hover:bg-white hover:border-amber-200 hover:shadow-sm">
+                    <div class="rounded-xl border border-gray-100 bg-gray-50/50 p-3.5">
                         <div class="flex items-center justify-between gap-3">
                             <p class="text-sm font-bold text-[#443210]">
                                 {item.skill_name}
                             </p>
                             <span class="shrink-0 rounded-md bg-[#443210] px-2.5 py-1 text-[11px] font-bold text-[#dca11d]">
-                                Level: {item.level_skill}
+                                ต้องการ Level: {item.required_level}
                             </span>
+                        </div>
+
+                        <div class="mt-2.5 space-y-1.5 border-t border-gray-200/70 pt-2.5">
+                            {#if item.courses && item.courses.length > 0}
+                                {#each item.courses as course (course.course_id)}
+                                    <div class="flex items-center justify-between gap-2 text-xs">
+                                        <span class="min-w-0 truncate font-medium text-gray-600">
+                                            <span class="font-bold text-[#443210]">{course.course_code}</span>
+                                            {course.course_name}
+                                        </span>
+                                        <span class="shrink-0 rounded bg-amber-100 px-2 py-0.5 font-bold text-amber-700">
+                                            สอน Level: {course.course_level}
+                                        </span>
+                                    </div>
+                                {/each}
+                            {:else}
+                                <p class="text-xs font-medium text-red-400 italic">ยังไม่มีรายวิชาที่สอนทักษะนี้</p>
+                            {/if}
                         </div>
                     </div>
                 {/each}

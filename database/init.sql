@@ -29,6 +29,12 @@ CREATE TABLE users (
     FOREIGN KEY (curriculum_id) REFERENCES curriculum(curriculum_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
+INSERT INTO users (full_name, username, email, password, role, curriculum_id) VALUES
+('ชโนดม อองกุลนะ','admin','admin@demo.com','$2b$10$qhqxvABMbQRNjJsLWq4g.ufRSd5GKsD3Mr8PKv.VhYbx6ZHJhEqkW','admin',null),
+('จิดาภา กันทวงศ์','teacher','teacher@demo.com','$2b$10$2iJgQEBRfBueH4XPJme0gOw8rDCFiIRsO1h3v98VvgwbHY7K8ji6m','teacher',null),
+('อรนุช ลุงหลิ่ง','user','user@demo.com','$2b$10$PkYhLV5y3qiRapzLWV8T9.u2/1zhCZ9Dv6HNHkhL57K5CIZhXvL46','student',1);
+
+
 -- ตารางรายวิชา
 CREATE TABLE courses (
     course_id INT PRIMARY KEY AUTO_INCREMENT,
