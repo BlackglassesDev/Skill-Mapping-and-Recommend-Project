@@ -80,6 +80,176 @@
     let missingCount = $derived(skillComparison.filter((s) => s.status === 'missing').length);
     let topSkill = $derived(data?.highestSkill);
     let secondSkill = $derived(data?.secondSkill);
+
+    // 🎯 5. ข้อมูลสำหรับวาด Radar Chart
+    // เมื่อเลือกอาชีพ: ใช้ทักษะของอาชีพนั้น (เทียบ student vs required)
+    // เมื่อยังไม่เลือกอาชีพ: ใช้ทักษะทั้งหมดที่นักศึกษามี
+    let radarData = $derived.by(() => {
+        if (selectedCareerId && skillComparison.length > 0) {
+            return {
+                labels: skillComparison.map((s) => s.skill_name),
+                student: skillComparison.map((s) => s.achievedLevel),
+                career: skillComparison.map((s) => s.requiredLevel),
+                hasCareer: true
+            };
+        }
+        // ยังไม่เลือกอาชีพ -> แสดงทักษะทั้งหมดของนักศึกษา
+        const list = studentSkills.map((s) => ({
+            name: s.skill_name || `สกิล ${s.skill_id}`,
+            level: Number(s.achieved_level) || 0
+        }));
+        return {
+            labels: list.map((s) => s.name),
+            student: list.map((s) => s.level),
+            career: list.map(() => 0),
+            hasCareer: false
+        };
+    });
+
+    let radarHasData = $derived(radarData.labels.length > 0);
+
+    // 🎯 6. Canvas ref + ฟังก์ชันวาด Radar Chart
+    /** @type {HTMLCanvasElement | null} */
+    let radarCanvas = $state(null);
+
+    function drawRadar() {
+        const canvas = radarCanvas;
+        if (!canvas) return;
+        const ctx = /** @type {CanvasRenderingContext2D | null} */ (canvas.getContext('2d'));
+        if (!ctx) return;
+
+        // รองรับ HiDPI
+        const dpr = window.devicePixelRatio || 1;
+        const cssW = canvas.clientWidth || 300;
+        const cssH = canvas.clientHeight || 256;
+        canvas.width = Math.floor(cssW * dpr);
+        canvas.height = Math.floor(cssH * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const W = cssW;
+        const H = cssH;
+        ctx.clearRect(0, 0, W, H);
+
+        const labels = radarData.labels;
+        const student = radarData.student;
+        const career = radarData.career;
+        const n = labels.length;
+        if (n === 0) return;
+
+        const cx = W / 2;
+        const cy = H / 2;
+        const radius = Math.max(10, Math.min(W, H) / 2 - 54);
+
+        const maxLevel = Math.max(
+            5,
+            ...student,
+            ...(radarData.hasCareer ? career : [0])
+        );
+
+        /** @param {number} i */
+        const angleFor = (i) => (Math.PI * 2 * i) / n - Math.PI / 2;
+        /** @param {number} i @param {number} value */
+        const pointFor = (i, value) => {
+            const r = (value / maxLevel) * radius;
+            const a = angleFor(i);
+            return [cx + Math.cos(a) * r, cy + Math.sin(a) * r];
+        };
+
+        // ---- วงแหวนกรอบ (grid rings)
+        const rings = maxLevel;
+        ctx.lineWidth = 1;
+        for (let r = 1; r <= rings; r++) {
+            const rr = (r / rings) * radius;
+            ctx.beginPath();
+            for (let i = 0; i < n; i++) {
+                const [px, py] = pointFor(i, r);
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = r === rings ? '#d1d5db' : '#eef0f3';
+            ctx.stroke();
+        }
+
+        // ---- เส้นแกนจากศูนย์กลาง
+        ctx.strokeStyle = '#e5e7eb';
+        for (let i = 0; i < n; i++) {
+            const [px, py] = pointFor(i, maxLevel);
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(px, py);
+            ctx.stroke();
+        }
+
+        // ---- โพลีกอนของอาชีพ (สีน้ำตาลเข้ม) ถ้ามี
+        if (radarData.hasCareer) {
+            ctx.beginPath();
+            for (let i = 0; i < n; i++) {
+                const [px, py] = pointFor(i, career[i]);
+                if (i === 0) ctx.moveTo(px, py);
+                else ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(68, 50, 16, 0.18)';
+            ctx.fill();
+            ctx.strokeStyle = '#443210';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+
+        // ---- โพลีกอนของนักศึกษา (สีทอง)
+        ctx.beginPath();
+        for (let i = 0; i < n; i++) {
+            const [px, py] = pointFor(i, student[i]);
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+        }
+        ctx.closePath();
+        ctx.fillStyle = 'rgba(220, 161, 29, 0.28)';
+        ctx.fill();
+        ctx.strokeStyle = '#DCA11D';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // จุดยอดของนักศึกษา
+        ctx.fillStyle = '#DCA11D';
+        for (let i = 0; i < n; i++) {
+            const [px, py] = pointFor(i, student[i]);
+            ctx.beginPath();
+            ctx.arc(px, py, 3, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // ---- ป้ายชื่อทักษะ
+        ctx.fillStyle = '#6b7280';
+        ctx.font = '600 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i < n; i++) {
+            const a = angleFor(i);
+            const lx = cx + Math.cos(a) * (radius + 20);
+            const ly = cy + Math.sin(a) * (radius + 16);
+            const label = labels[i] && labels[i].length > 14 ? labels[i].slice(0, 13) + '…' : labels[i];
+            ctx.fillText(label, lx, ly);
+        }
+
+        // มุมน้อยกว่า 3 ทักษะ วาดไม่ได้รูปทรง จัดการแยก
+    }
+
+    $effect(() => {
+        // ติดตามการเปลี่ยนแปลงของข้อมูล + canvas
+        void radarData;
+        void radarCanvas;
+        void radarHasData;
+        drawRadar();
+    });
+
+    // วาดใหม่เมื่อหน้าต่างถูก resize
+    $effect(() => {
+        const handler = () => drawRadar();
+        window.addEventListener('resize', handler);
+        return () => window.removeEventListener('resize', handler);
+    });
 </script>
 
 <svelte:head>
@@ -418,22 +588,37 @@
             <div class="flex flex-col items-center rounded-3xl border border-gray-200/60 bg-white p-6 shadow-sm lg:col-span-5 transition-all hover:shadow-md">
                 <h3 class="mb-4 text-sm font-bold text-[#443210]/90 tracking-wide">กราฟวิเคราะห์ทักษะใยแมงมุม (Radar Chart)</h3>
 
-                <div class="flex h-64 w-full items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50/50">
-                    <p class="text-xs font-bold text-gray-400 italic">
-                        [ ส่วนสำหรับเรนเดอร์ Radar Chart Canvas ]
-                    </p>
-                </div>
+                {#if !radarHasData || radarData.labels.length < 3}
+                    <div class="flex h-64 w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-red-200 bg-red-50/40 text-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-10 w-10 text-red-400">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                        </svg>
+                        <p class="px-6 text-xs font-bold text-red-500">
+                            {radarHasData
+                                ? 'ข้อมูลทักษะไม่เพียงพอสำหรับการแสดงผลกราฟ (ต้องมีอย่างน้อย 3 ทักษะ)'
+                                : (selectedCareerId
+                                    ? 'ไม่สามารถแสดงผลกราฟได้ เนื่องจากไม่พบข้อมูลทักษะของอาชีพที่เลือก'
+                                    : 'ไม่สามารถแสดงผลกราฟได้ เนื่องจากไม่พบข้อมูลทักษะของคุณ กรุณาบันทึกเกรดก่อน')}
+                        </p>
+                    </div>
+                {:else}
+                    <div class="w-full rounded-2xl border border-gray-100 bg-gray-50/40 p-2">
+                        <canvas bind:this={radarCanvas} class="h-72 w-full"></canvas>
+                    </div>
 
-                <div class="mt-5 flex gap-6 text-xs font-bold">
-                    <div class="flex items-center gap-2">
-                        <span class="h-3 w-3 rounded-full bg-[#DCA11D]"></span>
-                        <span class="text-gray-500">ทักษะปัจจุบันของคุณ</span>
+                    <div class="mt-5 flex gap-6 text-xs font-bold">
+                        <div class="flex items-center gap-2">
+                            <span class="h-3 w-3 rounded-full bg-[#DCA11D]"></span>
+                            <span class="text-gray-500">ทักษะปัจจุบันของคุณ</span>
+                        </div>
+                        {#if radarData.hasCareer}
+                            <div class="flex items-center gap-2">
+                                <span class="h-3 w-3 rounded-full bg-[#443210]"></span>
+                                <span class="text-gray-500">ความต้องการของสายงาน</span>
+                            </div>
+                        {/if}
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="h-3 w-3 rounded-full bg-[#443210]"></span>
-                        <span class="text-gray-500">ความต้องการของสายงาน</span>
-                    </div>
-                </div>
+                {/if}
             </div>
         </section>
 

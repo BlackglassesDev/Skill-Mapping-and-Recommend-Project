@@ -69,12 +69,13 @@ export const load = async ({ locals }) => {
 
 			// ดึง "ระดับทักษะที่นักศึกษาสะสมได้" แยกตามแต่ละทักษะ (เก็บค่าสูงสุดจากวิชาที่ผ่าน)
 			const [fetchedStudentSkills] = await pool.execute(
-				`SELECT cs.skill_id, MAX(ROUND(cs.skill_level * (sg.grade_point / 4.0), 0)) AS achieved_level
+				`SELECT cs.skill_id, s.skill_name, MAX(ROUND(cs.skill_level * (sg.grade_point / 4.0), 0)) AS achieved_level
                 FROM student_grades sg
                 INNER JOIN course_skills cs ON sg.course_id = cs.course_id
+                INNER JOIN skills s ON cs.skill_id = s.skill_id
                 WHERE sg.user_id = ?
                 AND sg.grade_letter NOT IN ('NOT_TAKEN', 'F')
-                GROUP BY cs.skill_id`,
+                GROUP BY cs.skill_id, s.skill_name`,
 				[userId]
 			);
 			//@ts-ignore
