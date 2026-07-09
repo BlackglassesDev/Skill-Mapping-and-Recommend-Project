@@ -2,6 +2,7 @@
     import { resolve } from '$app/paths';
     import { enhance } from '$app/forms';
     import { invalidateAll } from '$app/navigation';
+    import { fade } from 'svelte/transition';
 
     // 🎯 1. ดึงข้อมูลประยุกต์ใช้ผ่าน Props (Svelte 5 Rune - คงไว้ห้ามแก้)
     let { data } = $props();
@@ -107,6 +108,27 @@
     });
 
     let radarHasData = $derived(radarData.labels.length > 0);
+
+    // 🎯 7. สวิตช์สลับมุมมอง (ซ้าย = Radar Chart / ขวา = Matrix Table)
+    let isMatrix = $state(false);
+
+    // ข้อมูลสำหรับตารางเมทริกซ์ทักษะ (ใช้ข้อมูลเดียวกับเรดาร์)
+    let matrixRows = $derived.by(() => {
+        if (selectedCareerId && skillComparison.length > 0) {
+            return skillComparison.map((s) => ({
+                name: s.skill_name,
+                required: s.requiredLevel,
+                achieved: s.achievedLevel,
+                status: s.status
+            }));
+        }
+        return studentSkills.map((s) => ({
+            name: s.skill_name || `สกิล ${s.skill_id}`,
+            required: '-',
+            achieved: Number(s.achieved_level) || 0,
+            status: Number(s.achieved_level) > 0 ? 'met' : 'missing'
+        }));
+    });
 
     // 🎯 6. Canvas ref + ฟังก์ชันวาด Radar Chart
     /** @type {HTMLCanvasElement | null} */
@@ -586,35 +608,98 @@
             </div>
 
             <div class="flex flex-col items-center rounded-3xl border border-gray-200/60 bg-white p-6 shadow-sm lg:col-span-5 transition-all hover:shadow-md">
-                <h3 class="mb-4 text-sm font-bold text-[#443210]/90 tracking-wide">กราฟวิเคราะห์ทักษะใยแมงมุม (Radar Chart)</h3>
+                <h3 class="mb-4 text-sm font-bold text-[#443210]/90 tracking-wide">
+                    {isMatrix ? 'ตารางเมทริกซ์ทักษะ (Matrix Table)' : 'กราฟวิเคราะห์ทักษะใยแมงมุม (Radar Chart)'}
+                </h3>
 
-                {#if !radarHasData || radarData.labels.length < 3}
-                    <div class="flex h-64 w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-red-200 bg-red-50/40 text-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-10 w-10 text-red-400">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
-                        </svg>
-                        <p class="px-6 text-xs font-bold text-red-500">
-                            {radarHasData
-                                ? 'ข้อมูลทักษะไม่เพียงพอสำหรับการแสดงผลกราฟ (ต้องมีอย่างน้อย 3 ทักษะ)'
-                                : (selectedCareerId
-                                    ? 'ไม่สามารถแสดงผลกราฟได้ เนื่องจากไม่พบข้อมูลทักษะของอาชีพที่เลือก'
-                                    : 'ไม่สามารถแสดงผลกราฟได้ เนื่องจากไม่พบข้อมูลทักษะของคุณ กรุณาบันทึกเกรดก่อน')}
-                        </p>
+                <!-- 🎛️ สวิตช์สลับมุมมองซ้าย-ขวา -->
+                <div class="mb-5 flex select-none items-center justify-center gap-2.5 sm:gap-3">
+                    <span class="text-xs font-bold transition-colors duration-300 {isMatrix ? 'text-gray-400' : 'text-[#443210]'}">Radar Chart</span>
+                    <button
+                        type="button"
+                        onclick={() => (isMatrix = !isMatrix)}
+                        class="relative inline-flex h-7 w-14 shrink-0 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-[#DCA11D]/40 {isMatrix ? 'bg-[#443210]' : 'bg-[#DCA11D]'}"
+                        role="switch"
+                        aria-checked={isMatrix}
+                        aria-label="สลับมุมมองระหว่างกราฟเรดาร์และตารางเมทริกซ์"
+                    >
+                        <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform duration-300 {isMatrix ? 'translate-x-8' : 'translate-x-1'}"></span>
+                    </button>
+                    <span class="text-xs font-bold transition-colors duration-300 {isMatrix ? 'text-[#443210]' : 'text-gray-400'}">Matrix Table</span>
+                </div>
+
+                {#if !isMatrix}
+                    <div class="w-full" transition:fade={{ duration: 300 }}>
+                        {#if !radarHasData || radarData.labels.length < 3}
+                            <div class="flex h-64 w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-red-200 bg-red-50/40 text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="h-10 w-10 text-red-400">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                                </svg>
+                                <p class="px-6 text-xs font-bold text-red-500">
+                                    {radarHasData
+                                        ? 'ข้อมูลทักษะไม่เพียงพอสำหรับการแสดงผลกราฟ (ต้องมีอย่างน้อย 3 ทักษะ)'
+                                        : (selectedCareerId
+                                            ? 'ไม่สามารถแสดงผลกราฟได้ เนื่องจากไม่พบข้อมูลทักษะของอาชีพที่เลือก'
+                                            : 'ไม่สามารถแสดงผลกราฟได้ เนื่องจากไม่พบข้อมูลทักษะของคุณ กรุณาบันทึกเกรดก่อน')}
+                                </p>
+                            </div>
+                        {:else}
+                            <div class="w-full rounded-2xl border border-gray-100 bg-gray-50/40 p-2">
+                                <canvas bind:this={radarCanvas} class="h-72 w-full"></canvas>
+                            </div>
+
+                            <div class="mt-5 flex gap-6 text-xs font-bold">
+                                <div class="flex items-center gap-2">
+                                    <span class="h-3 w-3 rounded-full bg-[#DCA11D]"></span>
+                                    <span class="text-gray-500">ทักษะปัจจุบันของคุณ</span>
+                                </div>
+                                {#if radarData.hasCareer}
+                                    <div class="flex items-center gap-2">
+                                        <span class="h-3 w-3 rounded-full bg-[#443210]"></span>
+                                        <span class="text-gray-500">ความต้องการของสายงาน</span>
+                                    </div>
+                                {/if}
+                            </div>
+                        {/if}
                     </div>
                 {:else}
-                    <div class="w-full rounded-2xl border border-gray-100 bg-gray-50/40 p-2">
-                        <canvas bind:this={radarCanvas} class="h-72 w-full"></canvas>
-                    </div>
-
-                    <div class="mt-5 flex gap-6 text-xs font-bold">
-                        <div class="flex items-center gap-2">
-                            <span class="h-3 w-3 rounded-full bg-[#DCA11D]"></span>
-                            <span class="text-gray-500">ทักษะปัจจุบันของคุณ</span>
-                        </div>
-                        {#if radarData.hasCareer}
-                            <div class="flex items-center gap-2">
-                                <span class="h-3 w-3 rounded-full bg-[#443210]"></span>
-                                <span class="text-gray-500">ความต้องการของสายงาน</span>
+                    <div class="w-full" transition:fade={{ duration: 300 }}>
+                        {#if matrixRows.length === 0}
+                            <div class="flex h-64 w-full flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-gray-200 bg-gray-50/40 text-center">
+                                <p class="px-6 text-xs font-bold text-gray-400">
+                                    ไม่พบข้อมูลทักษะสำหรับแสดงในตาราง
+                                </p>
+                            </div>
+                        {:else}
+                            <div class="max-h-72 w-full overflow-auto scrollbar-thin rounded-2xl border border-gray-100">
+                                <table class="w-full border-collapse text-left text-xs">
+                                    <thead class="sticky top-0 z-10 bg-[#443210] text-[#DCA11D]">
+                                        <tr>
+                                            <th class="whitespace-nowrap px-3 py-2.5 font-bold">ทักษะ/สมรรถนะ</th>
+                                            <th class="whitespace-nowrap px-3 py-2.5 text-center font-bold">ระดับที่มี</th>
+                                            <th class="whitespace-nowrap px-3 py-2.5 text-center font-bold">ระดับที่ต้องการ</th>
+                                            <th class="whitespace-nowrap px-3 py-2.5 text-center font-bold">สถานะ</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100">
+                                        {#each matrixRows as row (row.name)}
+                                            <tr class="transition-colors hover:bg-amber-50/20">
+                                                <td class="px-3 py-2.5 font-bold text-[#443210]">{row.name}</td>
+                                                <td class="px-3 py-2.5 text-center font-bold text-[#443210]">{row.achieved}</td>
+                                                <td class="px-3 py-2.5 text-center font-bold text-[#DCA11D]">{row.required}</td>
+                                                <td class="px-3 py-2.5 text-center">
+                                                    {#if row.status === 'met'}
+                                                        <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700">ตรงเกณฑ์</span>
+                                                    {:else if row.status === 'gap'}
+                                                        <span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">ต้องเพิ่ม</span>
+                                                    {:else}
+                                                        <span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700">ยังไม่มี</span>
+                                                    {/if}
+                                                </td>
+                                            </tr>
+                                        {/each}
+                                    </tbody>
+                                </table>
                             </div>
                         {/if}
                     </div>
