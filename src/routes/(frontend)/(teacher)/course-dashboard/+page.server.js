@@ -19,7 +19,8 @@ export async function load({ locals }) {
 		if (!user) {
 			return {
 				totalCourses: 0,
-				skillStatistics: []
+				skillStatistics: [],
+				skillCompareStats: []
 			};
 		}
 
@@ -66,11 +67,39 @@ export async function load({ locals }) {
 			(/** @type {any} */ course) => !mappedIds.has(course.course_id)
 		);
 
+		// 📊 เปรียบเทียบระดับทักษะสูงสุด ฝั่งอาชีพ (job) vs ฝั่งรายวิชา (course) รายทักษะ
+		const [skillCompareRows] = await pool.execute(
+			`
+				SELECT
+					s.skill_id,
+					s.skill_name,
+					COALESCE((
+						SELECT MAX(js.level_skill)
+						FROM job_skills js
+						INNER JOIN job j ON j.job_id = js.job_id
+						WHERE js.skill_id = s.skill_id AND j.curriculum_id = ?
+					), 0) AS job_max_level,
+					COALESCE((
+						SELECT MAX(cs.skill_level)
+						FROM course_skills cs
+						INNER JOIN courses c ON c.course_id = cs.course_id
+						WHERE cs.skill_id = s.skill_id AND c.curriculum_id = ?
+					), 0) AS course_max_level
+				FROM skills s
+				WHERE s.curriculum_id = ?
+				ORDER BY s.skill_name
+			`,
+			[user.curriculum_id, user.curriculum_id, user.curriculum_id]
+		);
+		/** @type {any} */
+		const finalSkillCompareRows = skillCompareRows;
+
 		return {
 			totalCourses,
 			skillStatistics: finalStats,
 			mappedCourses,
-			unmappedCourses
+			unmappedCourses,
+			skillCompareStats: finalSkillCompareRows
 		};
 	} catch (error) {
 		console.error('Error loading course dashboard data:', error);
@@ -78,7 +107,8 @@ export async function load({ locals }) {
 			totalCourses: 0,
 			skillStatistics: [],
 			mappedCourses: [],
-			unmappedCourses: []
+			unmappedCourses: [],
+			skillCompareStats: []
 		};
 	}
 }

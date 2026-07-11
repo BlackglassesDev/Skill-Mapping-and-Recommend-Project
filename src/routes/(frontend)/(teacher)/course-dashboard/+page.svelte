@@ -36,10 +36,39 @@
         showAllUnmapped ? unmappedCoursesList : unmappedCoursesList.slice(0, initialUnmappedLimit)
     );
 
+    // --- 4. 📊 ข้อมูลเปรียบเทียบระดับทักษะสูงสุด ฝั่งอาชีพ vs ฝั่งรายวิชา (รายทักษะ) ---
+    /** @type {any[]} */
+    let skillCompareStats = $state(data.skillCompareStats || []);
+
     $effect(() => {
         skillStatistics = data.skillStatistics || [];
         unmappedCoursesList = data.unmappedCourses || [];
+        skillCompareStats = data.skillCompareStats || [];
     });
+
+    const LEVEL_SCALE = 6; // สเกลระดับทักษะสูงสุด (แกน Y)
+
+    // แกน Y ปรับอัตโนมัติตาม LEVEL_SCALE เช่น 6→0
+    let yAxisTicks = $derived(Array.from({ length: LEVEL_SCALE + 1 }, (_, i) => LEVEL_SCALE - i));
+
+    // เก็บเฉพาะทักษะที่ฝั่งใดฝั่งหนึ่งมีการกำหนดระดับ (เพื่อเปรียบเทียบที่มีความหมาย)
+    let skillCompareData = $derived(
+        skillCompareStats
+            .map((/** @type {any} */ s) => ({
+                skill_id: s.skill_id,
+                skill_name: s.skill_name,
+                job_max_level: Number(s.job_max_level) || 0,
+                course_max_level: Number(s.course_max_level) || 0
+            }))
+            .filter((/** @type {any} */ s) => s.job_max_level > 0 || s.course_max_level > 0)
+    );
+
+    // จำนวนทักษะที่อาชีพเรียกร้อง แต่รายวิชายังไม่ได้สอน (Gap สำคัญ)
+    let gapSkillCount = $derived(
+        skillCompareData.filter((/** @type {any} */ s) => s.job_max_level > 0 && s.course_max_level === 0).length
+    );
+    let jobMappedCount = $derived(skillCompareData.filter((/** @type {any} */ s) => s.job_max_level > 0).length);
+    let courseMappedCount = $derived(skillCompareData.filter((/** @type {any} */ s) => s.course_max_level > 0).length);
 
     const totalSkillsInSystem = $derived(skillStatistics.length); // จำนวนทักษะทั้งหมดที่มี
 
@@ -327,6 +356,90 @@
                 {/each}
             </div>
 
+        </div>
+
+        <div class="rounded-3xl border border-gray-200 bg-white mt-10 p-6 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 pb-4 mb-6 gap-3">
+                <div>
+                    <h3 class="text-base font-black text-[#443210]">เปรียบเทียบระดับทักษะสูงสุด: ฝั่งอาชีพ vs ฝั่งรายวิชา</h3>
+                    <p class="text-xs text-gray-400 mt-0.5">แผนภูมิแท่งคู่ (Paired Bar Chart) เทียบระดับสูงสุดที่อาชีพเรียกร้องกับระดับสูงสุดที่รายวิชาสอนในแต่ละทักษะ - (สเกล 0-{LEVEL_SCALE})</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[10px] font-bold shrink-0">
+                    <div class="flex items-center gap-1.5">
+                        <span class="h-3 w-3 rounded-sm bg-[#443210]"></span>
+                        <span class="text-gray-500">ฝั่งอาชีพ ({jobMappedCount})</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="h-3 w-3 rounded-sm bg-[#dca11d]"></span>
+                        <span class="text-gray-500">ฝั่งรายวิชา ({courseMappedCount})</span>
+                    </div>
+                </div>
+            </div>
+
+            {#if gapSkillCount > 0}
+                <div class="mb-5 flex items-center gap-2 rounded-xl border border-rose-100 bg-rose-50/50 px-4 py-2.5 text-xs font-bold text-rose-600">
+                    <span>⚠️</span>
+                    <span>พบ {gapSkillCount} ทักษะที่อาชีพเรียกร้อง แต่รายวิชายังไม่ได้สอน (ฝั่งรายวิชา = 0)</span>
+                </div>
+            {/if}
+
+            {#if skillCompareData.length > 0}
+                <div class="flex gap-2">
+                    <!-- แกน Y -->
+                    <div class="flex flex-col justify-between pr-1 text-right" style="height: 208px;">
+                        {#each yAxisTicks as tick}
+                            <span class="text-[9px] font-mono font-bold leading-none text-gray-300">{tick}</span>
+                        {/each}
+                    </div>
+                    <!-- พื้นที่กราฟ (เลื่อนแนวนอนได้) -->
+                    <div class="flex-1 overflow-x-auto pb-2">
+                        <div style="min-width: max-content;">
+                            <!-- แท่งคู่: 2 แท่งต่อทักษะ -->
+                            <div class="relative flex items-end gap-4 px-1" style="height: 208px;">
+                                <div class="pointer-events-none absolute inset-0 flex flex-col justify-between">
+                                    {#each yAxisTicks as _, i}
+                                        <div class="w-full border-t border-dashed {i === 0 ? 'border-gray-200' : 'border-gray-100'}"></div>
+                                    {/each}
+                                </div>
+                                {#each skillCompareData as skill (skill.skill_id)}
+                                    <div class="relative flex h-full w-16 shrink-0 items-end justify-center gap-1">
+                                        <!-- ฝั่งอาชีพ (น้ำตาล) -->
+                                        <div
+                                            class="relative flex w-7 shrink-0 items-start justify-center rounded-t-md pt-1 transition-all duration-700 ease-out hover:brightness-110 {skill.job_max_level > 0 ? '' : 'border border-dashed border-gray-200 bg-gray-50/70'}"
+                                            style="height: {skill.job_max_level > 0 ? Math.max(6, (skill.job_max_level / LEVEL_SCALE) * 100) : 4}%; {skill.job_max_level > 0 ? 'background: linear-gradient(0deg, #443210, #6b5028);' : ''}"
+                                            title={`${skill.skill_name} — อาชีพ: Level ${skill.job_max_level}`}
+                                        >
+                                            {#if skill.job_max_level > 0}
+                                                <span class="text-[9px] font-mono font-black text-white">{skill.job_max_level}</span>
+                                            {/if}
+                                        </div>
+                                        <!-- ฝั่งรายวิชา (ทอง) -->
+                                        <div
+                                            class="relative flex w-7 shrink-0 items-start justify-center rounded-t-md pt-1 transition-all duration-700 ease-out hover:brightness-110 {skill.course_max_level > 0 ? '' : 'border border-dashed border-gray-200 bg-gray-50/70'}"
+                                            style="height: {skill.course_max_level > 0 ? Math.max(6, (skill.course_max_level / LEVEL_SCALE) * 100) : 4}%; {skill.course_max_level > 0 ? 'background: linear-gradient(0deg, #b8861a, #dca11d);' : ''}"
+                                            title={`${skill.skill_name} — รายวิชา: Level ${skill.course_max_level}`}
+                                        >
+                                            {#if skill.course_max_level > 0}
+                                                <span class="text-[9px] font-mono font-black text-[#443210]">{skill.course_max_level}</span>
+                                            {/if}
+                                        </div>
+                                    </div>
+                                {/each}
+                            </div>
+                            <!-- แกน X = ชื่อทักษะ -->
+                            <div class="flex gap-4 border-t border-gray-100 px-1 pt-2">
+                                {#each skillCompareData as skill (skill.skill_id)}
+                                    <div class="w-16 shrink-0">
+                                        <span class="block h-12 text-center text-[9px] font-bold leading-tight text-gray-500 line-clamp-2" title={skill.skill_name}>{skill.skill_name}</span>
+                                    </div>
+                                {/each}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {:else}
+                <p class="py-10 text-center text-xs text-gray-400 italic">ยังไม่มีข้อมูลระดับทักษะสำหรับเปรียบเทียบในหลักสูตรนี้</p>
+            {/if}
         </div>
 
     </div>
