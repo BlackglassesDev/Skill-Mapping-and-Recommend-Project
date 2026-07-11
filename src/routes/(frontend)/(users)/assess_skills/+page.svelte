@@ -36,6 +36,21 @@
             : []
     );
 
+    // 🎯 ตัวเลือกเกรดสำหรับปุ่มกดเร็ว (Radio-style UI)
+    const GRADE_OPTIONS = ['NOT_TAKEN', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'];
+    /** @type {Record<string, string>} */
+    let courseGradeMap = $state({});
+
+    /** @param {number|string} courseId @param {string|undefined} oldGrade */
+    function currentGrade(courseId, oldGrade) {
+        return courseGradeMap[courseId] ?? oldGrade ?? 'NOT_TAKEN';
+    }
+
+    /** @param {number|string} courseId @param {string} grade */
+    function selectGrade(courseId, grade) {
+        courseGradeMap[courseId] = grade;
+    }
+
     // 🎯 3. ข้อมูลทักษะสำหรับเปรียบเทียบ
     let allJobSkills = $derived(Array.isArray(data?.jobSkills) ? data.jobSkills : []);
     let studentSkills = $derived(Array.isArray(data?.studentSkills) ? data.studentSkills : []);
@@ -379,39 +394,32 @@
                                     //@ts-ignore
                                     (g) => g.course_id === course.course_id
                                 )?.grade_letter}
-                                <div class="flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50/40 p-4 shadow-sm transition-colors hover:bg-amber-50/20 hover:border-amber-200/50">
-                                    <div class="min-w-0 flex-1">
-                                        <p class="text-xs font-extrabold tracking-wider text-[#DCA11D] uppercase">
-                                            {course.course_code}
-                                        </p>
-                                        <p class="mt-0.5 truncate text-sm font-bold text-[#443210]">
-                                            {course.course_name}
-                                        </p>
-                                        <input type="hidden" name="course_id" value={course.course_id} />
+                                {@const activeGrade = currentGrade(course.course_id, oldGrade)}
+                                <div class="rounded-xl border border-gray-100 bg-gray-50/40 p-4 shadow-sm transition-colors hover:bg-amber-50/20 hover:border-amber-200/50">
+                                    <div class="flex items-center justify-between gap-4">
+                                        <div class="min-w-0 flex-1">
+                                            <p class="text-xs font-extrabold tracking-wider text-[#DCA11D] uppercase">
+                                                {course.course_code}
+                                            </p>
+                                            <p class="mt-0.5 truncate text-sm font-bold text-[#443210]">
+                                                {course.course_name}
+                                            </p>
+                                        </div>
                                     </div>
 
-                                    <div class="relative w-28 shrink-0">
-                                        <select
-                                            name="course_grades"
-                                            required
-                                            class="w-full appearance-none rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm font-bold text-[#443210] shadow-sm focus:border-[#DCA11D] focus:outline-none"
-                                        >
-                                            <option value="" disabled selected={!oldGrade}>เลือกเกรด</option>
-                                            <option value="NOT_TAKEN" selected={oldGrade === 'NOT_TAKEN'}>ยังไม่ได้เรียน</option>
-                                            <option value="A" selected={oldGrade === 'A'}>A</option>
-                                            <option value="B+" selected={oldGrade === 'B+'}>B+</option>
-                                            <option value="B" selected={oldGrade === 'B'}>B</option>
-                                            <option value="C+" selected={oldGrade === 'C+'}>C+</option>
-                                            <option value="C" selected={oldGrade === 'C'}>C</option>
-                                            <option value="D+" selected={oldGrade === 'D+'}>D+</option>
-                                            <option value="D" selected={oldGrade === 'D'}>D</option>
-                                            <option value="F" selected={oldGrade === 'F'}>F</option>
-                                        </select>
-                                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2 text-gray-400">
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-3 w-3">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-                                            </svg>
-                                        </div>
+                                    <input type="hidden" name="course_id" value={course.course_id} />
+                                    <input type="hidden" name="course_grades" value={activeGrade} />
+
+                                    <div class="mt-3 flex flex-wrap gap-1">
+                                        {#each GRADE_OPTIONS as grade (grade)}
+                                            <button
+                                                type="button"
+                                                onclick={() => selectGrade(course.course_id, grade)}
+                                                class="cursor-pointer rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all duration-150 {activeGrade === grade ? 'bg-[#443210] text-[#DCA11D] shadow-sm ring-1 ring-[#DCA11D]/30' : 'border border-gray-200 bg-white text-gray-600 hover:border-[#DCA11D] hover:text-[#443210]'}"
+                                            >
+                                                {grade === 'NOT_TAKEN' ? 'ยังไม่ได้เรียน' : grade}
+                                            </button>
+                                        {/each}
                                     </div>
                                 </div>
                             {/each}
