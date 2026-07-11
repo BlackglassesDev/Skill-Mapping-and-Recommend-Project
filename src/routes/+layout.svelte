@@ -15,7 +15,7 @@
 	// ตั้งค่า Path ทั่วไป
 	const homePath = resolve('/home');
 	const loginPath = resolve('/login');
-	const curriculum = resolve('/curriculums_manage');
+	const curriculum = 'https://academic.rmutl.ac.th/page/Bachelor-Engineering';
 
 	// student
 	const assess_skills = resolve('/assess_skills');
@@ -64,12 +64,12 @@
 
 					{#if sid.role === 'teacher'}
 						<a href={teacherPage} class="transition-colors hover:text-[#dca11d] {isActive('/teacherPage') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>หน้าหลัก</a>
-						<a href={curriculum} class="transition-colors hover:text-[#dca11d] {isActive('/curriculums_manage') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>ข้อมูลหลักสูตร</a>
+						<a href={curriculum} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-[#dca11d] {isActive('/curriculums_manage') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>ข้อมูลหลักสูตร</a>
 					{/if}
 
 					{#if sid.role === 'admin'}
 						<a href={adminPage} class="transition-all duration-300 py-1.5 border-b-2 {isActive('/adminPage') ? 'border-[#dca11d] text-[#dca11d]' : 'border-transparent text-[#443210] hover:text-[#dca11d]'}">แผงควบคุมหลัก</a>
-						<a href={curriculum} class="transition-all duration-300 py-1.5 border-b-2 {isActive('/curriculums_manage') ? 'border-[#dca11d] text-[#dca11d]' : 'border-transparent text-[#443210] hover:text-[#dca11d]'}">ข้อมูลหลักสูตร</a>
+						<a href={curriculum} target="_blank" rel="noopener noreferrer" class="transition-all duration-300 py-1.5 border-b-2 {isActive('/curriculums_manage') ? 'border-[#dca11d] text-[#dca11d]' : 'border-transparent text-[#443210] hover:text-[#dca11d]'}">ข้อมูลหลักสูตร</a>
 					{/if}
 				</div>
 
@@ -140,12 +140,12 @@
 
 					{#if sid.role === 'teacher'}
 						<a href={teacherPage} class="transition-colors hover:text-[#dca11d] {isActive('/teacherPage') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>หน้าหลัก</a>
-						<a href={curriculum} class="transition-colors hover:text-[#dca11d] {isActive('/curriculums_manage') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>ข้อมูลหลักสูตร</a>
+						<a href={curriculum} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-[#dca11d] {isActive('/curriculums_manage') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>ข้อมูลหลักสูตร</a>
 					{/if}
 
 					{#if sid.role === 'admin'}
 						<a href={adminPage} class="transition-colors hover:text-[#dca11d] {isActive('/adminPage') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>หน้าหลัก</a>
-						<a href={curriculum} class="transition-colors hover:text-[#dca11d] {isActive('/curriculums_manage') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>ข้อมูลหลักสูตร</a>
+						<a href={curriculum} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-[#dca11d] {isActive('/curriculums_manage') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>ข้อมูลหลักสูตร</a>
 					{/if}
 				</div>
 
@@ -233,7 +233,7 @@
 				<div class="flex items-center gap-6 text-xs font-bold uppercase tracking-wider">
 					<a href={homePath} class="transition-all duration-300 py-1.5 border-b-2 {isActive('/home') ? 'border-[#dca11d] text-[#dca11d]' : 'border-transparent text-[#443210] hover:text-[#dca11d]'}">หน้าหลัก</a>
 					<a href={assess_skills} class="transition-all duration-300 py-1.5 border-b-2 {isActive('/assess_skills') ? 'border-[#dca11d] text-[#dca11d]' : 'border-transparent text-[#443210] hover:text-[#dca11d]'}">ประเมินทักษะ</a>
-					<a href={curriculum} class="transition-all duration-300 py-1.5 border-b-2 {isActive('/curriculums_manage') ? 'border-[#dca11d] text-[#dca11d]' : 'border-transparent text-[#443210] hover:text-[#dca11d]'}">ข้อมูลหลักสูตร</a>
+					<a href={curriculum} target="_blank" rel="noopener noreferrer" class="transition-all duration-300 py-1.5 border-b-2 {isActive('/curriculums_manage') ? 'border-[#dca11d] text-[#dca11d]' : 'border-transparent text-[#443210] hover:text-[#dca11d]'}">ข้อมูลหลักสูตร</a>
 				</div>
 				<a
 					href={loginPath}
@@ -269,7 +269,7 @@
 				<div class="flex flex-col gap-3 font-bold text-sm">
 					<a href={homePath} class="transition-colors hover:text-[#dca11d] {isActive('/home') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>หน้าหลัก</a>
 					<a href={assess_skills} class="transition-colors hover:text-[#dca11d] {isActive('/assess_skills') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>ประเมินทักษะ</a>
-					<a href={curriculum} class="transition-colors hover:text-[#dca11d] {isActive('/curriculums_manage') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>ข้อมูลหลักสูตร</a>
+					<a href={curriculum} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-[#dca11d] {isActive('/curriculums_manage') ? 'text-[#dca11d]' : ''}" onclick={toggleMenu}>ข้อมูลหลักสูตร</a>
 				</div>
 				<a
 					href={loginPath}
