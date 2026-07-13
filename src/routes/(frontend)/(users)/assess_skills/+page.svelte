@@ -19,6 +19,7 @@
     let selectedCurriculumId = $state(
         data.currentUserCurriculumId ? String(data.currentUserCurriculumId) : ''
     );
+    /** @type {any[]} */
     let allCourses = $derived(Array.isArray(data?.allCourses) ? data.allCourses : []);
     let selectedCareerId = $state('');
     let joblist = $derived(Array.isArray(data.jobs) ? data.jobs : []);
@@ -34,6 +35,20 @@
             ? // @ts-ignore
               allCourses.filter((course) => String(course.curriculum_id) === String(selectedCurriculumId))
             : []
+    );
+
+    let courseSearch = $state('');
+
+    let searchedCourses = $derived(
+        courseSearch.trim()
+            ? filteredCourses.filter((c) => {
+                const q = courseSearch.toLowerCase().trim();
+                return (
+                    String(c.course_code).toLowerCase().includes(q) ||
+                    String(c.course_name).toLowerCase().includes(q)
+                );
+            })
+            : filteredCourses
     );
 
     // 🎯 ตัวเลือกเกรดสำหรับปุ่มกดเร็ว (Radio-style UI)
@@ -388,42 +403,78 @@
                     </span>
 
                     {#if filteredCourses.length > 0}
-                        <div class="max-h-[35vh] space-y-2 overflow-y-auto pr-1 scrollbar-thin">
-                            {#each filteredCourses as course (course.course_id)}
-                                {@const oldGrade = data.savedGrades?.find(
-                                    //@ts-ignore
-                                    (g) => g.course_id === course.course_id
-                                )?.grade_letter}
-                                {@const activeGrade = currentGrade(course.course_id, oldGrade)}
-                                <div class="rounded-xl border border-gray-100 bg-gray-50/40 p-4 shadow-sm transition-colors hover:bg-amber-50/20 hover:border-amber-200/50">
-                                    <div class="flex items-center justify-between gap-4">
-                                        <div class="min-w-0 flex-1">
-                                            <p class="text-xs font-extrabold tracking-wider text-[#DCA11D] uppercase">
-                                                {course.course_code}
-                                            </p>
-                                            <p class="mt-0.5 truncate text-sm font-bold text-[#443210]">
-                                                {course.course_name}
-                                            </p>
+                        {#each filteredCourses as course (course.course_id)}
+                            {@const oldGrade = data.savedGrades?.find(
+                                //@ts-ignore
+                                (g) => g.course_id === course.course_id
+                            )?.grade_letter}
+                            {@const activeGrade = currentGrade(course.course_id, oldGrade)}
+                            <input type="hidden" name="course_id" value={course.course_id} />
+                            <input type="hidden" name="course_grades" value={activeGrade} />
+                        {/each}
+
+                        <div class="relative">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                                </svg>
+                            </span>
+                            <input
+                                type="text"
+                                bind:value={courseSearch}
+                                placeholder="ค้นหารหัสวิชา หรือ ชื่อวิชา..."
+                                class="w-full rounded-xl border border-gray-200 bg-white py-2.5 pl-10 pr-10 text-sm font-medium text-[#443210] shadow-sm placeholder-gray-400 outline-none transition-all focus:border-[#DCA11D] focus:ring-1 focus:ring-[#DCA11D]"
+                            />
+                            {#if courseSearch}
+                                <button
+                                    type="button"
+                                    onclick={() => (courseSearch = '')}
+                                    class="absolute inset-y-0 right-0 flex items-center pr-3 text-xs font-bold text-gray-400 hover:text-gray-600"
+                                >
+                                    ✕ ล้าง
+                                </button>
+                            {/if}
+                        </div>
+
+                        {#if searchedCourses.length > 0}
+                            <div class="max-h-[35vh] space-y-2 overflow-y-auto pr-1 scrollbar-thin">
+                                {#each searchedCourses as course (course.course_id)}
+                                    {@const oldGrade = data.savedGrades?.find(
+                                        //@ts-ignore
+                                        (g) => g.course_id === course.course_id
+                                    )?.grade_letter}
+                                    {@const activeGrade = currentGrade(course.course_id, oldGrade)}
+                                    <div class="rounded-xl border border-gray-100 bg-gray-50/40 p-4 shadow-sm transition-colors hover:bg-amber-50/20 hover:border-amber-200/50">
+                                        <div class="flex items-center justify-between gap-4">
+                                            <div class="min-w-0 flex-1">
+                                                <p class="text-xs font-extrabold tracking-wider text-[#DCA11D] uppercase">
+                                                    {course.course_code}
+                                                </p>
+                                                <p class="mt-0.5 truncate text-sm font-bold text-[#443210]">
+                                                    {course.course_name}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3 flex flex-wrap gap-1">
+                                            {#each GRADE_OPTIONS as grade (grade)}
+                                                <button
+                                                    type="button"
+                                                    onclick={() => selectGrade(course.course_id, grade)}
+                                                    class="cursor-pointer rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all duration-150 {activeGrade === grade ? 'bg-[#443210] text-[#DCA11D] shadow-sm ring-1 ring-[#DCA11D]/30' : 'border border-gray-200 bg-white text-gray-600 hover:border-[#DCA11D] hover:text-[#443210]'}"
+                                                >
+                                                    {grade === 'NOT_TAKEN' ? 'ยังไม่ได้เรียน' : grade}
+                                                </button>
+                                            {/each}
                                         </div>
                                     </div>
-
-                                    <input type="hidden" name="course_id" value={course.course_id} />
-                                    <input type="hidden" name="course_grades" value={activeGrade} />
-
-                                    <div class="mt-3 flex flex-wrap gap-1">
-                                        {#each GRADE_OPTIONS as grade (grade)}
-                                            <button
-                                                type="button"
-                                                onclick={() => selectGrade(course.course_id, grade)}
-                                                class="cursor-pointer rounded-lg px-2.5 py-1.5 text-xs font-bold transition-all duration-150 {activeGrade === grade ? 'bg-[#443210] text-[#DCA11D] shadow-sm ring-1 ring-[#DCA11D]/30' : 'border border-gray-200 bg-white text-gray-600 hover:border-[#DCA11D] hover:text-[#443210]'}"
-                                            >
-                                                {grade === 'NOT_TAKEN' ? 'ยังไม่ได้เรียน' : grade}
-                                            </button>
-                                        {/each}
-                                    </div>
-                                </div>
-                            {/each}
-                        </div>
+                                {/each}
+                            </div>
+                        {:else}
+                            <div class="rounded-xl border border-dashed border-gray-200 bg-gray-50/50 p-8 text-center text-sm font-medium text-gray-400 italic">
+                                ไม่พบรายวิชาที่ตรงกับ "{courseSearch.trim()}"
+                            </div>
+                        {/if}
                     {:else}
                         <div class="rounded-xl border border-dashed border-gray-200 bg-gray-50/50 p-8 text-center text-sm font-medium text-gray-400 italic">
                             {selectedCurriculumId
