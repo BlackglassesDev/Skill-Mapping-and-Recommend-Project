@@ -131,6 +131,10 @@
                     <p class="max-w-2xl text-sm leading-relaxed font-medium text-gray-400">
                         Course & Skill Dashboard — สรุปสถิติภาพรวมข้อมูลการจัดการหลักสูตร ตรวจสอบความสอดคล้อง ค้นหาจุดเด่นและจุดวิกฤตที่ทักษะขาดหายไป (Gap Analysis)
                     </p>
+                    <div class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-amber-600 uppercase">
+                        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500"></span>
+                        Teacher Mode Only
+                    </div>
                 </div>
                 <div class="flex w-full shrink-0 flex-col gap-2.5 pt-2 md:w-auto md:items-end">
                     <a href={adminPage}

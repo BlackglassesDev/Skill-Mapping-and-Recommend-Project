@@ -211,6 +211,10 @@
 						เลือกรายวิชาในหลักสูตรเพื่อระบุและเชื่อมโยงทักษะความรู้ที่นิสิตจะได้รับ
 						พร้อมกำหนดระดับระดับความคาดหวัง (เลเวล 1-6) เพื่อใช้วิเคราะห์ Gap ของหลักสูตร
 					</p>
+					<div class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-amber-600 uppercase">
+                        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500"></span>
+                        Teacher Mode Only
+                    </div>
 				</div>
 				<div class="flex w-full shrink-0 flex-col gap-2.5 pt-2 md:w-auto md:items-end">
 					<a
