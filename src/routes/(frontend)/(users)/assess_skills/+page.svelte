@@ -21,6 +21,7 @@
     );
     /** @type {any[]} */
     let allCourses = $derived(Array.isArray(data?.allCourses) ? data.allCourses : []);
+    let courseRecs = $derived(Array.isArray(data?.courseRecs) ? data.courseRecs : []);
     let selectedCareerId = $state('');
     let joblist = $derived(Array.isArray(data.jobs) ? data.jobs : []);
 
@@ -158,6 +159,76 @@
             achieved: Number(s.achieved_level) || 0,
             status: Number(s.achieved_level) > 0 ? 'met' : 'missing'
         }));
+    });
+
+    // 🎯 8. คำนวณรายวิชาแนะนำจากช่องว่างทักษะ (Skill Gaps)
+    /** @type {any[]} */
+    let courseSkills = $derived(Array.isArray(data?.courseSkills) ? data.courseSkills : []);
+
+    let recommendedCourses = $derived.by(() => {
+        if (!selectedCareerId || skillComparison.length === 0) return [];
+
+        const gaps = skillComparison.filter(
+            (s) => s.status === 'gap' || s.status === 'missing'
+        );
+        if (gaps.length === 0) return [];
+
+        /** @type {Map<number, {course_id: any, skill_level: number}[]>} */
+        const skillToCourses = new Map();
+        for (const cs of courseSkills) {
+            const sid = Number(cs.skill_id);
+            let arr = skillToCourses.get(sid);
+            if (!arr) {
+                arr = [];
+                skillToCourses.set(sid, arr);
+            }
+            arr.push({
+                course_id: cs.course_id,
+                skill_level: Number(cs.skill_level) || 0
+            });
+        }
+
+        /** @type {Map<any, {course: any, fills: any[]}>} */
+        const recMap = new Map();
+
+        for (const gap of gaps) {
+            const sid = Number(gap.skill_id);
+            const required = gap.requiredLevel;
+            const candidates = skillToCourses.get(sid) || [];
+            if (candidates.length === 0) continue;
+
+            // คัดวิชาที่สอนในระดับเท่ากับหรือสูงกว่าที่ต้องการ
+            let matches = candidates.filter((c) => c.skill_level >= required);
+
+            // ถ้าไม่มีวิชาได้ระดับที่ต้องการ ให้เลือกวิชาที่ใกล้เคียงที่สุด (เรียงระดับสูงไปต่ำ)
+            const isClosestFallback = matches.length === 0;
+            if (isClosestFallback) {
+                matches = [...candidates].sort((a, b) => b.skill_level - a.skill_level);
+            } else {
+                matches.sort((a, b) => b.skill_level - a.skill_level);
+            }
+
+            for (const m of matches) {
+                let entry = recMap.get(m.course_id);
+                if (!entry) {
+                    // @ts-ignore
+                    const course = courseRecs.find((c) => c.course_id === m.course_id);
+                    if (!course) continue;
+                    entry = { course, fills: [] };
+                    recMap.set(m.course_id, entry);
+                }
+                entry.fills.push({
+                    skill_name: gap.skill_name,
+                    required,
+                    course_level: m.skill_level,
+                    isClosest: isClosestFallback
+                });
+            }
+        }
+
+        return Array.from(recMap.values())
+            .map((entry) => ({ ...entry.course, fills: entry.fills }))
+            .sort((a, b) => b.fills.length - a.fills.length);
     });
 
     // 🎯 6. Canvas ref + ฟังก์ชันวาด Radar Chart
@@ -767,7 +838,58 @@
         </section>
 
         <section class="space-y-6 pt-4 border-t border-gray-200/50">
-            <h2 class="text-xl font-bold text-[#443210] md:text-2xl">วิชาเลือกเสรีแนะนำสำหรับคุณ</h2>
+            <h2 class="text-xl font-bold text-[#443210] md:text-2xl">วิชาแนะนำสำหรับคุณ</h2>
+
+            {#if !selectedCareerId}
+                <div class="rounded-2xl border-2 border-dashed border-gray-200 bg-white p-12 text-center shadow-sm">
+                    <p class="font-medium text-gray-400">กรุณาเลือกตำแหน่งงานเป้าหมายด้านบนเพื่อแสดงรายวิชาที่แนะนำ</p>
+                </div>
+            {:else if skillComparison.length === 0}
+                <div class="rounded-2xl border-2 border-dashed border-gray-200 bg-white p-12 text-center shadow-sm">
+                    <p class="font-medium text-gray-400">ไม่พบข้อมูลทักษะของอาชีพที่เลือก</p>
+                </div>
+            {:else if gapCount === 0 && missingCount === 0}
+                <div class="rounded-2xl border-2 border-dashed border-green-200 bg-green-50/40 p-12 text-center shadow-sm">
+                    <p class="font-bold text-green-600">ยินดีด้วย! คุณมีทักษะครบตามที่อาชีพนี้ต้องการแล้ว</p>
+                </div>
+            {:else if recommendedCourses.length === 0}
+                <div class="rounded-2xl border-2 border-dashed border-gray-200 bg-white p-12 text-center shadow-sm">
+                    <p class="font-medium text-gray-400">ไม่พบรายวิชาในหลักสูตรของคุณที่สามารถช่วยเติมเต็มทักษะที่ขาดได้</p>
+                </div>
+            {:else}
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {#each recommendedCourses as course (course.course_id)}
+                        <button
+                            type="button"
+                            onclick={() => info_subject(course.course_id)}
+                            class="group btn flex cursor-pointer flex-col justify-between rounded-2xl border border-gray-200/80 bg-white p-5 text-left shadow-sm transition-all duration-300 hover:border-[#DCA11D]/40"
+                        >
+                            <div class="mb-4">
+                                <span class="inline-block rounded-md bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 border border-amber-200/40">
+                                    {course.course_code}
+                                </span>
+                                <h3 class="mt-3 line-clamp-2 h-11 text-sm leading-snug font-bold text-[#443210]/90 transition-colors group-hover:text-[#dca11d] md:text-base">
+                                    {course.course_name}
+                                </h3>
+                            </div>
+
+                            <div class="border-t border-gray-100 pt-3">
+                                <span class="text-[10px] font-bold tracking-wider text-gray-400 uppercase">ช่วยเติมเต็มทักษะ</span>
+                                <div class="mt-1.5 flex flex-wrap gap-1">
+                                    {#each course.fills as f (f.skill_name)}
+                                        <span
+                                            class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold {f.isClosest ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700'}"
+                                            title={f.isClosest ? 'วิชาที่ใกล้เคียงที่สุด (ยังไม่ถึงระดับที่ต้องการ)' : 'สอนถึงระดับที่ต้องการ'}
+                                        >
+                                            {f.skill_name} · Lv{f.course_level}/{f.required}
+                                        </span>
+                                    {/each}
+                                </div>
+                            </div>
+                        </button>
+                    {/each}
+                </div>
+            {/if}
 
             <div class="flex justify-end items-center gap-3 pt-2">
                 <button

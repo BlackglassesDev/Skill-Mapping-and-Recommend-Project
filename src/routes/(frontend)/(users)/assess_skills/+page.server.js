@@ -15,7 +15,9 @@ export const load = async ({ locals }) => {
 			completedCoursesCount: [],
 			jobs: [],
 			jobSkills: [],
-			studentSkills: []
+			studentSkills: [],
+			courseRecs: [],
+			courseSkills: []
 		};
 	}
 
@@ -41,6 +43,21 @@ export const load = async ({ locals }) => {
 
 		const [courseRows] = await pool.execute(
 			'SELECT course_id, course_code, course_name, curriculum_id FROM courses'
+		);
+
+		const [courseRecRow] = await pool.execute(
+			`SELECT course_id,course_code,course_name,curriculum_id FROM courses
+			WHERE curriculum_id = ?`,
+			[userCurriculumId]
+		);
+
+		const [courseSkillRow] = await pool.execute(
+			`SELECT cs.course_id, cs.skill_id, cs.skill_level, s.skill_name
+			FROM course_skills cs
+			INNER JOIN skills s ON cs.skill_id = s.skill_id
+			INNER JOIN courses c ON cs.course_id = c.course_id
+			WHERE c.curriculum_id = ?`,
+			[userCurriculumId]
 		);
 
 		let savedGrades = [];
@@ -147,6 +164,8 @@ export const load = async ({ locals }) => {
 			users: rows_user, // ข้อมูล users
 			allCourses: courseRows, // ดึงวิชาทุกหลักสูตร
 			savedGrades: savedGrades,
+			courseRecs: courseRecRow, // วิชาแนะนำเฉพาะหลักสูตร
+			courseSkills: JSON.parse(JSON.stringify(courseSkillRow)), // ทักษะที่แต่ละวิชาสอน (พร้อมระดับ)
 			completedCoursesCount: completedCoursesCount,
 			passedSkillsCount: passedSkillsCount,
 			jobs: jobRows,
@@ -164,6 +183,8 @@ export const load = async ({ locals }) => {
 			curriculum: [],
 			users: [],
 			allCourse: [],
+			courseRecs: [],
+			courseSkills: [],
 			savedGrades: [],
 			completedCoursesCount: [],
 			passedSkillsCount: [],
