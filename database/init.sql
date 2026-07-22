@@ -144,35 +144,26 @@ INSERT INTO job (name_job, curriculum_id) VALUE
 -- ตารางเก็บชื่อทักษะหลัก (Master Data)
 CREATE TABLE skills (
     skill_id INT AUTO_INCREMENT PRIMARY KEY,
-    skill_name VARCHAR(255) NOT NULL UNIQUE, -- ใส่ UNIQUE กันชื่อซ้ำ
+    skill_name VARCHAR(255) NOT NULL, -- ใส่ UNIQUE กันชื่อซ้ำ
+    standard_skills TEXT,
     curriculum_id INT,
     FOREIGN KEY (curriculum_id) REFERENCES curriculum(curriculum_id)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
 
-INSERT INTO skills (skill_name, curriculum_id) VALUE
+INSERT INTO skills (skill_name,standard_skills, curriculum_id) VALUE
 -- ชื่อสกิล    ไอดีหลักสูตร
-    ('Frontend', 1),
-    ('Node Backend', 1),
-    ('Python Backend', 1),
-    ('Java Backend', 1),
-    ('.NET Backend', 1),
-    ('PHP Backend', 1),
-    ('Systems (C/C++)', 1),
-    ('Mobile', 1),
-    ('Scripting', 1),
-    ('Functional', 1),
-    ('Game/Graphics', 1),
-    ('Desktop', 1),
-    ('Machine Learning', 1),
-    ('Data Engineering', 1),
-    ('SQL DB', 1),
-    ('NoSQL DB', 1),
-    ('Cloud', 1),
-    ('DevOps', 1),
-    ('Build Tools', 1),
-    ('Messaging', 1),
-    ('GPU/Compute', 1),
-    ('Embedded/IoT', 1);
+    ('Data science','Athena, Big data, data mining, Glue, Kafka, Kineses, Lake Formation, predictive modelling',1),
+    ('Database design / Database administration','BigQuery, database, database performance tuning, database recovery plan, DynamoDB, ElasticSearch, MongoDB, MsSQL, MYSQL, nosql, Oracle, Oracle Database, PostgreSQL, RDS, redis, Redshift, Relational database design, Relational OLTP queries, SQL',1),
+    ('Systems design', 'concurrency, design patterns, MVC Architecture, Object-Oriented Design & Programming, REST API / Web Services, RPC, single page application spa, Spark, threading',1),
+    ('System installation and decommissioning / Infrastructure operations', 'Apache, DNS, F5 load balancers, HTTP, Microsoft IIS, Mule, networking, NTP, OpenAM, TCP/IP, Tomcat, Windows OS',1),
+    ('User experience design', 'Linux, redux, User Experience (UX) Design',1),
+    ('Infrastructure architecture / Cloud platform operations', 'Amazon Sagemaker, Amazon Web Services (AWS), cloud, Cloud Computing, Cloud environments, Cloud infrastructure, Cloudify, Containerisation, Docker, EKS, GKE, Google Cloud Platform (GCP), IaaS, Kubernetes, Microsoft Azure, Openshift, PaaS, Sagemaker, Virtual Machines (VMs)',1),
+    ('Methods and tools (Agile frameworks)', 'Agile Development, Scrum',1),
+    ('Machine learning', 'Artificial Neural Network ANN, Classic Image processing techniques, computer vision, Convolutional Neural Networks, Deep Learning, Faster RCNN, Image Processing, Instance segmentation, Machine Learning, Mask RCNN, Mobile net, Object detection, Semantic segmentation, Single shot multibox detector SSD',1),
+    ('Programming/software development', '.NET, algorithms, Angular, application debugging, application resiliency, Bash, Bootstrap, C#, C++, C/C++, capacity planning, CFEngine, Chrome Inspector, Cocoa Touch, configuration management, Core Animation, Core Data, Core Graphics, Core Text, cross browser, CSS, Datadog, deployment validation, distributed systems, Django, edge, Firebug, Flask, flutter, Go, Google, Grafana, GraphQL, grid computing, Groovy, Hadoop, HTML, Infrastructure as Code, Jasmine, Java, JavaScript, JQuery, Keras, less, Matlab, methodologies, Node.js, Numpy, Objective C, OpenCV, performance, Perl, PHP, postcss, predictive software development, process automation, Prometheus, protractor, Python, PyTorch, PyUnit, R, React, replication, Restful services, Ruby, sass, Scala, scalability, scikit learn, System troubleshooting, TensorFlow, Vue.js, WordPress, XML/XSLT, Zend',1),
+    ('Professional skills & Communication', 'Communication Skills, decision making, interpersonal skills, Problem Solving & Troubleshooting, team player, time management skills',1),
+    ('Release and deployment / Methods and tools', 'Chef, CI/CD, Cobbler, DevOps, Foreman, Gerrit, Git, GitLab CI, IBM Rational ClearCase, Jenkins, Mercurial, Puppet, SVN, Urban Code, Version Control',1),
+    ('Testing', 'Software Testing',1);
 
 CREATE TABLE job_skills (
     job_id INT,

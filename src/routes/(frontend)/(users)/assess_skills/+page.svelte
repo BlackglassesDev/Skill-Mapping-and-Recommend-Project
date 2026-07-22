@@ -14,6 +14,7 @@
     let authModalOpen = $state(!data.user);
     let curriculumModalOpen = $state(data.user && data.hasCurriculum === false);
     let curriculumList = $derived(Array.isArray(data?.curriculum) ? data.curriculum : []);
+    let JobRecommendModal = $state(false);
 
     // ตัวแปรผูกกับ Dropdown หลักสูตรที่เลือก
     let selectedCurriculumId = $state(
@@ -229,6 +230,95 @@
         return Array.from(recMap.values())
             .map((entry) => ({ ...entry.course, fills: entry.fills }))
             .sort((a, b) => b.fills.length - a.fills.length);
+    });
+
+    // 🎯 9. จัดอันดับสายงานที่ถนัด (แนะนำอาชีพที่ตรงทักษะมากที่สุด / เรียนเพิ่มน้อยที่สุด)
+    let jobRecommendations = $derived.by(() => {
+        if (joblist.length === 0 || allJobSkills.length === 0) return [];
+
+        const ranked = joblist.map((job) => {
+            // @ts-ignore
+            const required = allJobSkills.filter(
+                // @ts-ignore
+                (js) => String(js.job_id) === String(job.job_id)
+            );
+
+            if (required.length === 0) {
+                return {
+                    job_id: job.job_id,
+                    name_job: job.name_job,
+                    totalSkills: 0,
+                    metCount: 0,
+                    gapCount: 0,
+                    missingCount: 0,
+                    matchPercent: 0,
+                    levelMatchPercent: 0,
+                    totalRequired: 0,
+                    totalAchieved: 0,
+                    skills: []
+                };
+            }
+
+            let metCount = 0;
+            let gapCount = 0;
+            let missingCount = 0;
+            let totalRequired = 0;
+            let totalAchieved = 0;
+
+            const skills = required.map((js) => {
+                const requiredLevel = Number(js.level_skill) || 0;
+                const achievedLevel = studentSkillMap.get(Number(js.skill_id)) ?? 0;
+                const cappedAchieved = Math.min(achievedLevel, requiredLevel);
+
+                totalRequired += requiredLevel;
+                totalAchieved += cappedAchieved;
+
+                let status = 'gap';
+                if (achievedLevel === 0) {
+                    status = 'missing';
+                    missingCount++;
+                } else if (achievedLevel >= requiredLevel) {
+                    status = 'met';
+                    metCount++;
+                } else {
+                    status = 'gap';
+                    gapCount++;
+                }
+
+                return {
+                    skill_id: js.skill_id,
+                    skill_name: js.skill_name,
+                    requiredLevel,
+                    achievedLevel,
+                    status
+                };
+            });
+
+            const matchPercent = Math.round((metCount / required.length) * 100);
+            const levelMatchPercent =
+                totalRequired > 0 ? Math.round((totalAchieved / totalRequired) * 100) : 0;
+
+            return {
+                job_id: job.job_id,
+                name_job: job.name_job,
+                totalSkills: required.length,
+                metCount,
+                gapCount,
+                missingCount,
+                matchPercent,
+                levelMatchPercent,
+                totalRequired,
+                totalAchieved,
+                skills
+            };
+        });
+
+        return ranked.sort((a, b) => {
+            if (b.levelMatchPercent !== a.levelMatchPercent)
+                return b.levelMatchPercent - a.levelMatchPercent;
+            if (b.matchPercent !== a.matchPercent) return b.matchPercent - a.matchPercent;
+            return a.gapCount + a.missingCount - (b.gapCount + b.missingCount);
+        });
     });
 
     // 🎯 6. Canvas ref + ฟังก์ชันวาด Radar Chart
@@ -579,6 +669,113 @@
     </div>
 {/if}
 
+{#if JobRecommendModal}
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+        <div class="max-h-[88vh] w-full max-w-3xl overflow-y-auto rounded-3xl border border-gray-100 bg-white p-6 md:p-8 shadow-2xl transition-all animate-in fade-in zoom-in-95 duration-300 scrollbar-thin">
+            <div class="mb-6 flex items-start justify-between gap-4 border-b border-gray-100 pb-4">
+                <div>
+                    <h3 class="text-xl font-extrabold text-[#443210]">แนะนำสายงานที่ถนัด</h3>
+                    <p class="mt-1.5 text-xs font-medium text-gray-500">
+                        จัดอันดับตำแหน่งงานตามทักษะที่คุณมี โดยเรียงจากสายงานที่ตรงที่สุดและต้องเรียนเพิ่มน้อยที่สุด
+                    </p>
+                </div>
+                <button
+                    type="button"
+                    onclick={() => (JobRecommendModal = false)}
+                    class="shrink-0 cursor-pointer rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-[#443210]"
+                    aria-label="ปิด"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-5 w-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            {#if jobRecommendations.length > 0}
+                {@const top = jobRecommendations[0]}
+                <div class="mb-6 rounded-2xl border border-[#DCA11D]/40 bg-gradient-to-br from-amber-50 to-amber-50/30 p-5">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="inline-flex items-center gap-1 rounded-full bg-[#443210] px-2.5 py-1 text-[10px] font-bold text-[#DCA11D]">
+                            🏆 แนะนำอันดับ 1
+                        </span>
+                        <span class="rounded-full bg-white/70 px-2.5 py-1 text-[10px] font-bold text-amber-700">
+                            ตรง {top.levelMatchPercent}%
+                        </span>
+                    </div>
+                    <h4 class="mt-2 text-lg font-black text-[#443210]">{top.name_job}</h4>
+                    <p class="mt-1 text-xs font-medium text-gray-500">
+                        ตรงเกณฑ์ {top.metCount}/{top.totalSkills} ทักษะ · ต้องเพิ่ม {top.gapCount} · ยังไม่มี {top.missingCount}
+                    </p>
+                    <div class="mt-3 h-2 w-full overflow-hidden rounded-full bg-white/60">
+                        <div class="h-full rounded-full bg-gradient-to-r from-[#DCA11D] to-[#443210] transition-all duration-500" style="width: {top.levelMatchPercent}%"></div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <h5 class="text-xs font-bold tracking-wider text-gray-400 uppercase">สรุปทุกตำแหน่งงานในหลักสูตร</h5>
+                    {#each jobRecommendations as job, i (job.job_id)}
+                        <details class="group rounded-xl border border-gray-100 bg-gray-50/40 transition-colors hover:bg-amber-50/20 {i === 0 ? 'ring-1 ring-[#DCA11D]/30' : ''}" open={i === 0}>
+                            <summary class="flex cursor-pointer list-none items-center justify-between gap-3 p-4">
+                                <div class="flex min-w-0 items-center gap-3">
+                                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-black {i === 0 ? 'bg-[#443210] text-[#DCA11D]' : 'bg-gray-200 text-gray-500'}">
+                                        {i + 1}
+                                    </span>
+                                    <div class="min-w-0">
+                                        <p class="truncate text-sm font-bold text-[#443210]">{job.name_job}</p>
+                                        <p class="mt-0.5 text-[11px] font-medium text-gray-500">
+                                            ระดับที่มี {job.totalAchieved}/{job.totalRequired}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="flex shrink-0 items-center gap-3">
+                                    <div class="text-right">
+                                        <p class="text-sm font-black text-[#DCA11D]">{job.levelMatchPercent}%</p>
+                                        <p class="text-[10px] font-medium text-gray-400">ตรง {job.metCount}/{job.totalSkills}</p>
+                                    </div>
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4 text-gray-400 transition-transform group-open:rotate-180">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                    </svg>
+                                </div>
+                            </summary>
+                            <div class="border-t border-gray-100 px-4 pb-4 pt-3">
+                                <div class="mb-3 flex flex-wrap gap-2 text-[10px] font-bold">
+                                    <span class="rounded-full bg-green-100 px-2 py-0.5 text-green-700">ตรง {job.metCount}</span>
+                                    <span class="rounded-full bg-amber-100 px-2 py-0.5 text-amber-700">ขาด {job.gapCount}</span>
+                                    <span class="rounded-full bg-red-100 px-2 py-0.5 text-red-700">ยังไม่มี {job.missingCount}</span>
+                                </div>
+                                <ul class="space-y-1.5">
+                                    {#each job.skills as sk (sk.skill_id)}
+                                        <li class="flex items-center justify-between gap-2 rounded-lg bg-white/70 px-3 py-1.5">
+                                            <span class="truncate text-xs font-bold text-[#443210]">{sk.skill_name}</span>
+                                            <span class="shrink-0 text-[11px] font-bold {sk.status === 'met' ? 'text-green-600' : sk.status === 'gap' ? 'text-amber-600' : 'text-red-500'}">
+                                                {sk.achievedLevel}/{sk.requiredLevel}
+                                            </span>
+                                        </li>
+                                    {/each}
+                                </ul>
+                            </div>
+                        </details>
+                    {/each}
+                </div>
+            {:else}
+                <div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50/50 p-10 text-center">
+                    <p class="text-sm font-medium text-gray-400">ยังไม่มีข้อมูลสายงานหรือทักษะเพียงพอในการแนะนำ</p>
+                </div>
+            {/if}
+
+            <div class="mt-6 flex justify-end border-t border-gray-100 pt-4">
+                <button
+                    type="button"
+                    onclick={() => (JobRecommendModal = false)}
+                    class="cursor-pointer rounded-xl bg-[#443210] px-6 py-2.5 text-sm font-bold text-[#DCA11D] shadow-md transition-all hover:bg-[#543f15]"
+                >
+                    ปิดหน้าต่าง
+                </button>
+            </div>
+        </div>
+    </div>
+{/if}
+
 <div class="min-h-screen bg-gradient-to-b from-amber-50/40 via-gray-50 to-gray-100/50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-[size:16px_16px] py-12 md:py-16">
     <main class="container mx-auto max-w-7xl space-y-10 px-4 md:px-8">
         
@@ -894,6 +1091,7 @@
             <div class="flex justify-end items-center gap-3 pt-2">
                 <button
                     type="button"
+                    onclick={() => (JobRecommendModal = true)}
                     class="cursor-pointer rounded-xl bg-amber-500/10 px-6 py-3 text-sm font-bold text-[#443210] border border-amber-500/20 transition-all hover:bg-amber-500/20"
                 >
                     แนะนำสายงานที่ถนัด 💡
