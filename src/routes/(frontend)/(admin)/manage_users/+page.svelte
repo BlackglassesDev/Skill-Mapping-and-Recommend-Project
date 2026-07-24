@@ -444,13 +444,14 @@
 							</div>
 
 							<div class="space-y-1.5">
-								<label for="username" class="text-gray-400">ชื่อบัญชีผู้ใช้ (Username)</label>
+								<label for="username" class="text-gray-400">ชื่อบัญชีผู้ใช้ (Username ไม่สามารถแก้ไขได้)</label>
 								<input
 									id="username"
 									type="text"
+									disabled
 									name="username"
 									bind:value={editingUser.username}
-									class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 outline-none focus:border-[#dca11d] focus:bg-white"
+									class="w-full rounded-2xl border-2 border-gray-200 bg-gray-100 p-3 font-mono text-gray-500 outline-none"
 									required
 								/>
 							</div>
