@@ -36,6 +36,14 @@
         showAllUnmapped ? unmappedCoursesList : unmappedCoursesList.slice(0, initialUnmappedLimit)
     );
 
+    // จำกัดจำนวนแถวกราฟความถี่ทักษะ พร้อมปุ่มดูทั้งหมด/ซ่อน
+    let showAllSkills = $state(false);
+    let skillStatsLimit = 5;
+
+    let visibleSkillStatistics = $derived(
+        showAllSkills ? skillStatistics : skillStatistics.slice(0, skillStatsLimit)
+    );
+
     // --- 4. 📊 ข้อมูลเปรียบเทียบระดับทักษะสูงสุด ฝั่งอาชีพ vs ฝั่งรายวิชา (รายทักษะ) ---
     /** @type {any[]} */
     let skillCompareStats = $state(data.skillCompareStats || []);
@@ -326,7 +334,7 @@
             </div>
 
             <div class="flex flex-col gap-4">
-                {#each skillStatistics as skill}
+                {#each visibleSkillStatistics as skill}
                     <div class="grid grid-cols-1 md:grid-cols-4 items-center gap-2 text-xs font-medium">
                         <div class="md:col-span-1 flex flex-col">
                             <span class="font-black text-[#443210] tracking-tight">{skill.skill_name}</span>
@@ -358,6 +366,31 @@
                 {:else}
                     <p class="text-center text-xs text-gray-400 py-10">ไม่พบทักษะในระบบหลักสูตรนี้</p>
                 {/each}
+
+                {#if skillStatistics.length > skillStatsLimit}
+                    <div class="mt-2 flex justify-center border-t border-gray-100 pt-4">
+                        <button
+                            type="button"
+                            onclick={() => {
+                                showAllSkills = !showAllSkills;
+                                if (showAllSkills) {
+                                    setTimeout(() => {
+                                        window.scrollBy({ top: 150, behavior: 'smooth' });
+                                    }, 100);
+                                }
+                            }}
+                            class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-4.5 py-2 text-xs font-black text-gray-500 shadow-sm transition-all hover:border-[#dca11d] hover:text-[#dca11d]"
+                        >
+                            {#if !showAllSkills}
+                                <span class="inline-block animate-bounce">↓</span>
+                                <span>ดูทักษะที่เหลือทั้งหมด (Show More)</span>
+                            {:else}
+                                <span class="inline-block">↑</span>
+                                <span>ซ่อนทักษะ (Show Less)</span>
+                            {/if}
+                        </button>
+                    </div>
+                {/if}
             </div>
 
         </div>
