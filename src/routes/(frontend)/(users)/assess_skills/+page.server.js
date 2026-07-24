@@ -136,7 +136,7 @@ export const load = async ({ locals }) => {
 
 				// ดึง "ระดับทักษะที่แต่ละอาชีพต้องการ" พร้อมชื่อทักษะ เฉพาะอาชีพในหลักสูตรของผู้ใช้
 				const [fetchedJobSkills] = await pool.execute(
-					`SELECT js.job_id, js.skill_id, js.level_skill, s.skill_name
+					`SELECT js.job_id, js.skill_id, js.level_skill, s.skill_name, s.description
                     FROM job_skills js
                     INNER JOIN skills s ON js.skill_id = s.skill_id
                     INNER JOIN job j ON js.job_id = j.job_id

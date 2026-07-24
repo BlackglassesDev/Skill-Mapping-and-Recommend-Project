@@ -100,6 +100,7 @@
             return {
                 skill_id: js.skill_id,
                 skill_name: js.skill_name,
+                skill_description: js.description || '',
                 requiredLevel,
                 achievedLevel,
                 diff,
@@ -891,6 +892,11 @@
                                             <p class="truncate text-sm font-bold text-[#443210]">
                                                 {sk.skill_name}
                                             </p>
+                                            {#if sk.skill_description}
+                                                <p class="mt-0.5 line-clamp-2 text-xs font-medium text-gray-400">
+                                                    {sk.skill_description}
+                                                </p>
+                                            {/if}
                                             <p class="mt-0.5 text-xs font-medium text-gray-500">
                                                 ระดับที่มี: <span class="font-bold text-[#443210]">{sk.achievedLevel}</span>
                                                 / ระดับที่ต้องการ: <span class="font-bold text-[#DCA11D]">{sk.requiredLevel}</span>
