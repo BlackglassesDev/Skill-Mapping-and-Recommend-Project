@@ -323,7 +323,8 @@
 									class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-black text-[#443210] shadow-sm outline-none focus:border-[#dca11d]"
 								>
 									{#each availableSkills as skill}
-										<option value={skill.name}>[{skill.category}] — {skill.name}</option>
+										<!-- <option value={skill.name}>[{skill.category}] — {skill.name}</option> -->
+										<option value={skill.name}>{skill.name}</option>
 									{/each}
 								</select>
 							</div>
