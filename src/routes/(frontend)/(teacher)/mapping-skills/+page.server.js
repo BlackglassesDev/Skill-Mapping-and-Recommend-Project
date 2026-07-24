@@ -18,7 +18,7 @@ export async function load({locals}) {
     const courses = coursesRows;
 
     const [skillsRows] = await pool.execute(`
-        SELECT s.skill_id, s.skill_name, s.curriculum_id, c.curriculum_name
+        SELECT s.skill_id, s.skill_code, s.skill_name, s.standard_skills, s.description, s.curriculum_id, c.curriculum_name
         FROM skills s
         LEFT JOIN curriculum c ON s.curriculum_id = c.curriculum_id
         WHERE s.curriculum_id = ?

@@ -61,7 +61,10 @@
 	let availableSkills = $derived(
 		skillsData.map((/** @type {any} */ skill) => ({
 			id: skill.skill_id,
+			code: skill.skill_code || '',
 			name: skill.skill_name,
+			standard: skill.standard_skills || '',
+			description: skill.description || '',
 			category: skill.curriculum_name || 'Unspecified course'
 		}))
 	);
@@ -75,6 +78,35 @@
 			formSkillName = skillsData[0].skill_name;
 		}
 	});
+
+	// --- Combobox ค้นหาทักษะแบบเรียลไทม์ (กรอง skill_code / skill_name / standard_skills / description) ---
+	let skillSearch = $state('');
+	let skillDropdownOpen = $state(false);
+
+	let filteredSkills = $derived(
+		skillSearch.trim()
+			? availableSkills.filter((/** @type {any} */ skill) => {
+					const q = skillSearch.toLowerCase().trim();
+					return (
+						String(skill.code).toLowerCase().includes(q) ||
+						String(skill.name).toLowerCase().includes(q) ||
+						String(skill.standard).toLowerCase().includes(q) ||
+						String(skill.description).toLowerCase().includes(q)
+					);
+				})
+			: availableSkills
+	);
+
+	let selectedSkillCode = $derived(
+		availableSkills.find((/** @type {any} */ s) => s.name === formSkillName)?.code || ''
+	);
+
+	/** @param {any} skill */
+	function selectSkill(skill) {
+		formSkillName = skill.name;
+		skillSearch = '';
+		skillDropdownOpen = false;
+	}
 
 	// --- 4. ⚡️ ระบบ Reactive คำนวณกรองรายวิชา (Derived Runes) ---
 	let filteredCourses = $derived(
@@ -152,7 +184,7 @@
 				if (result.type === 'success') {
 					await invalidateAll();
 					triggerAlert(
-						'💾 บันทึกโครงสร้างผังทักษะ (Skill Mapping) เข้าสู่ระบบฐานข้อมูลหลักเรียบร้อย!'
+						'บันทึกโครงสร้างผังทักษะเข้าสู่ระบบฐานข้อมูลหลักเรียบร้อย!'
 					);
 				} else {
 					//@ts-ignore
@@ -314,20 +346,71 @@
 						</div>
 
 						<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
-							<div class="flex flex-col gap-1.5 md:col-span-2">
-								<span class="pl-1 text-xs font-bold text-gray-400"
-									>1. เลือกองค์ความรู้/ทักษะปลายทาง</span
+						<div class="flex flex-col gap-1.5 md:col-span-2">
+							<span class="pl-1 text-xs font-bold text-gray-400"
+								>1. เลือกองค์ความรู้/ทักษะปลายทาง</span
+							>
+							<div class="relative">
+								<input
+									type="text"
+									autocomplete="off"
+									bind:value={skillSearch}
+									onfocus={() => (skillDropdownOpen = true)}
+									onblur={() => setTimeout(() => { skillDropdownOpen = false; skillSearch = ''; }, 150)}
+									placeholder={formSkillName ? `[${selectedSkillCode}] ${formSkillName}` : 'พิมพ์เพื่อค้นหา รหัส / ชื่อ / คำค้น / คำอธิบาย...'}
+									class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 pr-10 text-sm font-black text-[#443210] shadow-sm outline-none transition-all focus:border-[#dca11d] focus:ring-1 focus:ring-[#dca11d]"
+								/>
+								<div
+									class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400"
 								>
-								<select
-									bind:value={formSkillName}
-									class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-black text-[#443210] shadow-sm outline-none focus:border-[#dca11d]"
-								>
-									{#each availableSkills as skill}
-										<!-- <option value={skill.name}>[{skill.category}] — {skill.name}</option> -->
-										<option value={skill.name}>{skill.name}</option>
-									{/each}
-								</select>
+									<svg
+										xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+										stroke-width="2.5" stroke="currentColor"
+										class="h-4 w-4 transition-transform duration-200 {skillDropdownOpen ? 'rotate-180' : ''}"
+									>
+										<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+									</svg>
+								</div>
+
+								{#if skillDropdownOpen}
+									<div
+										class="absolute z-30 mt-1 max-h-72 w-full overflow-y-auto rounded-xl border border-gray-200 bg-white py-1 shadow-xl"
+									>
+										{#if filteredSkills.length > 0}
+											{#each filteredSkills as skill (skill.id)}
+												<button
+													type="button"
+													onmousedown={() => selectSkill(skill)}
+													class="flex w-full cursor-pointer flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-amber-50/60 {skill.name === formSkillName ? 'bg-amber-50/40' : ''}"
+												>
+													<div class="flex items-center gap-2">
+														<span
+															class="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#443210]"
+															>{skill.code}</span
+														>
+														<span class="text-xs font-bold text-[#443210]">{skill.name}</span>
+														{#if skill.name === formSkillName}
+															<span class="ml-auto text-[10px] font-black text-[#dca11d]"
+																>✓ เลือกแล้ว</span
+															>
+														{/if}
+													</div>
+													{#if skill.description}
+														<span class="line-clamp-1 text-[10px] font-medium text-gray-400"
+															>{skill.description}</span
+														>
+													{/if}
+												</button>
+											{/each}
+										{:else}
+											<div class="px-4 py-6 text-center text-xs font-medium text-gray-400">
+												ไม่พบทักษะที่ตรงกับ "{skillSearch.trim()}"
+											</div>
+										{/if}
+									</div>
+								{/if}
 							</div>
+						</div>
 
 							<div class="flex flex-col gap-1.5">
 								<span class="pl-1 text-xs font-bold text-gray-400"
