@@ -10,6 +10,8 @@
     let totalCourses = $derived(data?.stats?.totalCourses ?? 0);
     let totalCurriculums = $derived(data?.stats?.totalCurriculums ?? 0);
     let totalCredits = $derived(data?.stats?.totalCredits ?? 0);
+    let totalSkills = $derived(data?.stats?.totalSkills ?? 0);
+    let totalJobs = $derived(data?.stats?.totalJobs ?? 0);
 
     // ดึงรายชื่อวิชาล่าสุด หรือ ข้อมูลสถิติย่อยมาโชว์แผงควบคุม
     let recentCourses = $derived(data?.recentCourses ?? []);
@@ -59,7 +61,7 @@
             </div>
         </div>
 
-        <div class="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
             <div class="flex items-center gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#dca11d]">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-xl shadow-inner">👥</div>
                 <div class="space-y-0.5">
@@ -86,6 +88,26 @@
                     <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">รายวิชาในระบบ</p>
                     <p class="text-2xl font-black text-[#443210]">
                         {totalCourses} <span class="text-xs font-medium text-gray-400">วิชา</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#dca11d]">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-xl shadow-inner">🧩</div>
+                <div class="space-y-0.5">
+                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">ทักษะในระบบ</p>
+                    <p class="text-2xl font-black text-[#443210]">
+                        {totalSkills} <span class="text-xs font-medium text-gray-400">ทักษะ</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#dca11d]">
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-xl shadow-inner">💼</div>
+                <div class="space-y-0.5">
+                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">อาชีพ / สายงาน</p>
+                    <p class="text-2xl font-black text-[#443210]">
+                        {totalJobs} <span class="text-xs font-medium text-gray-400">อาชีพ</span>
                     </p>
                 </div>
             </div>
