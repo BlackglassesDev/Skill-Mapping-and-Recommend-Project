@@ -26,7 +26,10 @@
 
 	let skillToEdit = $state({
 		skill_id: '',
+        skill_code: '',
 		skill_name: '',
+        skill_keywords: '',
+        skill_description: '',
 		curriculum_id: ''
 	});
 
@@ -39,7 +42,10 @@
 	function openEditModal(skill) {
 		skillToEdit = {
 			skill_id: skill.skill_id || '',
+			skill_code: skill.skill_code || '',
 			skill_name: skill.skill_name || '',
+			skill_keywords: skill.standard_skills || skill.skill_keywords || '',
+			skill_description: skill.description || skill.skill_description || '',
 			curriculum_id: skill.curriculum_id !== null ? String(skill.curriculum_id) : ''
 		};
 		isEditModalOpen = true;
@@ -57,10 +63,13 @@
 	// 5. การกรองข้อมูลด้วยคำค้นหา
 	let filteredSkills = $derived(
 		skillList.filter((skill) => {
+			const code = (skill.skill_code || '').toLowerCase();
 			const name = (skill.skill_name || '').toLowerCase();
+			const keywords = (skill.standard_skills || '').toLowerCase();
+			const description = (skill.description || '').toLowerCase();
 			const dept = (skill.curriculum_name || '').toLowerCase();
 			const query = searchQuery.toLowerCase().trim();
-			return name.includes(query) || dept.includes(query);
+			return code.includes(query) || name.includes(query) || keywords.includes(query) || description.includes(query) || dept.includes(query);
 		})
 	);
 
@@ -373,6 +382,21 @@
                 }}
                 class="space-y-4 p-6 text-xs font-bold text-[#443210]"
             >
+
+                <div class="space-y-1.5">
+                    <label for="skillCode" class="text-gray-400">
+                        โค้ดของทักษะ <span class="text-rose-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="skillCode"
+                        name="skill_code"
+                        placeholder="เช่น PROG จาก SFIA"
+                        required
+                        class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                    />
+                </div>
+
                 <div class="space-y-1.5">
                     <label for="skillName" class="text-gray-400">
                         ชื่อทักษะความสามารถ <span class="text-rose-500">*</span>
@@ -381,9 +405,36 @@
                         type="text"
                         id="skillName"
                         name="skill_name"
-                        placeholder="เช่น Web Development หรือ Data Analytics"
+                        placeholder="Programming/software development"
                         required
                         class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                    />
+                </div>
+
+                <div class="space-y-1.5">
+                    <label for="skillKeywords" class="text-gray-400">
+                        Keyword ชื่อเรียกทักษะย่อย
+                    </label>
+                    <input
+                        type="text"
+                        id="skillKeywords"
+                        name="skill_keywords"
+                        placeholder="เช่น PHP Node.js html css"
+                        class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                    />
+                </div>
+
+                <div class="space-y-1.5">
+                    <label for="skillDescription" class="text-gray-400">
+                        คำอธิบายทักษะความสามารถจากโค้ด <span class="text-rose-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="skillDescription"
+                        name="skill_description"
+                        placeholder="เช่น การออกแบบ เขียนโค้ด ทดสอบ และพัฒนาส่วนประกอบซอฟต์แวร์เพื่อสร้างมูลค่าแก่ผู้ใช้"
+                        required
+                        class="w-full resize-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
                     />
                 </div>
 
@@ -471,6 +522,21 @@
                 <input type="hidden" name="skill_id" value={skillToEdit.skill_id} />
 
                 <div class="space-y-1.5">
+                    <label for="editSkillCode" class="text-gray-400">
+                        โค้ดทักษะ <span class="text-rose-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="editSkillCode"
+                        name="skill_code"
+                        bind:value={skillToEdit.skill_code}
+                        placeholder="เช่น PROG จาก SFIA"
+                        required
+                        class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                    />
+                </div>
+
+                <div class="space-y-1.5">
                     <label for="editSkillName" class="text-gray-400">
                         ชื่อทักษะความสามารถ <span class="text-rose-500">*</span>
                     </label>
@@ -479,8 +545,36 @@
                         id="editSkillName"
                         name="skill_name"
                         bind:value={skillToEdit.skill_name}
-                        placeholder="เช่น Web Development หรือ Data Analytics"
+                        placeholder="เช่น Programming/software development"
                         required
+                        class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                    />
+                </div>
+
+                <div class="space-y-1.5">
+                    <label for="editSkillKeywords" class="text-gray-400">
+                        Keyword ชื่อเรียกทักษะย่อย
+                    </label>
+                    <input
+                        type="text"
+                        id="editSkillKeywords"
+                        name="skill_keywords"
+                        bind:value={skillToEdit.skill_keywords}
+                        placeholder="เช่น php html css js"
+                        class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
+                    />
+                </div>
+
+                <div class="space-y-1.5">
+                    <label for="editSkillDescription" class="text-gray-400">
+                        คำอธิบายทักษะความสามารถจากโค้ด<span class="text-rose-500">*</span>
+                    </label>
+                    <input
+                        type="text"
+                        id="editSkillDescription"
+                        name="skill_description"
+                        bind:value={skillToEdit.skill_description}
+                        placeholder="เช่น php html css js"
                         class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
                     />
                 </div>

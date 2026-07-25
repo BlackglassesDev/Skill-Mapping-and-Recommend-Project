@@ -4,7 +4,7 @@ import { pool } from '$lib/server/db';
 export async function load() {
     try {
         const [skillRows] = await pool.execute(
-            `SELECT s.skill_id, s.skill_name, s.curriculum_id, c.curriculum_name 
+            `SELECT s.skill_id, s.skill_code, s.skill_name, s.standard_skills, s.description, s.curriculum_id, c.curriculum_name 
              FROM skills s 
              LEFT JOIN curriculum c ON s.curriculum_id = c.curriculum_id`
         );
@@ -30,7 +30,10 @@ export async function load() {
 export const actions = {
     createSkill: async ({ request }) => {
         const data = await request.formData();
+        const skill_code = data.get('skill_code')?.toString().trim();
         const skill_name = data.get('skill_name')?.toString().trim();
+        const skill_keywords = data.get('skill_keywords')?.toString().trim();
+        const skill_description = data.get('skill_description')?.toString().trim();
         const curriculum_id = data.get('curriculum_id');
 
         try {
@@ -38,22 +41,23 @@ export const actions = {
                 return { success: false, message: 'กรุณากรอกชื่อทักษะให้ถูกต้อง 📋' };
             }
 
+            const dbCurriculumId = curriculum_id && curriculum_id !== '' ? Number(curriculum_id) : null;
+
             // ตรวจสอบชื่อทักษะซ้ำ
             /** @type {[any, any]} */
             const [existing] = await pool.execute(
-                'SELECT skill_name FROM skills WHERE skill_name = ?',
-                [skill_name]
+                'SELECT skill_name FROM skills WHERE skill_name = ? AND curriculum_id = ?',
+                [skill_name, dbCurriculumId]
             );
 
             if (existing.length > 0) {
-                return { success: false, message: 'ทักษะนี้มีอยู่แล้วในระบบ ❌' };
+                return { success: false, message: 'ชื่อทักษะนี้มีอยู่แล้วในหลักสูตรนี้แล้ว ❌' };
             }
 
-            const dbCurriculumId = curriculum_id && curriculum_id !== '' ? Number(curriculum_id) : null;
-
             await pool.execute(
-                'INSERT INTO skills (skill_name, curriculum_id) VALUES (?, ?)',
-                [skill_name, dbCurriculumId]
+                //@ts-ignore
+                `INSERT INTO skills (skill_code, skill_name, standard_skills, description, curriculum_id) VALUES (?, ?, ?, ?, ?)`,
+                [skill_code, skill_name, skill_keywords, skill_description, dbCurriculumId]
             );
 
             return { success: true, message: 'เพิ่มทักษะเรียนสำเร็จ ✅' };
@@ -66,7 +70,10 @@ export const actions = {
     updateSkill: async ({ request }) => {
         const data = await request.formData();
         const skill_id = data.get('skill_id');
+        const skill_code = data.get('skill_code')?.toString().trim();
         const skill_name = data.get('skill_name')?.toString().trim();
+        const skill_keywords = data.get('skill_keywords')?.toString().trim();
+        const skill_description = data.get('skill_description')?.toString().trim();
         const curriculum_id = data.get('curriculum_id');
 
         try {
@@ -74,22 +81,23 @@ export const actions = {
                 return { success: false, message: 'กรุณากรอกข้อมูลให้ครบถ้วน 📋' };
             }
 
+            const dbCurriculumId = curriculum_id && curriculum_id !== '' ? Number(curriculum_id) : null;
+
             // ตรวจสอบชื่อทักษะซ้ำที่ไม่ใช่ของตัวเอง
             /** @type {[any, any]} */
             const [existing] = await pool.execute(
-                'SELECT skill_id FROM skills WHERE skill_name = ? AND skill_id != ?',
-                [skill_name, skill_id]
+                'SELECT skill_id FROM skills WHERE skill_name = ? AND curriculum_id != ?',
+                [skill_name, dbCurriculumId]
             );
 
             if (existing.length > 0) {
-                return { success: false, message: 'ชื่อทักษะนี้มีอยู่แล้วในระบบ ❌' };
+                return { success: false, message: 'ชื่อทักษะนี้มีอยู่แล้วในหลักสูตรนี้แล้ว ❌' };
             }
 
-            const dbCurriculumId = curriculum_id && curriculum_id !== '' ? Number(curriculum_id) : null;
-
             await pool.execute(
-                'UPDATE skills SET skill_name = ?, curriculum_id = ? WHERE skill_id = ?',
-                [skill_name, dbCurriculumId, skill_id]
+                //@ts-ignore
+                'UPDATE skills SET skill_code = ?, skill_name = ?, standard_skills = ?, description = ?, curriculum_id = ? WHERE skill_id = ?',
+                [skill_code, skill_name, skill_keywords, skill_description, dbCurriculumId, skill_id]
             );
 
             return { success: true, message: 'แก้ไขข้อมูลทักษะสำเร็จ ✅' };
