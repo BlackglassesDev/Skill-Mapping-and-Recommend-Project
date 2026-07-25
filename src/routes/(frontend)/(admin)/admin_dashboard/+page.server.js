@@ -37,6 +37,16 @@ export const load = async () => {
             'SELECT course_code, course_name, credits FROM courses ORDER BY curriculum_id DESC LIMIT 5'
         );
 
+        // 8. การกระจายระดับทักษะที่อาชีพเรียกร้อง (ฝั่งอาชีพ) แยกตามเลเวล 1-6
+        const [jobSkillLevelRows] = await pool.execute(
+            'SELECT level_skill, COUNT(*) as count FROM job_skills GROUP BY level_skill ORDER BY level_skill'
+        );
+
+        // 9. การกระจายระดับทักษะที่รายวิชาสอน (ฝั่งรายวิชา) แยกตามเลเวล 1-6
+        const [courseSkillLevelRows] = await pool.execute(
+            'SELECT skill_level as level_skill, COUNT(*) as count FROM course_skills GROUP BY skill_level ORDER BY skill_level'
+        );
+
         return {
             stats: {
                 totalUsers,
@@ -46,13 +56,17 @@ export const load = async () => {
                 totalSkills,
                 totalJobs
             },
-            recentCourses: recentCourses || []
+            recentCourses: recentCourses || [],
+            jobSkillDistribution: jobSkillLevelRows || [],
+            courseSkillDistribution: courseSkillLevelRows || []
         };
     } catch (err) {
         console.error('Dashboard Load Error:', err);
         return {
             stats: { totalUsers: 0, totalCourses: 0, totalCurriculums: 0, totalCredits: 0, totalSkills: 0, totalJobs: 0 },
-            recentCourses: []
+            recentCourses: [],
+            jobSkillDistribution: [],
+            courseSkillDistribution: []
         };
     }
 };

@@ -18,6 +18,39 @@
 
     // Path สำหรับย้อนกลับไปหน้า Admin หลัก
     let adminPage = resolve('/adminPage');
+
+    // --- การกระจายระดับทักษะ ฝั่งอาชีพ vs ฝั่งรายวิชา (แยกตามเลเวล 1-6) ---
+    let jobSkillDistRaw = $derived(data?.jobSkillDistribution ?? []);
+    let courseSkillDistRaw = $derived(data?.courseSkillDistribution ?? []);
+
+    const LEVEL_INFO = [
+        { level: 1, name: 'ความเข้าใจเบื้องต้น', bar: 'bg-red-400', text: 'text-red-600' },
+        { level: 2, name: 'ประยุกต์ใช้พื้นฐาน', bar: 'bg-orange-400', text: 'text-orange-600' },
+        { level: 3, name: 'ปฏิบัติงานได้อิสระ', bar: 'bg-amber-400', text: 'text-amber-600' },
+        { level: 4, name: 'แก้ไขปัญหาซับซ้อน', bar: 'bg-lime-500', text: 'text-lime-600' },
+        { level: 5, name: 'เชี่ยวชาญเฉพาะทาง', bar: 'bg-emerald-500', text: 'text-emerald-600' },
+        { level: 6, name: 'ผู้เชี่ยวชาญ/นวัตกร', bar: 'bg-cyan-500', text: 'text-cyan-600' }
+    ];
+
+    function buildDist(rows) {
+        const map = new Map();
+        for (const r of rows) {
+            const lvl = Number(r.level_skill);
+            if (lvl >= 1 && lvl <= 6) map.set(lvl, Number(r.count) || 0);
+        }
+        const total = Array.from(map.values()).reduce((a, b) => a + b, 0);
+        return {
+            rows: LEVEL_INFO.map((info) => {
+                const count = map.get(info.level) || 0;
+                const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+                return { ...info, count, pct };
+            }),
+            total
+        };
+    }
+
+    let jobDist = $derived(buildDist(jobSkillDistRaw));
+    let courseDist = $derived(buildDist(courseSkillDistRaw));
 </script>
 
 <svelte:head>
@@ -125,47 +158,57 @@
 
         <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <div class="space-y-6 lg:col-span-2">
-                <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-                    <h3 class="mb-5 flex items-center gap-2 text-sm font-black text-[#443210]">
-                        📈 สัดส่วนการกระจายระดับการเรียนรู้ (Bloom's Taxonomy)
-                    </h3>
-                    <div class="space-y-4 pt-1">
-                        <div>
-                            <div class="mb-1.5 flex justify-between text-xs font-bold">
-                                <span class="text-red-600">Level 1: ความจำ (Remembering)</span>
-                                <span class="text-gray-400 font-medium">45% ของวิชาทั้งหมด</span>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 class="mb-1 flex items-center gap-2 text-sm font-black text-[#443210]">
+                            💼 การกระจายทักษะที่อาชีพเรียกร้อง
+                        </h3>
+                        <p class="mb-4 text-[11px] font-medium text-gray-400">
+                            รวม {jobDist.total} รายการ · สัดส่วนตามเลเวลที่ต้องการ (Occupational Skills)
+                        </p>
+                        {#if jobDist.total > 0}
+                            <div class="space-y-3">
+                                {#each jobDist.rows as row (row.level)}
+                                    <div>
+                                        <div class="mb-1 flex justify-between text-[11px] font-bold">
+                                            <span class={row.text}>Level {row.level}: {row.name}</span>
+                                            <span class="text-gray-400 font-medium">{row.count} ({row.pct}%)</span>
+                                        </div>
+                                        <div class="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                                            <div class="h-full rounded-full transition-all duration-500 {row.bar}" style="width: {row.pct}%"></div>
+                                        </div>
+                                    </div>
+                                {/each}
                             </div>
-                            <div class="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                                <div class="h-full rounded-full bg-red-500 transition-all duration-500" style="width: 45%"></div>
+                        {:else}
+                            <p class="py-8 text-center text-xs text-gray-400 italic">ยังไม่มีข้อมูลทักษะที่อาชีพเรียกร้อง</p>
+                        {/if}
+                    </div>
+
+                    <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+                        <h3 class="mb-1 flex items-center gap-2 text-sm font-black text-[#443210]">
+                            📚 การกระจายทักษะที่รายวิชาสอน
+                        </h3>
+                        <p class="mb-4 text-[11px] font-medium text-gray-400">
+                            รวม {courseDist.total} รายการ · สัดส่วนตามเลเวลที่สอน (Academic Subjects)
+                        </p>
+                        {#if courseDist.total > 0}
+                            <div class="space-y-3">
+                                {#each courseDist.rows as row (row.level)}
+                                    <div>
+                                        <div class="mb-1 flex justify-between text-[11px] font-bold">
+                                            <span class={row.text}>Level {row.level}: {row.name}</span>
+                                            <span class="text-gray-400 font-medium">{row.count} ({row.pct}%)</span>
+                                        </div>
+                                        <div class="h-2 w-full overflow-hidden rounded-full bg-gray-100">
+                                            <div class="h-full rounded-full transition-all duration-500 {row.bar}" style="width: {row.pct}%"></div>
+                                        </div>
+                                    </div>
+                                {/each}
                             </div>
-                        </div>
-                        <div>
-                            <div class="mb-1.5 flex justify-between text-xs font-bold">
-                                <span class="text-orange-600">Level 2: ความเข้าใจ (Understanding)</span>
-                                <span class="text-gray-400 font-medium">60% ของวิชาทั้งหมด</span>
-                            </div>
-                            <div class="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                                <div class="h-full rounded-full bg-orange-500 transition-all duration-500" style="width: 60%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="mb-1.5 flex justify-between text-xs font-bold">
-                                <span class="text-amber-600">Level 3: การประยุกต์ใช้ (Applying)</span>
-                                <span class="text-gray-400 font-medium">35% ของวิชาทั้งหมด</span>
-                            </div>
-                            <div class="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                                <div class="h-full rounded-full bg-amber-500 transition-all duration-500" style="width: 35%"></div>
-                            </div>
-                        </div>
-                        <div>
-                            <div class="mb-1.5 flex justify-between text-xs font-bold">
-                                <span class="text-emerald-600">Level 4-6: การวิเคราะห์และประเมินค่า (Advanced Skill)</span>
-                                <span class="text-gray-400 font-medium">20% ของวิชาทั้งหมด</span>
-                            </div>
-                            <div class="h-2 w-full overflow-hidden rounded-full bg-gray-100">
-                                <div class="h-full rounded-full bg-emerald-500 transition-all duration-500" style="width: 20%"></div>
-                            </div>
-                        </div>
+                        {:else}
+                            <p class="py-8 text-center text-xs text-gray-400 italic">ยังไม่มีข้อมูลทักษะที่รายวิชาสอน</p>
+                        {/if}
                     </div>
                 </div>
             </div>
