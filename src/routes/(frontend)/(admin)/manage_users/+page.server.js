@@ -10,18 +10,25 @@ export async function load() {
                 u.username,
                 u.email,
                 u.role,
+                u.curriculum_id,
                 cl.curriculum_name AS department
             FROM users u
             LEFT JOIN curriculum cl ON u.curriculum_id = cl.curriculum_id` // LEFT JOIN เผื่อกรณีแอดมินไม่มี curriculum_id จะได้ไม่หลุดหายไปจากตาราง
         );
 
+        const [curriculumRows] = await pool.execute(
+            `SELECT curriculum_id, curriculum_name FROM curriculum ORDER BY curriculum_name`
+        );
+
         return {
-            users: userRows
+            users: userRows,
+            curriculums: curriculumRows
         };
     } catch (error) {
         console.error('fail load information page:', error);
         return {
-            users: []
+            users: [],
+            curriculums: []
         };
     }
 }
@@ -35,14 +42,15 @@ export const actions = {
         const email = formData.get('email');
         const full_name = formData.get('full_name');
         const role = formData.get('role');
+        const curriculum_id = formData.get('curriculum_id');
 
         try {
             // ทำการ UPDATE ข้อมูลลงตาราง users บน MySQL
             await pool.execute(
                 `UPDATE users
-                SET username = ?, email = ?, full_name = ?, role = ?
+                SET username = ?, email = ?, full_name = ?, role = ?, curriculum_id = ?
                 WHERE id = ?`,
-                [username, email, full_name, role, id]
+                [username, email, full_name, role, role === 'student' ? (curriculum_id || null) : null, id]
             );
 
             return { success: true };

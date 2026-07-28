@@ -512,14 +512,24 @@
 {/if}
 
 {#if curriculumModalOpen && !authModalOpen}
-    <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-        <div class="max-h-[85vh] w-full max-w-xl overflow-y-auto rounded-3xl border border-gray-100 bg-white p-6 md:p-8 text-left shadow-2xl transition-all animate-in fade-in zoom-in-95 duration-300 scrollbar-thin">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+        <div class="relative max-h-[85vh] w-full max-w-xl overflow-y-auto rounded-3xl border border-gray-100 bg-white p-6 md:p-8 text-left shadow-2xl transition-all animate-in fade-in zoom-in-95 duration-300 scrollbar-thin">
             <div class="mb-6 text-center border-b border-gray-100 pb-4">
                 <h3 class="text-xl font-extrabold text-[#443210]">บันทึกข้อมูลการเรียน</h3>
                 <p class="mt-1.5 text-xs font-medium text-gray-500">
                     กรุณาระบุหลักสูตรเพื่อดึงข้อมูลวิชาในการเลือกบันทึกเกรดสะสมของคุณ
                 </p>
             </div>
+            <button
+                    type="button"
+                    onclick={() => (curriculumModalOpen = false)}
+                    class="absolute right-4 top-4 cursor-pointer rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-[#443210]"
+                    aria-label="ปิด"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-5 w-5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                </button>
 
             <form
                 method="POST"

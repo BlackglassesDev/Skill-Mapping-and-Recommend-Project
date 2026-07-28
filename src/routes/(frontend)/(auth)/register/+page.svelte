@@ -43,7 +43,7 @@
                         />
                     </svg>
                 </a>
-                <span class="text-base font-black tracking-wide text-amber-400">CPE Skill Mapping</span>
+                <span class="text-base font-black tracking-wide text-amber-400">RMUTL | Skill Mapping</span>
             </div>
             <span class="text-sm font-bold text-white uppercase tracking-wider">Sign Up</span>
         </header>
@@ -85,7 +85,7 @@
                     <input
                         id="fullname"
                         type="text"
-                        placeholder="กรอกชื่อและนามสกุลของคุณ"
+                        placeholder="เช่น สมชาย ใจดี"
                         name="full_name"
                         required
                         class="w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 p-3 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:border-[#dca11d] focus:bg-white focus:ring-4 focus:ring-amber-50"
@@ -97,7 +97,7 @@
                     <input
                         id="username"
                         type="text"
-                        placeholder="ตั้งชื่อผู้ใช้งานระบบ"
+                        placeholder="เช่น Somchai_Ja67"
                         name="username"
                         required
                         class="w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 p-3 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:border-[#dca11d] focus:bg-white focus:ring-4 focus:ring-amber-50"
@@ -121,7 +121,7 @@
                     <input
                         id="pass"
                         type="password"
-                        placeholder="กำหนดรหัสผ่านเข้าใช้งานอย่างน้อย 8 ตัวอักษร"
+                        placeholder="รหัสผ่านอย่างน้อย 8 ตัวอักษร"
                         name="password"
                         required
                         class="w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 p-3 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:border-[#dca11d] focus:bg-white focus:ring-4 focus:ring-amber-50"
@@ -133,7 +133,7 @@
                     <input
                         id="conpass"
                         type="password"
-                        placeholder="ป้อนรหัสผ่านให้ตรงกันอีกครั้ง"
+                        placeholder="ระบุรหัสผ่านอีกครั้ง"
                         name="confirmPassword"
                         required
                         class="w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 p-3 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:border-[#dca11d] focus:bg-white focus:ring-4 focus:ring-amber-50"

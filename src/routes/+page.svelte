@@ -23,7 +23,7 @@
 </script>
 
 <svelte:head>
-    <title>Skill Mapping | RMUTL</title>
+    <title>RMUTL | Skill Mapping</title>
 </svelte:head>
 
 <div class="min-h-screen bg-gradient-to-b from-amber-50/40 via-gray-50 to-gray-100/50 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-[size:16px_16px] py-12 md:py-20">
@@ -43,7 +43,7 @@
                 <span class="bg-gradient-to-r from-[#443210] to-[#dca11d] bg-clip-text text-transparent">และเส้นทางอาชีพของคุณ</span>
             </h1>
             <p class="text-base text-gray-600 max-w-xl mx-auto font-medium">
-                สำรวจอาชีพในสายงาน และประเมินช่องว่างทักษะของคุณ อ้างอิงตามโครงสร้างหลักสูตร มทร.ล้านนา
+                สำรวจอาชีพในสายงาน และประเมินช่องว่างทักษะของคุณ อ้างอิงตามโครงสร้างหลักสูตร มหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา
             </p>
 
             <div class="flex flex-wrap justify-center gap-8 pt-12 md:gap-16">

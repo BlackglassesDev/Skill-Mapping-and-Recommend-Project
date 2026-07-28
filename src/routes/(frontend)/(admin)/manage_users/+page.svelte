@@ -26,7 +26,8 @@
 		username: '',
 		email: '',
 		role: '',
-		department: ''
+		department: '',
+		curriculum_id: ''
 	});
 
 	let isDeleteModalOpen = $state(false);
@@ -80,9 +81,38 @@
 			username: user.username || '',
 			email: user.email || '',
 			role: user.role || 'student',
-			department: user.department || ''
+			department: user.department || '',
+			curriculum_id: user.curriculum_id || ''
 		};
+		deptSearch = '';
+		deptDropdownOpen = false;
 		isEditModalOpen = true;
+	}
+
+	// Combobox เลือกสาขาวิชา (curriculum) สำหรับนักศึกษา — พิมพ์ค้นหาหรือเลือกจากรายการ
+	let curriculums = $derived(data?.curriculums ?? []);
+	let deptSearch = $state('');
+	let deptDropdownOpen = $state(false);
+
+	let filteredDepartments = $derived(
+		deptSearch.trim()
+			? curriculums.filter((c) =>
+					String(c.curriculum_name).toLowerCase().includes(deptSearch.toLowerCase().trim())
+				)
+			: curriculums
+	);
+
+	let selectedDeptName = $derived(
+		curriculums.find((c) => String(c.curriculum_id) === String(editingUser.curriculum_id))
+			?.curriculum_name || ''
+	);
+
+	/** @param {any} c */
+	function selectDepartment(c) {
+		editingUser.curriculum_id = c.curriculum_id;
+		editingUser.department = c.curriculum_name;
+		deptSearch = '';
+		deptDropdownOpen = false;
 	}
 
 	function openDeleteModal(user) {
@@ -96,7 +126,7 @@
 </script>
 
 <svelte:head>
-	<title>แผงควบคุมผู้ดูแลระบบ | Skill Mapping</title>
+    <title>Admin Control</title>
 </svelte:head>
 
 <div
@@ -120,16 +150,15 @@
 						จัดการ<span class="text-[#dca11d]">ผู้ใช้งานระบบ</span>
 					</h1>
 					<p class="max-w-2xl text-sm leading-relaxed font-medium text-gray-400">
-						User Management — ข้อมูลผู้ใช้งานจริงจากระบบฐานข้อมูล สามารถตรวจสอบ ค้นหา
-						และปรับปรุงบทบาทสังกัดของผู้ใช้งานในระบบ Skill Mapping ได้ทันที
+						ระบบจัดการบัญชีผู้ใช้งาน ลบ/แก้ไขข้อมูลบางส่วนและจัดการสิทธิ์การเข้าใช้งาน เพื่อความถูกต้อง
 					</p>
 
 					<div
-						class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-red-100 bg-red-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-red-600 uppercase"
-					>
-						<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500"></span>
-						Admin Mode Only
-					</div>
+                        class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-red-100 bg-red-50/60 px-2.5 py-0.5 text-[10px] font-bold text-red-600 uppercase tracking-wider"
+                    >
+                        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500"></span>
+                        Admin Privileges Only
+                    </div>
 				</div>
 
 				<div class="flex w-full shrink-0 flex-col gap-3 pt-2 md:w-auto md:items-end">
@@ -145,7 +174,7 @@
 						onclick={() => window.open('/api/export-users-csv', '_blank')}
 						class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
 					>
-						📥 ส่งออกข้อมูล (Export CSV)
+						📥 ส่งออกข้อมูล(CSV)
 					</button>
 				</div>
 			</div>
@@ -251,10 +280,10 @@
 							class="border-b-2 border-gray-200 bg-gray-50/80 text-[11px] font-black tracking-widest text-[#443210] uppercase"
 						>
 							<th class="px-6 py-4.5">รหัสผู้ใช้ / อีเมล</th>
-							<th class="px-6 py-4.5">ชื่อ-นามสกุลจริง</th>
+							<th class="px-6 py-4.5">ชื่อ-นามสกุล</th>
 							<th class="px-6 py-4.5">บทบาทระบบ</th>
 							<th class="px-6 py-4.5">สาขาวิชา / สังกัดหน่วยงาน</th>
-							<th class="px-6 py-4.5 text-center">การจัดการจัดการ</th>
+							<th class="px-6 py-4.5 text-center">การจัดการ</th>
 						</tr>
 					</thead>
 					<tbody class="divide-y-2 divide-gray-100 text-xs font-bold">
@@ -333,7 +362,7 @@
 											onclick={() => openDeleteModal(user)}
 											class="cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-black text-rose-500 shadow-sm transition-all hover:border-rose-400 hover:bg-rose-50/50"
 										>
-											🗑️ ลบผู้ใช้
+											🗑️ ลบบัญชีผู้ใช้
 										</button>
 									</div>
 								</td>
@@ -496,17 +525,60 @@
 
 							<div class="space-y-1.5">
 								<label for="department" class="text-gray-400"
-									>สาขาวิชา / ภาควิชาสังกัด (เฉพาะนักศึกษา)</label
+									>สาขาวิชา / ภาควิชาสังกัด</label
 								>
-								<input
-									id="department"
-									type="text"
-									name="department"
-									bind:value={editingUser.department}
-									placeholder="เช่น วิศวกรรมคอมพิวเตอร์"
-									disabled={editingUser.role !== 'student'}
-									class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 outline-none focus:border-[#dca11d] focus:bg-white disabled:border-gray-200 disabled:bg-gray-100 disabled:text-gray-400"
-								/>
+
+								{#if editingUser.role === 'student'}
+									<div class="relative">
+										<input
+											id="department"
+											type="text"
+											autocomplete="off"
+											bind:value={deptSearch}
+											onfocus={() => (deptDropdownOpen = true)}
+											onblur={() => setTimeout(() => { deptDropdownOpen = false; deptSearch = ''; }, 150)}
+											placeholder={selectedDeptName || 'พิมพ์เพื่อค้นหาสาขาวิชา...'}
+											class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 pr-10 font-black text-[#443210] outline-none focus:border-[#dca11d] focus:bg-white"
+										/>
+										<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400">
+											<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4 transition-transform duration-200 {deptDropdownOpen ? 'rotate-180' : ''}">
+												<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+											</svg>
+										</div>
+										<input type="hidden" name="curriculum_id" value={editingUser.curriculum_id} />
+
+										{#if deptDropdownOpen}
+											<div class="absolute z-30 mt-1 max-h-56 w-full overflow-y-auto rounded-2xl border-2 border-gray-200 bg-white py-1 shadow-xl">
+												{#if filteredDepartments.length > 0}
+													{#each filteredDepartments as c (c.curriculum_id)}
+														<button
+															type="button"
+															onmousedown={() => selectDepartment(c)}
+															class="flex w-full cursor-pointer items-center justify-between gap-2 px-4 py-2.5 text-left text-xs font-bold text-[#443210] transition-colors hover:bg-amber-50/60 {String(c.curriculum_id) === String(editingUser.curriculum_id) ? 'bg-amber-50/40' : ''}"
+														>
+															<span class="truncate">{c.curriculum_name}</span>
+															{#if String(c.curriculum_id) === String(editingUser.curriculum_id)}
+																<span class="shrink-0 text-[10px] font-black text-[#dca11d]">✓ เลือกแล้ว</span>
+															{/if}
+														</button>
+													{/each}
+												{:else}
+													<div class="px-4 py-5 text-center text-[11px] font-bold text-gray-400">
+														ไม่พบสาขาวิชาที่ตรงกับ "{deptSearch.trim()}"
+													</div>
+												{/if}
+											</div>
+										{/if}
+									</div>
+								{:else}
+									<input
+										id="department"
+										type="text"
+										value={editingUser.department || ''}
+										disabled
+										class="w-full rounded-2xl border-2 border-gray-200 bg-gray-100 p-3 font-bold text-gray-400 outline-none"
+									/>
+								{/if}
 							</div>
 						</div>
 
@@ -601,7 +673,7 @@
 							type="submit"
 							class="cursor-pointer rounded-xl border border-rose-200 bg-rose-500 px-5 py-2.5 text-xs font-black text-white shadow-sm transition-colors hover:bg-rose-600"
 						>
-							💥 ยืนยันการลบถาวร
+							🗑️ ยืนยันการลบข้อมูล
 						</button>
 					</form>
 				</div>

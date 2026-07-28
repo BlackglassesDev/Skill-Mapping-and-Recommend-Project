@@ -35,7 +35,7 @@
         }
     });
 </script>
-<svelte:head><title>Teacher | Skill Mapping</title></svelte:head>
+<svelte:head><title>Teacher Control</title></svelte:head>
 
 <div
     class="pointer-events-none fixed top-6 right-0 left-0 z-50 flex justify-center p-4 transition-all duration-500 ease-out"
@@ -76,8 +76,7 @@
                         ระบบควบคุมสำหรับ<span class="text-[#dca11d]">อาจารย์ผู้สอน</span>
                     </h1>
                     <p class="max-w-2xl text-sm leading-relaxed font-medium text-gray-400">
-                        ยินดีต้อนรับสู่ห้องทำงานอาจารย์ กรุณาเลือกเมนูด้านล่างเพื่อจัดการโครงสร้างวิชา
-                        แผนผังทักษะ หรือดูรายงานวิเคราะห์หลักสูตร
+                        กรุณาเลือกเมนูด้านล่างเพื่อจัดการโครงสร้างวิชา/จับคู่ทักษะ/วิเคราะห์ภาพรวมหลักสูตร
                     </p>
                     <div class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-amber-600 uppercase">
                         <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500"></span>
@@ -105,8 +104,8 @@
                             Mapping ทักษะกับหลักสูตร
                         </h3>
                         <p class="text-xs leading-relaxed font-medium text-gray-400">
-                            เชื่อมโยงและจัดกลุ่มทักษะความเชี่ยวชาญ (Skill Framework)
-                            เข้ากับมาตรฐานวิเคราะห์ของหลักสูตรการศึกษา
+                            เชื่อมโยงทักษะความเชี่ยวชาญ (Skill Framework)
+                            เข้ากับรายวิชาของหลักสูตรการศึกษา
                         </p>
                     </div>
                 </div>
@@ -114,7 +113,7 @@
                     <span
                         class="flex translate-y-1 transform items-center gap-1 text-xs font-semibold text-amber-700 opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100"
                     >
-                        เข้าสู่ระบบผัง mapping-skills ➔
+                        เข้าสู่การจับคู่ทักษะรายวิชา ➔
                     </span>
                 </div>
             </a>
@@ -133,11 +132,11 @@
                         <h3
                             class="text-lg font-black text-[#443210] transition-colors group-hover:text-[#dca11d]"
                         >
-                            เพิ่มหรือลบวิชาเรียน
+                            จัดการรายวิชาในหลักสูตร
                         </h3>
                         <p class="text-xs leading-relaxed font-medium text-gray-400">
-                            จัดการคลังรายวิชาในภาคเรียน เปิดรายวิชาใหม่
-                            หรือถอดถอนรายวิชาที่ไม่ได้เปิดสอนออกจากฐานข้อมูลหลัก
+                            จัดการรายวิชาในหลักสูตร เพิ่มรายวิชาใหม่
+                            /ถอดถอนรายวิชา/แก้ไขข้อมูลต่างๆในรายวิชา
                         </p>
                     </div>
                 </div>
@@ -145,7 +144,7 @@
                     <span
                         class="flex translate-y-1 transform items-center gap-1 text-xs font-semibold text-amber-700 opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100"
                     >
-                        จัดการรายวิชา ➔
+                        จัดการรายวิชาในหลักสูตร ➔
                     </span>
                 </div>
             </a>
@@ -164,11 +163,11 @@
                         <h3
                             class="text-lg font-black text-[#443210] transition-colors group-hover:text-[#dca11d]"
                         >
-                            Dashboard ภาพรวมหลักสูตร
+                            ภาพรวมหลักสูตร
                         </h3>
                         <p class="text-xs leading-relaxed font-medium text-gray-400">
-                            วิเคราะห์สถิติตัวชี้วัด สัดส่วน Bloom's Taxonomy
-                            และการกระจายตัวของหน่วยกิตวิชาผ่านระบบ Visual Report
+                            แสดงข้อมูลภาพรวมหลักสูตร/ข้อมูลการใช้ทักษะ/สถิติการใช้ทักษะในหลักสูตร/
+                            กราฟเปรียบเทียบระดับทักษะสูงสุดระหว่างรายวิชากับอาชีพ
                         </p>
                     </div>
                 </div>
@@ -176,7 +175,7 @@
                     <span
                         class="flex translate-y-1 transform items-center gap-1 text-xs font-semibold text-amber-700 opacity-0 transition-all group-hover:translate-y-0 group-hover:opacity-100"
                     >
-                        เปิดสถิติวิเคราะห์ ➔
+                        ดูภาพรวมหลักสูตร ➔
                     </span>
                 </div>
             </a>
@@ -190,7 +189,7 @@
             class="relative w-full max-w-md overflow-hidden rounded-[28px] border-2 border-gray-100 bg-white shadow-[0_20px_50px_rgba(0,0,0,0.15)] transition-all"
         >
             <div class="border-b border-gray-100 px-6 py-4.5">
-                <h3 class="text-base font-black text-[#443210]">🎓 ระบุข้อมูลหลักสูตรประจำตัว</h3>
+                <h3 class="text-base font-black text-[#443210]">🎓 กรุณาระบุหลักสูตรที่คุณประจำอยู่</h3>
             </div>
 
             <form
@@ -239,7 +238,7 @@
                             required
                             class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-black outline-none transition-all focus:border-[#dca11d] focus:bg-white"
                         >
-                            <option value="" disabled selected>-- โปรดเลือกหลักสูตรของคุณ --</option>
+                            <option value="" disabled selected>-- โปรดเลือกหลักสูตร --</option>
                             {#each curriculumList as item (item.curriculum_id)}
                                 <option value={item.curriculum_id}>{item.curriculum_name}</option>
                             {/each}

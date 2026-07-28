@@ -49,7 +49,7 @@
                         />
                     </svg>
                 </a>
-                <span class="text-base font-black tracking-wide text-amber-400">CPE Skill Mapping</span>
+                <span class="text-base font-black tracking-wide text-amber-400">RMUTL | Skill Mapping</span>
             </div>
             <span class="text-sm font-bold text-white uppercase tracking-wider">Sign In</span>
         </header>
@@ -65,7 +65,7 @@
             action="?/login"
             use:enhance={() => {
                 isloading = true;
-                message = 'กำลังตรวจสอบข้อมูลบัญชีผู้ใช้งาน...';
+                message = 'กำลังเข้าสู่ระบบ';
 
                 return async ({ result }) => {
                     if (result.type === 'success') {
@@ -90,7 +90,7 @@
                     <label for="user" class="text-xs font-bold uppercase tracking-wider text-gray-500">ชื่อผู้ใช้งาน (Username)</label>
                     <input
                         type="text"
-                        placeholder="กรอกชื่อผู้ใช้งานหรือรหัสนักศึกษา"
+                        placeholder="กรุณากรอกชื่อผู้ใช้งาน"
                         id="user"
                         name="username"
                         required
@@ -102,7 +102,7 @@
                     <label for="pass" class="text-xs font-bold uppercase tracking-wider text-gray-500">รหัสผ่าน (Password)</label>
                     <input
                         type="password"
-                        placeholder="กรอกรหัสผ่านเพื่อเข้าใช้งาน"
+                        placeholder="กรุณากรอกรหัสผ่าน"
                         id="pass"
                         name="password"
                         required
@@ -202,7 +202,7 @@
                         }}
                         class="space-y-4"
                     >
-                        <p class="text-xs leading-relaxed font-medium text-gray-500">ระบุอีเมลสถาบันเพื่อรับรหัสยืนยันความปลอดภัย (One-Time Password)</p>
+                        <p class="text-xs leading-relaxed font-medium text-gray-500">กรุณากรอกอีเมลเพื่อรับรหัสยืนยันความปลอดภัย</p>
                         <input
                             type="email"
                             name="email"
@@ -216,7 +216,7 @@
                             disabled={isloading}
                             class="w-full rounded-xl bg-[#443210] py-3 text-sm font-bold text-amber-400 shadow-md transition-all hover:bg-[#594216] active:scale-[0.99] disabled:opacity-50"
                         >
-                            {isloading ? 'กำลังดำเนินรายการ...' : 'รับรหัสยืนยัน (Request OTP)'}
+                            {isloading ? 'กำลังดำเนินรายการ...' : 'ส่ง'}
                         </button>
                     </form>
                 {:else if step === 2}
@@ -251,7 +251,7 @@
                             bind:value={backup_otp}
                             maxlength="6"
                             required
-                            placeholder="000000"
+                            placeholder="เช่น 000000"
                             class="w-full text-center tracking-[0.5em] text-lg font-black rounded-xl border-2 border-gray-200 p-3 text-gray-900 transition-all outline-none focus:border-[#dca11d] focus:ring-4 focus:ring-amber-50"
                         />
                         <button
@@ -259,7 +259,7 @@
                             disabled={isloading}
                             class="w-full rounded-xl bg-[#443210] py-3 text-sm font-bold text-amber-400 shadow-md transition-all hover:bg-[#594216] active:scale-[0.99] disabled:opacity-50"
                         >
-                            {isloading ? 'กำลังตรวจสอบรหัส...' : 'ยืนยันรหัสความปลอดภัย'}
+                            {isloading ? 'กำลังตรวจสอบรหัส...' : 'ยืนยันรหัสความปลอดภัย (OTP)'}
                         </button>
                     </form>
                 {:else if step === 3}
@@ -295,7 +295,7 @@
                         <input
                             type="password"
                             name="newPassword"
-                            placeholder="ป้อนรหัสผ่านใหม่ของคุณ"
+                            placeholder="กรุณากรอกรหัสผ่านใหม่ของคุณ"
                             required
                             class="w-full rounded-xl border-2 border-gray-200 p-3 text-sm text-gray-900 transition-all outline-none focus:border-[#dca11d] focus:ring-4 focus:ring-amber-50"
                         />
@@ -304,7 +304,7 @@
                             disabled={isloading}
                             class="w-full rounded-xl bg-[#443210] py-3 text-sm font-bold text-amber-400 shadow-md transition-all hover:bg-[#594216] active:scale-[0.99] disabled:opacity-50"
                         >
-                            {isloading ? 'กำลังอัปเดตข้อมูล...' : 'บันทึกและเปลี่ยนรหัสผ่าน'}
+                            {isloading ? 'กำลังอัปเดตข้อมูล...' : 'ยืนยันการเปลี่ยนรหัสผ่าน'}
                         </button>
                     </form>
                 {/if}

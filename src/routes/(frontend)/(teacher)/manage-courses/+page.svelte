@@ -12,7 +12,7 @@
     let selectedCurriculum = $state(data.user?.curriculum_id || "");
     let curriculumList = $derived(Array.isArray(data.curriculums) ? data.curriculums : []);
     
-    const itemsPerPage = 5; // แสดงหน้าละ 5 รายวิชา
+    const itemsPerPage = 10; // แสดงหน้าละ 10 รายวิชา
     const teacherPage = "/teacherPage"; // ลิงก์กลับหน้าควบคุม
 
     // ฟังก์ชันเรียกกล่องแจ้งเตือน 🔔 สไลด์ด้านบน
@@ -97,7 +97,7 @@
     }
 </script>
 
-<svelte:head><title>Teachers | Skill Mapping</title></svelte:head>
+<svelte:head><title>Teachers Control</title></svelte:head>
 
 <!-- 🔔 กล่องแจ้งเตือนสไลด์บน (Toast Alert) คงเอกลักษณ์ตามต้นแบบ -->
 <div
@@ -139,7 +139,7 @@
                         ระบบจัดการ<span class="text-[#dca11d]">หลักสูตรและรายวิชา</span>
                     </h1>
                     <p class="max-w-2xl text-sm leading-relaxed font-medium text-gray-400">
-                        Curriculum Management — บริหารจัดการโครงสร้างรายวิชาของภาควิชา เพื่อนำข้อมูลไปประมวลผลและการจัดทำแผนผังทักษะ (Skill Mapping)
+                        บริหารจัดการโครงสร้างรายวิชาของหลักสูตร เพื่อนำข้อมูลไปประมวลผลและการจัดทำแผนผังทักษะ (Skill Mapping)
                     </p>
 
                     <div class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-amber-600 uppercase">
@@ -161,7 +161,7 @@
                         onclick={exportCSV}
                         class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
                     >
-                        📤 ส่งออกข้อมูลรายวิชา (CSV)
+                        📤 ส่งออกข้อมูล(CSV)
                     </button>
                 </div>
             </div>
@@ -496,25 +496,18 @@
 
                     <div class="space-y-1.5">
                         <label for="editCurriculumId" class="text-gray-400">
-                            หลักสูตร / ภาควิชาที่สังกัด <span class="text-rose-500">*</span>
+                            หลักสูตร / ภาควิชาที่สังกัด
                         </label>
-                        <div class="relative">
-                            <select
-                                id="editCurriculumId"
-                                name="curriculum_id"
-                                bind:value={courseToEdit.curriculum_id}
-                                required
-                                class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-black outline-none focus:border-[#dca11d] focus:bg-white"
-                            >
-                                <option value="" disabled>-- เลือกหลักสูตรที่รายวิชานี้สังกัด --</option>
-                                {#each curriculumList as item (item.curriculum_id)}
-                                    <option value={item.curriculum_id}>{item.curriculum_name}</option>
-                                {/each}
-                            </select>
-                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-[10px] text-gray-400">
-                                ▼
-                            </div>
+                        <input type="hidden" name="curriculum_id" value={courseToEdit.curriculum_id} />
+                        <div class="flex w-full items-center gap-2 rounded-2xl border-2 border-gray-200 bg-gray-100 p-3 font-black text-gray-500">
+                            <span class="text-sm">🔒</span>
+                            <span class="truncate">
+                                {curriculumList.find((c) => c.curriculum_id === courseToEdit.curriculum_id)?.curriculum_name || 'ไม่ระบุหลักสูตร'}
+                            </span>
                         </div>
+                        <p class="text-[10px] font-medium text-gray-400">
+                            ไม่สามารถเปลี่ยนแปลงหลักสูตรของรายวิชาที่สร้างแล้วได้ (คงค่าเดิมไว้อัตโนมัติเมื่อบันทึก)
+                        </p>
                     </div>
 
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -527,7 +520,7 @@
                                 id="editCourseCode"
                                 name="course_code"
                                 bind:value={courseToEdit.course_code}
-                                placeholder="เช่น 04113101"
+                                placeholder="เช่น ENGCE174"
                                 required
                                 class="w-full rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-medium outline-none focus:border-[#dca11d] focus:bg-white"
                             />
@@ -680,7 +673,7 @@
                     type="submit"
                     class="cursor-pointer rounded-xl border border-rose-200 bg-rose-500 px-5 py-2.5 text-xs font-black text-white shadow-sm transition-colors hover:bg-rose-600"
                 >
-                    💥 ยืนยันการลบถาวร
+                    🗑️ ยืนยันการลบ
                 </button>
             </form>
         </div>

@@ -54,7 +54,7 @@
 </script>
 
 <svelte:head>
-    <title>แผงควบคุมผู้ดูแลระบบ | Skill Mapping</title>
+    <title>Admin Control</title>
 </svelte:head>
 
 <div
@@ -69,11 +69,17 @@
                 </div>
                 <div class="flex-1 space-y-1">
                     <h1 class="text-2xl font-black tracking-tight text-[#443210] sm:text-3xl">
-                        ภาพรวม<span class="text-[#dca11d]">ระบบควบคุม (Dashboard)</span>
+                        ภาพรวมระบบ<span class="text-[#dca11d]">(Dashboard)</span>
                     </h1>
                     <p class="max-w-2xl text-sm leading-relaxed font-medium text-gray-400">
-                        ตรวจสอบผลและสถิติการใช้งานแต่ละภาคเรียน หน่วยกิตภาพรวม และวิเคราะห์โครงสร้างทักษะสะสมจากระบบฐานข้อมูล Skill Mapping
+                        ตรวจสอบสถิติการใช้งาน จำนวนหลักสูตร/วิชา/ทักษะ/อาชีพและหน่วยกิตทั้งหมดในระบบ อัตราการกระจายทักษะของอาชีพและวิชาเรียน และการเพิ่มรายวิชาล่าสุด
                     </p>
+                    <div
+                        class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-red-100 bg-red-50/60 px-2.5 py-0.5 text-[10px] font-bold text-red-600 uppercase tracking-wider"
+                    >
+                        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500"></span>
+                        Admin Privileges Only
+                    </div>
                 </div>
                 <div class="flex w-full shrink-0 flex-col gap-2.5 pt-2 md:w-auto md:items-end">
 					<a
@@ -88,7 +94,7 @@
 						onclick={() => window.open('/api/export-dashboard-csv', '_blank')}
 						class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
 					>
-						📤 ส่งออกข้อมูลรายวิชา (CSV)
+						📤 ส่งออกข้อมูล(CSV)
 					</button>
 				</div>
             </div>
@@ -98,7 +104,7 @@
             <div class="flex items-center gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#dca11d]">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-xl shadow-inner">👥</div>
                 <div class="space-y-0.5">
-                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">ผู้ใช้งานระบบทั้งหมด</p>
+                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">จำนวนผู้ใช้ในระบบ</p>
                     <p class="text-2xl font-black text-[#443210]">
                         {totalUsers} <span class="text-xs font-medium text-gray-400">คน</span>
                     </p>
@@ -108,7 +114,7 @@
             <div class="flex items-center gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#dca11d]">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-xl shadow-inner">🏢</div>
                 <div class="space-y-0.5">
-                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">แผนก / หลักสูตร</p>
+                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">จำนวนแผนกและหลักสูตร</p>
                     <p class="text-2xl font-black text-[#443210]">
                         {totalCurriculums} <span class="text-xs font-medium text-gray-400">แผนก</span>
                     </p>
@@ -118,7 +124,7 @@
             <div class="flex items-center gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#dca11d]">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-xl shadow-inner">📖</div>
                 <div class="space-y-0.5">
-                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">รายวิชาในระบบ</p>
+                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">จำนวนวิชาในระบบ</p>
                     <p class="text-2xl font-black text-[#443210]">
                         {totalCourses} <span class="text-xs font-medium text-gray-400">วิชา</span>
                     </p>
@@ -126,9 +132,9 @@
             </div>
 
             <div class="flex items-center gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#dca11d]">
-                <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-xl shadow-inner">🧩</div>
+                <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-xl shadow-inner">🗄️</div>
                 <div class="space-y-0.5">
-                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">ทักษะในระบบ</p>
+                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">จำนวนทักษะในระบบ</p>
                     <p class="text-2xl font-black text-[#443210]">
                         {totalSkills} <span class="text-xs font-medium text-gray-400">ทักษะ</span>
                     </p>
@@ -138,7 +144,7 @@
             <div class="flex items-center gap-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:border-[#dca11d]">
                 <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-xl shadow-inner">💼</div>
                 <div class="space-y-0.5">
-                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">อาชีพ / สายงาน</p>
+                    <p class="text-xs font-bold tracking-wider text-gray-400 uppercase">จำนวนอาชีพในระบบ</p>
                     <p class="text-2xl font-black text-[#443210]">
                         {totalJobs} <span class="text-xs font-medium text-gray-400">อาชีพ</span>
                     </p>

@@ -112,6 +112,8 @@
     let chartMaxHeight = $derived(maxCount > 0 ? maxCount + 2 : 20);
 </script>
 
+<svelte:head><title>Teachers Control</title></svelte:head>
+
 <div
     class="pointer-events-none fixed top-6 right-0 left-0 z-50 flex justify-center p-4 transition-all duration-500 ease-out"
     class:translate-y-0={showMessage}
@@ -131,13 +133,13 @@
         
         <div class="mb-8 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex flex-col items-center gap-5 text-center md:flex-row md:items-start md:gap-6 md:text-left">
-                <div class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 text-2xl shadow-sm">📊</div>
+                <div class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-gray-100 bg-gray-50 text-2xl shadow-sm">📈</div>
                 <div class="flex-1 space-y-1">
                     <h1 class="text-2xl font-black tracking-tight text-[#443210] sm:text-3xl">
-                        แดชบอร์ด<span class="text-[#dca11d]">วิเคราะห์ผลผังทักษะ</span>
+                        วิเคราะห์<span class="text-[#dca11d]">ภาพรวมหลักสูตร</span>
                     </h1>
                     <p class="max-w-2xl text-sm leading-relaxed font-medium text-gray-400">
-                        Course & Skill Dashboard — สรุปสถิติภาพรวมข้อมูลการจัดการหลักสูตร ตรวจสอบความสอดคล้อง ค้นหาจุดเด่นและจุดวิกฤตที่ทักษะขาดหายไป (Gap Analysis)
+                        สรุปสถิติภาพรวมข้อมูลการจัดการหลักสูตร ตรวจสอบความสอดคล้อง ค้นหาจุดเด่นและจุดวิกฤตที่ทักษะขาดหายไป (Gap Analysis)
                     </p>
                     <div class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-amber-600 uppercase">
                         <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500"></span>
@@ -172,7 +174,7 @@
             <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm flex items-center gap-4">
                 <div class="h-11 w-11 rounded-xl bg-amber-50 flex items-center justify-center border border-amber-100 text-xl text-[#dca11d]">📝</div>
                 <div>
-                    <span class="block text-xs font-bold text-gray-400 uppercase">รายวิชาที่แมปแล้ว</span>
+                    <span class="block text-xs font-bold text-gray-400 uppercase">รายวิชาที่จับคู่แล้ว</span>
                     <span class="text-2xl font-black text-[#443210]">{totalMappedCount} <span class="text-xs font-medium text-gray-400">วิชา</span></span>
                 </div>
             </div>
@@ -180,7 +182,7 @@
             <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm flex items-center gap-4">
                 <div class="h-11 w-11 rounded-xl bg-[#443210]/5 flex items-center justify-center border border-[#443210]/10 text-xl text-[#443210]">⚠️</div>
                 <div>
-                    <span class="block text-xs font-bold text-gray-400 uppercase">รายวิชาที่ยังไม่แมพ</span>
+                    <span class="block text-xs font-bold text-gray-400 uppercase">รายวิชาที่ยังไม่ได้จับคู่</span>
                     <span class="text-2xl font-black text-rose-500">{totalUnmappedCount} <span class="text-xs font-medium text-gray-400">วิชา</span></span>
                 </div>
             </div>
@@ -188,7 +190,7 @@
             <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm flex items-center gap-4">
                 <div class="h-11 w-11 rounded-xl bg-amber-50 flex items-center justify-center border border-amber-100 text-xl text-[#dca11d]">🎯</div>
                 <div>
-                    <span class="block text-xs font-bold text-gray-400 uppercase">ทักษะเป้าหมายทั้งหมด</span>
+                    <span class="block text-xs font-bold text-gray-400 uppercase">ทักษะทั้งหมดในหลักสูตร</span>
                     <span class="text-2xl font-black text-[#443210]">{totalSkillsInSystem} <span class="text-xs font-medium text-gray-400">ทักษะ</span></span>
                 </div>
             </div>
@@ -196,7 +198,7 @@
             <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm flex items-center gap-4">
                 <div class="h-11 w-11 rounded-xl bg-rose-50 flex items-center justify-center border border-rose-100 text-xl text-rose-500">⚠️</div>
                 <div>
-                    <span class="block text-xs font-bold text-gray-400 uppercase">ทักษะที่ยังไม่ได้แมพ</span>
+                    <span class="block text-xs font-bold text-gray-400 uppercase">ทักษะที่ยังไม่ได้จับคู่</span>
                     <span class="text-2xl font-black text-rose-500">{unmappedSkills.length} <span class="text-xs font-medium text-gray-400">ทักษะ</span></span>
                 </div>
             </div>
@@ -217,7 +219,7 @@
             <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col">
                 <div class="flex items-center gap-2 border-b border-gray-100 pb-3 mb-4">
                     <span class="text-base">🚨</span>
-                    <h3 class="text-sm font-black text-[#443210]">ทักษะที่ตกหล่น (ยังไม่ถูกแมพ)</h3>
+                    <h3 class="text-sm font-black text-[#443210]">ทักษะที่ตกหล่น (ยังไม่ถูกจับคู่)</h3>
                 </div>
                 <div class="flex flex-wrap gap-2 flex-1 items-start content-start">
                     {#each unmappedSkills as skill}
@@ -251,7 +253,7 @@
             <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col">
                 <div class="flex items-center gap-2 border-b border-gray-100 pb-3 mb-4">
                     <span class="text-base">📈</span>
-                    <h3 class="text-sm font-black text-[#443210]">ทักษะหลักโดดเด่น (ใช้แมพมากที่สุด)</h3>
+                    <h3 class="text-sm font-black text-[#443210]">ทักษะหลักโดดเด่น (ใช้มากที่สุด)</h3>
                 </div>
                 <div class="flex flex-col gap-2.5 flex-1 justify-start">
                     {#each mostMappedSkills as skill}
@@ -271,15 +273,15 @@
             <div class="mb-8 rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
                 <div class="flex items-center gap-2 border-b border-gray-100 pb-3 mb-4">
                     <span class="text-base">⚠️</span>
-                    <h3 class="text-base font-black text-[#443210]">รายวิชาที่ยังไม่ได้ระบุทักษะการเรียนรู้ (Unmapped Courses)</h3>
+                    <h3 class="text-base font-black text-[#443210]">รายวิชาที่ยังไม่ได้ระบุทักษะการเรียนรู้</h3>
                 </div>
                 <div class="overflow-x-auto transition-all duration-500 ease-in-out">
                     <table class="min-w-full divide-y divide-gray-100 text-left text-xs">
                         <thead>
                             <tr class="text-gray-400 uppercase font-bold">
-                                <th class="py-3 px-4">รหัสวิชา (Course Code)</th>
-                                <th class="py-3 px-4">ชื่อรายวิชา (Course Name)</th>
-                                <th class="py-3 px-4">สถานะ (Status)</th>
+                                <th class="py-3 px-4">รหัสวิชา</th>
+                                <th class="py-3 px-4">ชื่อรายวิชา</th>
+                                <th class="py-3 px-4">สถานะ</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100 font-medium text-gray-600 transition-all duration-500 ease-in-out">
@@ -289,7 +291,7 @@
                                     <td class="py-3 px-4 font-black text-[#443210]">{course.course_name}</td>
                                     <td class="py-3 px-4">
                                         <span class="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 font-bold text-rose-600 border border-rose-100">
-                                            ❌ ยังไม่ได้แมปทักษะ
+                                            ❌ ยังไม่ได้จับคู่ทักษะ
                                         </span>
                                     </td>
                                 </tr>
@@ -399,16 +401,16 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 pb-4 mb-6 gap-3">
                 <div>
                     <h3 class="text-base font-black text-[#443210]">เปรียบเทียบระดับทักษะสูงสุด: ฝั่งอาชีพ vs ฝั่งรายวิชา</h3>
-                    <p class="text-xs text-gray-400 mt-0.5">แผนภูมิแท่งคู่ (Paired Bar Chart) เทียบระดับสูงสุดที่อาชีพเรียกร้องกับระดับสูงสุดที่รายวิชาสอนในแต่ละทักษะ - (สเกล 0-{LEVEL_SCALE})</p>
+                    <p class="text-xs text-gray-400 mt-0.5">แผนภูมิแท่งคู่เปรียบเทียบระดับสูงสุดที่อาชีพเรียกร้องกับระดับสูงสุดที่รายวิชาสอนในแต่ละทักษะ - (สเกล 0-{LEVEL_SCALE})</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[10px] font-bold shrink-0">
                     <div class="flex items-center gap-1.5">
                         <span class="h-3 w-3 rounded-sm bg-[#443210]"></span>
-                        <span class="text-gray-500">ฝั่งอาชีพ ({jobMappedCount})</span>
+                        <span class="text-gray-500">อาชีพ ({jobMappedCount})</span>
                     </div>
                     <div class="flex items-center gap-1.5">
                         <span class="h-3 w-3 rounded-sm bg-[#dca11d]"></span>
-                        <span class="text-gray-500">ฝั่งรายวิชา ({courseMappedCount})</span>
+                        <span class="text-gray-500">รายวิชา ({courseMappedCount})</span>
                     </div>
                 </div>
             </div>
@@ -416,7 +418,7 @@
             {#if gapSkillCount > 0}
                 <div class="mb-5 flex items-center gap-2 rounded-xl border border-rose-100 bg-rose-50/50 px-4 py-2.5 text-xs font-bold text-rose-600">
                     <span>⚠️</span>
-                    <span>พบ {gapSkillCount} ทักษะที่อาชีพเรียกร้อง แต่รายวิชายังไม่ได้สอน (ฝั่งรายวิชา = 0)</span>
+                    <span>พบ {gapSkillCount} ทักษะที่อาชีพเรียกร้อง แต่รายวิชายังไม่ได้สอน</span>
                 </div>
             {/if}
 

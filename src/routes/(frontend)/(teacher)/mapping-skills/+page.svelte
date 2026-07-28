@@ -135,7 +135,7 @@
 
 		if (existingSkill) {
 			existingSkill.level = Number(formSkillLevel);
-			triggerAlert(`🔄 อัปเดตระดับทักษะ ${formSkillName} เป็นเลเวล ${formSkillLevel}`);
+			triggerAlert(`อัปเดตระดับทักษะ ${formSkillName} เป็นเลเวล ${formSkillLevel}`);
 		} else {
 			currentSelectedCourse.skills.push({
 				name: formSkillName,
@@ -162,7 +162,7 @@
 			(/** @type {any} */ s) => s.name !== skillName
 		);
 		courses = [...courses];
-		triggerAlert(`🗑️ ถอดถอนทักษะ ${skillName} ออกแล้ว`);
+		triggerAlert(`ถอดถอนทักษะ ${skillName} ออกแล้ว`);
 	}
 
 	async function saveMappingToDatabase() {
@@ -184,7 +184,7 @@
 				if (result.type === 'success') {
 					await invalidateAll();
 					triggerAlert(
-						'บันทึกโครงสร้างผังทักษะเข้าสู่ระบบฐานข้อมูลหลักเรียบร้อย!'
+						'บันทึกโครงสร้างผังทักษะเข้าสู่ระบบเรียบร้อย!'
 					);
 				} else {
 					//@ts-ignore
@@ -199,6 +199,8 @@
 		}
 	}
 </script>
+
+<svelte:head><title>Teachers Control</title></svelte:head>
 
 <div
 	class="pointer-events-none fixed top-6 right-0 left-0 z-50 flex justify-center p-4 transition-all duration-500 ease-out"
@@ -240,7 +242,7 @@
 						การจัดทำ<span class="text-[#dca11d]">แผนผังทักษะ (Skill Mapping)</span>
 					</h1>
 					<p class="max-w-2xl text-sm leading-relaxed font-medium text-gray-400">
-						เลือกรายวิชาในหลักสูตรเพื่อระบุและเชื่อมโยงทักษะความรู้ที่นิสิตจะได้รับ
+						เลือกรายวิชาในหลักสูตรเพื่อระบุและเชื่อมโยงทักษะความรู้ที่นักศึกษาจะได้รับ
 						พร้อมกำหนดระดับระดับความคาดหวัง (เลเวล 1-6) เพื่อใช้วิเคราะห์ Gap ของหลักสูตร
 					</p>
 					<div class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-amber-600 uppercase">
@@ -270,7 +272,7 @@
 		<div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
 			<div class="flex flex-col gap-4 lg:col-span-1">
 				<div class="flex flex-col gap-1.5">
-					<span class="pl-1 text-xs font-bold text-gray-400">ค้นหารายวิชาในคลังข้อมูล</span>
+					<span class="pl-1 text-xs font-bold text-gray-400">ค้นหารายวิชาในหลักสูตร</span>
 					<div class="relative">
 						<input
 							type="text"
@@ -305,7 +307,7 @@
 								<span
 									class="rounded-md border border-gray-100 bg-white px-2 py-0.5 text-[10px] font-bold text-gray-400"
 								>
-									สกิลที่แมปแล้ว: {course.skills.length}
+									จำนวนทักษะ: {course.skills.length}
 								</span>
 							</div>
 							<h3 class="font-black tracking-tight text-[#443210]">{course.course_name}</h3>
@@ -325,7 +327,7 @@
 					{:else}
 						<div class="text-center py-10 bg-white border border-gray-200 rounded-2xl p-6">
 							<span class="text-2xl">💨</span>
-							<p class="text-xs text-gray-400 mt-2 font-medium">ไม่พบวิชาเรียนที่ตรงเงื่อนไข</p>
+							<p class="text-xs text-gray-400 mt-2 font-medium">ไม่พบวิชาเรียนที่ระบุ</p>
 						</div>
 					{/each}
 				</div>
@@ -348,7 +350,7 @@
 						<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
 						<div class="flex flex-col gap-1.5 md:col-span-2">
 							<span class="pl-1 text-xs font-bold text-gray-400"
-								>1. เลือกองค์ความรู้/ทักษะปลายทาง</span
+								>1. เลือกทักษะที่จะระบุในรายวิชา</span
 							>
 							<div class="relative">
 								<input
@@ -357,7 +359,7 @@
 									bind:value={skillSearch}
 									onfocus={() => (skillDropdownOpen = true)}
 									onblur={() => setTimeout(() => { skillDropdownOpen = false; skillSearch = ''; }, 150)}
-									placeholder={formSkillName ? `[${selectedSkillCode}] ${formSkillName}` : 'พิมพ์เพื่อค้นหา รหัส / ชื่อ / คำค้น / คำอธิบาย...'}
+									placeholder='พิมพ์รหัสทักษะ / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ'
 									class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 pr-10 text-sm font-black text-[#443210] shadow-sm outline-none transition-all focus:border-[#dca11d] focus:ring-1 focus:ring-[#dca11d]"
 								/>
 								<div
@@ -414,7 +416,7 @@
 
 							<div class="flex flex-col gap-1.5">
 								<span class="pl-1 text-xs font-bold text-gray-400"
-									>2. ระดับเลเวลคาดหวัง (1 - 6)</span
+									>2. ระดับของทักษะ (1 - 6)</span
 								>
 								<select
 									bind:value={formSkillLevel}
@@ -444,11 +446,11 @@
 					<div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm">
 						<div class="mb-4 flex items-center justify-between border-b border-gray-100 pb-3">
 							<h3 class="text-sm font-black text-[#443210]">
-								📊 ทักษะความสามารถรวมที่จะปรากฏหลังเรียนจบ
+								📊 ทักษะความสามารถรวมที่จะได้รับในวิชานี้
 							</h3>
 							<button
 								onclick={saveMappingToDatabase}
-								class="text-xs font-black text-[#dca11d] hover:underline"
+								class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
 								>💾 ยืนยันบันทึกโครงสร้างทั้งหมด</button
 							>
 						</div>

@@ -35,7 +35,7 @@
             title: 'ภาพรวมระบบ',
             subTitle: 'Dashboard',
             description:
-                'ตรวจสอบผลและสถิติการใช้งานแต่ละภาคเรียน หน่วยกิตภาพรวม และกราฟวิเคราะห์ทักษะสะสมรายบุคคล',
+                'ตรวจสอบสถิติการใช้งาน จำนวนหลักสูตร/วิชา/ทักษะ/อาชีพและหน่วยกิตทั้งหมดในระบบ อัตราการกระจายทักษะของอาชีพและวิชาเรียน',
             icon: '📊',
             href: dashboardPath,
             iconBg: 'bg-emerald-50 text-emerald-700 border border-emerald-100/70'
@@ -44,7 +44,7 @@
             title: 'จัดการผู้ใช้งาน',
             subTitle: 'User Management',
             description:
-                'ระบบจัดการบัญชีผู้ใช้งาน ค้นหาประวัติ ตรวจสอบชั่วโมง และเครื่องมือนำเข้าข้อมูลผ่าน Excel',
+                'ระบบจัดการบัญชีผู้ใช้งาน ลบ/แก้ไขข้อมูลบางส่วนและจัดการสิทธิ์การเข้าใช้งาน เพื่อความถูกต้อง',
             icon: '👥',
             href: manageUsersPath,
             iconBg: 'bg-blue-50 text-blue-700 border border-blue-100/70'
@@ -52,14 +52,14 @@
         {
             title: 'ข้อมูลหลักสูตร',
             subTitle: 'Curriculum Management',
-            description: 'กำหนดการและโครงสร้างวิศวกรรมคอมพิวเตอร์ จัดหมวดหมู่รายวิชาบังคับและวิชาเลือก',
+            description: 'เลือกดูรายวิชาแต่ละหลักสูตรและจัดการรายวิชา และเพิ่มหลักสูตร/รายวิชาแต่ละหลักสูตร',
             icon: '🗺️',
             href: curriculumPath,
             iconBg: 'bg-amber-50 text-[#dca11d] border border-amber-100/70'
         },
         {
             title: 'คลังทักษะมาตรฐาน',
-            description: 'กำหนดเกณฑ์และชุดทักษะความเชี่ยวชาญกลาง เพื่อใช้เทียบโยงและประเมินผลระดับคณะ',
+            description: 'จัดการคลังทักษะที่ใช้ในการเชื่อมโยงระหว่างอาชีพและรายวิชา',
             subTitle: 'Skill Framework',
             icon: '🎯',
             href: manageSkillsPath,
@@ -69,7 +69,7 @@
 </script>
 
 <svelte:head>
-    <title>แผงควบคุมผู้ดูแลระบบ | Skill Mapping</title>
+    <title>Admin Control</title>
 </svelte:head>
 
 <div
@@ -113,7 +113,7 @@
                         แผงควบคุม<span class="text-[#dca11d]">ผู้ดูแลระบบ</span>
                     </h1>
                     <p class="max-w-2xl text-sm leading-relaxed font-normal text-gray-500">
-                        CPE Skill Mapping Console — แหล่งรวมศูนย์จัดการข้อมูลโครงสร้างหลักสูตร ทักษะ และบัญชีสมาชิกนักศึกษา
+                        แหล่งรวมศูนย์จัดการข้อมูลโครงสร้างหลักสูตร ทักษะ และบัญชีสมาชิกนักศึกษา
                     </p>
 
                     <div
@@ -159,7 +159,7 @@
                     <div
                         class="mt-auto pt-6 text-[10px] font-bold tracking-wider text-gray-400 uppercase transition-colors group-hover:text-[#dca11d]"
                     >
-                        เข้าสู่ระบบจัดการ →
+                        ดูรายละเอียด →
                     </div>
                 </a>
             {/each}

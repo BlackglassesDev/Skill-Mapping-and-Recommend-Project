@@ -48,6 +48,8 @@
 			skill_description: skill.description || skill.skill_description || '',
 			curriculum_id: skill.curriculum_id !== null ? String(skill.curriculum_id) : ''
 		};
+		editCurriculumSearch = '';
+		editCurriculumOpen = false;
 		isEditModalOpen = true;
 	}
 
@@ -58,6 +60,70 @@
 			skill_name: skill.skill_name || ''
 		};
 		isDeleteModalOpen = true;
+	}
+
+	// Combobox หลักสูตร สำหรับ modal เพิ่มทักษะ (เลือกได้ หรือปล่อยว่าง = ทักษะสากล)
+	let addCurriculumId = $state('');
+	let addCurriculumSearch = $state('');
+	let addCurriculumOpen = $state(false);
+
+	let filteredAddCurriculums = $derived(
+		addCurriculumSearch.trim()
+			? curriculumList.filter((c) =>
+					String(c.curriculum_name).toLowerCase().includes(addCurriculumSearch.toLowerCase().trim())
+				)
+			: curriculumList
+	);
+
+	let addCurriculumName = $derived(
+		addCurriculumId
+			? curriculumList.find((c) => String(c.curriculum_id) === String(addCurriculumId))
+					?.curriculum_name || ''
+			: ''
+	);
+
+	function selectAddCurriculum(c) {
+		addCurriculumId = c.curriculum_id;
+		addCurriculumSearch = '';
+		addCurriculumOpen = false;
+	}
+
+	function clearAddCurriculum() {
+		addCurriculumId = '';
+		addCurriculumSearch = '';
+		addCurriculumOpen = false;
+	}
+
+	function openAddModal() {
+		addCurriculumId = '';
+		addCurriculumSearch = '';
+		addCurriculumOpen = false;
+		isAddModalOpen = true;
+	}
+
+	// Combobox หลักสูตร สำหรับ modal แก้ไขทักษะ
+	let editCurriculumSearch = $state('');
+	let editCurriculumOpen = $state(false);
+
+	let filteredEditCurriculums = $derived(
+		editCurriculumSearch.trim()
+			? curriculumList.filter((c) =>
+					String(c.curriculum_name).toLowerCase().includes(editCurriculumSearch.toLowerCase().trim())
+				)
+			: curriculumList
+	);
+
+	let editCurriculumName = $derived(
+		skillToEdit.curriculum_id
+			? curriculumList.find((c) => String(c.curriculum_id) === String(skillToEdit.curriculum_id))
+					?.curriculum_name || ''
+			: ''
+	);
+
+	function selectEditCurriculum(c) {
+		skillToEdit.curriculum_id = String(c.curriculum_id);
+		editCurriculumSearch = '';
+		editCurriculumOpen = false;
 	}
 
 	// 5. การกรองข้อมูลด้วยคำค้นหา
@@ -92,7 +158,7 @@
 </script>
 
 <svelte:head>
-    <title>แผงควบคุมผู้ดูแลระบบ | Skill Mapping</title>
+    <title>Admin Control</title>
 </svelte:head>
 
 <!-- แถบแจ้งเตือน Notification Alert -->
@@ -140,14 +206,14 @@
                         จัดการ<span class="text-[#dca11d]">คลังทักษะมาตรฐาน</span>
                     </h1>
                     <p class="max-w-2xl text-sm leading-relaxed font-medium text-gray-400">
-                        Skill Framework — บริหารจัดการชุดทักษะความเชี่ยวชาญกลาง เพื่อเชื่อมโยงกับรายวิชาและเกณฑ์ประเมินของหลักสูตร
+                        จัดการคลังทักษะที่ใช้ในการเชื่อมโยงระหว่างอาชีพและรายวิชา
                     </p>
 
                     <div
-                        class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-red-100 bg-red-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-red-600 uppercase"
+                        class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-red-100 bg-red-50/60 px-2.5 py-0.5 text-[10px] font-bold text-red-600 uppercase tracking-wider"
                     >
                         <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500"></span>
-                        Admin Mode Only
+                        Admin Privileges Only
                     </div>
                 </div>
 
@@ -164,7 +230,7 @@
 						onclick={() => window.open('/api/export-skills-csv', '_blank')}
 						class="inline-flex items-center justify-center gap-2 rounded-xl border-2 border-[#443210] bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
 					>
-						📤 ส่งออกข้อมูลทักษะ (CSV)
+						📤 ส่งออกข้อมูล(CSV)
 					</button>
 				</div>
             </div>
@@ -200,7 +266,7 @@
             <div class="flex flex-col gap-2.5 sm:flex-row sm:items-center sm:justify-end">
                 <button
                     type="button"
-                    onclick={() => (isAddModalOpen = true)}
+                    onclick={openAddModal}
                     class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#443210] px-5 py-2.5 text-sm font-bold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d] sm:w-auto"
                 >
                     ➕ เพิ่มทักษะใหม่
@@ -255,7 +321,7 @@
                                             onclick={() => openEditModal(skill)}
                                             class="cursor-pointer rounded-xl border border-gray-200 bg-white px-3 py-1.5 text-xs font-black text-gray-600 shadow-sm transition-all hover:border-[#dca11d] hover:text-[#dca11d]"
                                         >
-                                            ✏️ แก้ไข
+                                            ✏️ แก้ไขข้อมูล
                                         </button>
                                         <button
                                             onclick={() => openDeleteModal(skill)}
@@ -443,19 +509,45 @@
                         หลักสูตร / ภาควิชาที่เกี่ยวข้อง
                     </label>
                     <div class="relative">
-                        <select
+                        <input
                             id="curriculumId"
-                            name="curriculum_id"
-                            class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-black outline-none focus:border-[#dca11d] focus:bg-white"
-                        >
-                            <option value="">--เลือกหลักสูตรของทักษะ--</option>
-                            {#each curriculumList as item (item.curriculum_id)}
-                                <option value={item.curriculum_id}>{item.curriculum_name}</option>
-                            {/each}
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-[10px] text-gray-400">
-                            ▼
+                            type="text"
+                            autocomplete="off"
+                            bind:value={addCurriculumSearch}
+                            onfocus={() => (addCurriculumOpen = true)}
+                            onblur={() => setTimeout(() => { addCurriculumOpen = false; addCurriculumSearch = ''; }, 150)}
+                            placeholder={addCurriculumName || '-- เลือกหรือค้นหาชื่อหลักสูตร --'}
+                            class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-black text-[#443210] outline-none focus:border-[#dca11d] focus:bg-white"
+                        />
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4 transition-transform duration-200 {addCurriculumOpen ? 'rotate-180' : ''}">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                            </svg>
                         </div>
+                        <input type="hidden" name="curriculum_id" value={addCurriculumId} />
+
+                        {#if addCurriculumOpen}
+                            <div class="absolute z-30 mt-1 max-h-56 w-full overflow-y-auto rounded-2xl border-2 border-gray-200 bg-white py-1 shadow-xl">
+                                {#if filteredAddCurriculums.length > 0}
+                                    {#each filteredAddCurriculums as item (item.curriculum_id)}
+                                        <button
+                                            type="button"
+                                            onmousedown={() => selectAddCurriculum(item)}
+                                            class="flex w-full cursor-pointer items-center justify-between gap-2 px-4 py-2.5 text-left text-xs font-bold text-[#443210] transition-colors hover:bg-amber-50/60 {String(item.curriculum_id) === String(addCurriculumId) ? 'bg-amber-50/40' : ''}"
+                                        >
+                                            <span class="truncate">{item.curriculum_name}</span>
+                                            {#if String(item.curriculum_id) === String(addCurriculumId)}
+                                                <span class="shrink-0 text-[10px] font-black text-[#dca11d]">✓ เลือกแล้ว</span>
+                                            {/if}
+                                        </button>
+                                    {/each}
+                                {:else}
+                                    <div class="px-4 py-5 text-center text-[11px] font-bold text-gray-400">
+                                        ไม่พบหลักสูตรที่ตรงกับ "{addCurriculumSearch.trim()}"
+                                    </div>
+                                {/if}
+                            </div>
+                        {/if}
                     </div>
                 </div>
 
@@ -465,7 +557,7 @@
                         onclick={() => (isAddModalOpen = false)}
                         class="cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black text-gray-500 shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
                     >
-                        ยกเลิกข้อมูล
+                        ยกเลิก
                     </button>
                     <button
                         type="submit"
@@ -584,20 +676,45 @@
                         หลักสูตร / ภาควิชาที่เกี่ยวข้อง
                     </label>
                     <div class="relative">
-                        <select
+                        <input
                             id="editCurriculumId"
-                            name="curriculum_id"
-                            bind:value={skillToEdit.curriculum_id}
-                            class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-black outline-none focus:border-[#dca11d] focus:bg-white"
-                        >
-                            <option value="">--เลือกหลักสูตรของทักษะ--</option>
-                            {#each curriculumList as item (item.curriculum_id)}
-                                <option value={String(item.curriculum_id)}>{item.curriculum_name}</option>
-                            {/each}
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-[10px] text-gray-400">
-                            ▼
+                            type="text"
+                            autocomplete="off"
+                            bind:value={editCurriculumSearch}
+                            onfocus={() => (editCurriculumOpen = true)}
+                            onblur={() => setTimeout(() => { editCurriculumOpen = false; editCurriculumSearch = ''; }, 150)}
+                            placeholder={editCurriculumName}
+                            class="w-full cursor-pointer appearance-none rounded-2xl border-2 border-gray-200 bg-gray-50 p-3 font-black text-[#443210] outline-none focus:border-[#dca11d] focus:bg-white"
+                        />
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-gray-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="h-4 w-4 transition-transform duration-200 {editCurriculumOpen ? 'rotate-180' : ''}">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                            </svg>
                         </div>
+                        <input type="hidden" name="curriculum_id" value={skillToEdit.curriculum_id} />
+
+                        {#if editCurriculumOpen}
+                            <div class="absolute z-30 mt-1 max-h-56 w-full overflow-y-auto rounded-2xl border-2 border-gray-200 bg-white py-1 shadow-xl">
+                                {#if filteredEditCurriculums.length > 0}
+                                    {#each filteredEditCurriculums as item (item.curriculum_id)}
+                                        <button
+                                            type="button"
+                                            onmousedown={() => selectEditCurriculum(item)}
+                                            class="flex w-full cursor-pointer items-center justify-between gap-2 px-4 py-2.5 text-left text-xs font-bold text-[#443210] transition-colors hover:bg-amber-50/60 {String(item.curriculum_id) === String(skillToEdit.curriculum_id) ? 'bg-amber-50/40' : ''}"
+                                        >
+                                            <span class="truncate">{item.curriculum_name}</span>
+                                            {#if String(item.curriculum_id) === String(skillToEdit.curriculum_id)}
+                                                <span class="shrink-0 text-[10px] font-black text-[#dca11d]">✓ เลือกแล้ว</span>
+                                            {/if}
+                                        </button>
+                                    {/each}
+                                {:else}
+                                    <div class="px-4 py-5 text-center text-[11px] font-bold text-gray-400">
+                                        ไม่พบหลักสูตรที่ตรงกับ "{editCurriculumSearch.trim()}"
+                                    </div>
+                                {/if}
+                            </div>
+                        {/if}
                     </div>
                 </div>
 
@@ -607,7 +724,7 @@
                         onclick={() => (isEditModalOpen = false)}
                         class="cursor-pointer rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-xs font-black text-gray-500 shadow-sm hover:border-[#dca11d] hover:text-[#dca11d]"
                     >
-                        ยกเลิกข้อมูล
+                        ยกเลิก
                     </button>
                     <button
                         type="submit"
@@ -701,7 +818,7 @@
                     type="submit"
                     class="cursor-pointer rounded-xl border border-rose-200 bg-rose-500 px-5 py-2.5 text-xs font-black text-white shadow-sm transition-colors hover:bg-rose-600"
                 >
-                    💥 ยืนยันการลบถาวร
+                    🗑️ ยืนยันการลบ
                 </button>
             </form>
         </div>
