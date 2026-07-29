@@ -347,25 +347,13 @@
 							</h2>
 						</div>
 
-						<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-4">
-						<div class="flex flex-col gap-1.5 md:col-span-2">
-							<span class="pl-1 text-xs font-bold text-gray-600"
-								>1. เลือกทักษะที่จะระบุในรายวิชา</span
-							>
-							<span class="pl-1 text-xs font-bold text-gray-600"
-								>📋Tip: พิมพ์เพื่อค้นหา รหัส / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ</span>
-							<div class="relative">
-								<input
-									type="text"
-									autocomplete="off"
-									bind:value={skillSearch}
-									onfocus={() => (skillDropdownOpen = true)}
-									onblur={() => setTimeout(() => { skillDropdownOpen = false; skillSearch = ''; }, 150)}
-									placeholder={formSkillName ? `[${selectedSkillCode}] ${formSkillName}` : 'พิมพ์เพื่อค้นหา รหัส / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ'}
-									class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 pr-10 text-sm font-black text-[#443210] shadow-sm outline-none transition-all focus:border-[#dca11d] focus:ring-1 focus:ring-[#dca11d]"
-								/>
-								<div
-									class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400"
+						<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
+							<div class="flex flex-col gap-1.5 md:col-span-2">
+								<span class="pl-1 text-xs font-bold text-gray-600"
+									>1. เลือกทักษะที่จะระบุในรายวิชา</span
+								>
+								<span class="pl-1 text-xs font-bold text-gray-400"
+									>📋Tip: พิมพ์เพื่อค้นหา รหัส / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ</span
 								>
 								<div class="relative">
 									<input
@@ -378,8 +366,10 @@
 												skillDropdownOpen = false;
 												skillSearch = '';
 											}, 150)}
-										placeholder="พิมพ์รหัสทักษะ / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ"
-										class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 pr-10 text-sm font-black text-[#443210] shadow-sm outline-none transition-all focus:border-[#dca11d] focus:ring-1 focus:ring-[#dca11d]"
+										placeholder={formSkillName
+											? `[${selectedSkillCode}] ${formSkillName}`
+											: 'พิมพ์เพื่อค้นหา รหัส / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ'}
+										class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 pr-10 text-sm font-black text-[#443210] shadow-sm transition-all outline-none focus:border-[#dca11d] focus:ring-1 focus:ring-[#dca11d]"
 									/>
 									<div
 										class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400"
@@ -445,13 +435,11 @@
 								</div>
 							</div>
 
-							<div class="flex flex-col gap-1.5">
-								<span class="pl-1 text-xs font-bold text-gray-600"
-									>2. ระดับของทักษะ (1 - 6)</span
+							<div class="flex flex-col gap-1.5 md:col-span-1">
+								<span class="pl-1 text-xs font-bold text-gray-600">2. ระดับของทักษะ (1 - 6)</span>
+								<span class="pl-1 text-xs font-bold text-gray-400"
+									>📋Tip: เลเวลของทักษะในรายวิชา</span
 								>
-								<span
-									class="pl-1 text-xs font-bold text-gray-600"
-									>📋Tip: เลเวลของทักษะในรายวิชา</span>
 								<select
 									bind:value={formSkillLevel}
 									class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-black text-[#443210] shadow-sm outline-none focus:border-[#dca11d]"
@@ -465,11 +453,11 @@
 								</select>
 							</div>
 
-							<div class="flex w-full">
+							<div class="flex justify-end gap-2 border-t border-gray-100 pt-4 md:col-span-3">
 								<button
 									type="button"
 									onclick={addSkillToCourse}
-									class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#fff8eb] border border-[#fdebbd] px-5 py-2.5 text-xs font-bold text-[#443210] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#fdebbd] hover:border-[#dca11d]"
+									class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#fdebbd] bg-[#fff8eb] px-5 py-2.5 text-xs font-bold text-[#443210] shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:bg-[#fdebbd]"
 								>
 									+ เพิ่มทักษะนี้
 								</button>
@@ -498,7 +486,7 @@
 										</div>
 										<div class="flex items-center gap-3">
 											<span
-												class="inline-flex h-7 items-center justify-center rounded-lg px-2.5 font-mono text-xs font-black text-[#dca11d] bg-white border border-gray-200 shadow-sm"
+												class="inline-flex h-7 items-center justify-center rounded-lg border border-gray-200 bg-white px-2.5 font-mono text-xs font-black text-[#dca11d] shadow-sm"
 											>
 												Lv. {skill.level}/6
 											</span>

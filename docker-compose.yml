@@ -7,7 +7,7 @@ services:
     expose:
       - "3000"
     environment:
-      - ORIGIN=https://8w3rcq92-80.asse.devtunnels.ms/ #เปลี่ยนเป็น https://localhost ถ้ารันในเครื่อง
+      - ORIGIN=https://localhost #เปลี่ยนเป็น https://localhost ถ้ารันในเครื่อง
       - PROTOCOL_HEADER=X-Forwarded-Proto
       - HOST_HEADER=X-Forwarded-Host
     env_file:
