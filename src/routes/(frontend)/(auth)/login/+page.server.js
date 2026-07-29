@@ -1,5 +1,6 @@
 import { redirect, fail } from '@sveltejs/kit';
 
+/** @type {import('./$types').PageServerLoad} */
 export async function load({ locals }) {
 	if (locals.user) {
 		throw redirect(302, '/home');
@@ -9,6 +10,7 @@ export async function load({ locals }) {
 
 // let email = $state('');
 
+/** @type {import('./$types').Actions} */
 export const actions = {
 	login: async ({ request, fetch }) => {
 		const data = await request.formData();

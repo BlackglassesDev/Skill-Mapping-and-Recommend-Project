@@ -1,5 +1,6 @@
 import { redirect, fail } from '@sveltejs/kit';
 
+/** @type {import('./$types').PageServerLoad} */
 export async function load({ locals }) {
 	if (locals.user) {
 		throw redirect(302, '/home');
@@ -7,6 +8,7 @@ export async function load({ locals }) {
 	return {};
 }
 
+/**@type {import('./$types').Actions} */
 export const actions = {
 	regis: async ({ request, fetch }) => {
 		const data = await request.formData();

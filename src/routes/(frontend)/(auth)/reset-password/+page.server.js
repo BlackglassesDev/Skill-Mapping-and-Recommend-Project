@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import nodemailer from 'nodemailer';
 import { env } from '$env/dynamic/private';
 
+/** @type {import('./$types').PageServerLoad} */
 export async function load({ locals }) {
 	if (locals.user) {
 		throw redirect(302, '/home');
@@ -29,6 +30,7 @@ async function resolveEmail(identifier) {
 	return rows.length ? rows[0].email : null;
 }
 
+/** @type {import('./$types').Actions} */
 export const actions = {
 	sendotp: async ({ request }) => {
 		const data = await request.formData();

@@ -30,6 +30,7 @@ export async function load({ url }) {
 				'SELECT curriculum_name FROM curriculum WHERE curriculum_id = ?',[id]
 			);
 
+			//@ts-ignore
 			const curriculum_name = Curriculum_name[0]?.curriculum_name || 'Unknown Curriculum';
 
 			return {
