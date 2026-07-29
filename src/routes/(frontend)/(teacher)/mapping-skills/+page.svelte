@@ -349,9 +349,11 @@
 
 						<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
 						<div class="flex flex-col gap-1.5 md:col-span-2">
-							<span class="pl-1 text-xs font-bold text-gray-400"
+							<span class="pl-1 text-xs font-bold text-gray-500"
 								>1. เลือกทักษะที่จะระบุในรายวิชา</span
 							>
+							<span class="pl-1 text-xs font-bold text-gray-400"
+								>📋Tip: พิมพ์เพื่อค้นหา รหัส / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ</span>
 							<div class="relative">
 								<input
 									type="text"
@@ -359,7 +361,7 @@
 									bind:value={skillSearch}
 									onfocus={() => (skillDropdownOpen = true)}
 									onblur={() => setTimeout(() => { skillDropdownOpen = false; skillSearch = ''; }, 150)}
-									placeholder='พิมพ์รหัสทักษะ / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ'
+									placeholder={formSkillName ? `[${selectedSkillCode}] ${formSkillName}` : 'พิมพ์เพื่อค้นหา รหัส / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ'}
 									class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 pr-10 text-sm font-black text-[#443210] shadow-sm outline-none transition-all focus:border-[#dca11d] focus:ring-1 focus:ring-[#dca11d]"
 								/>
 								<div
@@ -415,9 +417,12 @@
 						</div>
 
 							<div class="flex flex-col gap-1.5">
-								<span class="pl-1 text-xs font-bold text-gray-400"
-									>2. ระดับของทักษะ (1 - 6)</span
+								<span class="pl-1 text-xs font-bold text-gray-500"
+									>2. เลือกระดับของทักษะ (1 - 6)</span
 								>
+								<span
+									class="pl-1 text-xs font-bold text-gray-400"
+									>📋Tip: เลเวลของทักษะในรายวิชา</span>
 								<select
 									bind:value={formSkillLevel}
 									class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-black text-[#443210] shadow-sm outline-none focus:border-[#dca11d]"
