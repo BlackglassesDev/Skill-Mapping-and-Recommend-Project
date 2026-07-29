@@ -7,6 +7,76 @@
     let isloading = $state(false);
 
     const login_page = resolve('/login');
+
+    let fullName = $state('');
+    let fullNameTouched = $state(false);
+    let username = $state('');
+    let usernameTouched = $state(false);
+    let email = $state('');
+    let emailTouched = $state(false);
+    let password = $state('');
+    let confirmPassword = $state('');
+    let showPassword = $state(false);
+    let showConfirmPassword = $state(false);
+    let passwordTouched = $state(false);
+
+    const rules = $derived([
+        { label: 'อย่างน้อย 8 ตัวอักษร', valid: password.length >= 8 },
+        { label: 'ตัวอักษรเล็ก (a-z)', valid: /[a-z]/.test(password) },
+        { label: 'ตัวอักษรใหญ่ (A-Z)', valid: /[A-Z]/.test(password) },
+        { label: 'ตัวเลข (0-9)', valid: /[0-9]/.test(password) },
+        { label: 'อักขระพิเศษ เช่น !@#$%', valid: /[^A-Za-z0-9]/.test(password) }
+    ]);
+
+    const allRulesValid = $derived(rules.every((r) => r.valid));
+    const passwordMatch = $derived(confirmPassword.length > 0 && password === confirmPassword);
+    const nameWords = $derived(fullName.trim().split(/\s+/).filter(Boolean));
+    const nameValid = $derived(
+        nameWords.length >= 2 && nameWords.every((w) => /^[A-Za-z\u0E00-\u0E7F]+$/.test(w))
+    );
+    const usernameValid = $derived(/^[A-Za-z]+_[A-Za-z]{2}[0-9]{2}$/.test(username));
+    const emailValid = $derived(/^[A-Za-z0-9._%+-]+@live\.rmutl\.ac\.th$/.test(email));
+    const canSubmit = $derived(nameValid && usernameValid && emailValid && allRulesValid && passwordMatch);
+
+    const nameBorderClass = $derived(
+        fullNameTouched
+            ? nameValid
+                ? 'border-green-400 focus:border-green-500 focus:ring-green-50'
+                : 'border-red-300 focus:border-red-400 focus:ring-red-50'
+            : 'border-gray-200 focus:border-[#dca11d] focus:ring-amber-50'
+    );
+
+    const usernameBorderClass = $derived(
+        usernameTouched
+            ? usernameValid
+                ? 'border-green-400 focus:border-green-500 focus:ring-green-50'
+                : 'border-red-300 focus:border-red-400 focus:ring-red-50'
+            : 'border-gray-200 focus:border-[#dca11d] focus:ring-amber-50'
+    );
+
+    const emailBorderClass = $derived(
+        emailTouched
+            ? emailValid
+                ? 'border-green-400 focus:border-green-500 focus:ring-green-50'
+                : 'border-red-300 focus:border-red-400 focus:ring-red-50'
+            : 'border-gray-200 focus:border-[#dca11d] focus:ring-amber-50'
+    );
+
+    const passwordBorderClass = $derived(
+        passwordTouched
+            ? allRulesValid
+                ? 'border-green-400 focus:border-green-500 focus:ring-green-50'
+                : 'border-red-300 focus:border-red-400 focus:ring-red-50'
+            : 'border-gray-200 focus:border-[#dca11d] focus:ring-amber-50'
+    );
+
+    const confirmBorderClass = $derived(
+        confirmPassword.length > 0
+            ? passwordMatch
+                ? 'border-green-400 focus:border-green-500 focus:ring-green-50'
+                : 'border-red-300 focus:border-red-400 focus:ring-red-50'
+            : 'border-gray-200 focus:border-[#dca11d] focus:ring-amber-50'
+    );
 </script>
 
 <svelte:head>
@@ -82,68 +152,225 @@
                 
                 <div class="flex flex-col gap-1.5">
                     <label for="fullname" class="text-xs font-bold uppercase tracking-wider text-gray-500">ชื่อ - นามสกุล</label>
-                    <input
-                        id="fullname"
-                        type="text"
-                        placeholder="เช่น สมชาย ใจดี"
-                        name="full_name"
-                        required
-                        class="w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 p-3 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:border-[#dca11d] focus:bg-white focus:ring-4 focus:ring-amber-50"
-                    />
+                    <div class="relative">
+                        <input
+                            id="fullname"
+                            type="text"
+                            placeholder="เช่น สมชาย ใจดี"
+                            name="full_name"
+                            bind:value={fullName}
+                            oninput={() => (fullNameTouched = true)}
+                            required
+                            class="w-full rounded-xl border-2 {nameBorderClass} bg-gray-50/50 p-3 pr-10 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:bg-white focus:ring-4"
+                        />
+                        {#if fullNameTouched}
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 {nameValid ? 'text-green-500' : 'text-red-500'}">
+                                {#if nameValid}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="h-4 w-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                {:else}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="h-4 w-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>
+                                {/if}
+                            </span>
+                        {/if}
+                    </div>
+                    {#if fullNameTouched && !nameValid}
+                        <p class="text-[11px] font-semibold text-red-500">❌ กรุณากรอกชื่อและนามสกุลให้ครบ (ภาษาไทยหรืออังกฤษ) เช่น สมชาย ใจดี</p>
+                    {/if}
                 </div>
 
                 <div class="flex flex-col gap-1.5">
                     <label for="username" class="text-xs font-bold uppercase tracking-wider text-gray-500">ชื่อผู้ใช้งาน (Username)</label>
-                    <input
-                        id="username"
-                        type="text"
-                        placeholder="เช่น Somchai_Ja67"
-                        name="username"
-                        required
-                        class="w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 p-3 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:border-[#dca11d] focus:bg-white focus:ring-4 focus:ring-amber-50"
-                    />
+                    <div class="relative">
+                        <input
+                            id="username"
+                            type="text"
+                            placeholder="เช่น Somchai_Ja67"
+                            name="username"
+                            bind:value={username}
+                            oninput={() => (usernameTouched = true)}
+                            required
+                            class="w-full rounded-xl border-2 {usernameBorderClass} bg-gray-50/50 p-3 pr-10 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:bg-white focus:ring-4"
+                        />
+                        {#if usernameTouched}
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 {usernameValid ? 'text-green-500' : 'text-red-500'}">
+                                {#if usernameValid}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="h-4 w-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                {:else}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="h-4 w-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>
+                                {/if}
+                            </span>
+                        {/if}
+                    </div>
+                    {#if usernameTouched && !usernameValid}
+                        <p class="text-[11px] font-semibold text-red-500">❌ ต้องเป็นภาษาอังกฤษ รูปแบบ ชื่อ_อักษร2ตัว+ตัวเลข2ตัว เช่น Somchai_Ja67</p>
+                    {/if}
                 </div>
 
                 <div class="flex flex-col gap-1.5 sm:col-span-2">
                     <label for="mail" class="text-xs font-bold uppercase tracking-wider text-gray-500">อีเมลสถาบัน (Institutional Email)</label>
-                    <input
-                        id="mail"
-                        type="email"
-                        placeholder="username@live.rmutl.ac.th"
-                        name="email"
-                        required
-                        class="w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 p-3 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:border-[#dca11d] focus:bg-white focus:ring-4 focus:ring-amber-50"
-                    />
+                    <div class="relative">
+                        <input
+                            id="mail"
+                            type="email"
+                            placeholder="username@live.rmutl.ac.th"
+                            name="email"
+                            bind:value={email}
+                            oninput={() => (emailTouched = true)}
+                            required
+                            class="w-full rounded-xl border-2 {emailBorderClass} bg-gray-50/50 p-3 pr-10 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:bg-white focus:ring-4"
+                        />
+                        {#if emailTouched}
+                            <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 {emailValid ? 'text-green-500' : 'text-red-500'}">
+                                {#if emailValid}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="h-4 w-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                {:else}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="h-4 w-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                    </svg>
+                                {/if}
+                            </span>
+                        {/if}
+                    </div>
+                    {#if emailTouched && !emailValid}
+                        <p class="text-[11px] font-semibold text-red-500">❌ ต้องเป็นอีเมลสถาบันที่ลงท้ายด้วย @live.rmutl.ac.th เท่านั้น</p>
+                    {/if}
                 </div>
 
                 <div class="flex flex-col gap-1.5 sm:col-span-2">
                     <label for="pass" class="text-xs font-bold uppercase tracking-wider text-gray-500">รหัสผ่าน (Password)</label>
-                    <input
-                        id="pass"
-                        type="password"
-                        placeholder="รหัสผ่านอย่างน้อย 8 ตัวอักษร"
-                        name="password"
-                        required
-                        class="w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 p-3 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:border-[#dca11d] focus:bg-white focus:ring-4 focus:ring-amber-50"
-                    />
+                    <div class="relative">
+                        <input
+                            id="pass"
+                            type={showPassword ? 'text' : 'password'}
+                            bind:value={password}
+                            oninput={() => (passwordTouched = true)}
+                            placeholder="รหัสผ่านอย่างน้อย 8 ตัวอักษร"
+                            name="password"
+                            required
+                            class="w-full rounded-xl border-2 {passwordBorderClass} bg-gray-50/50 p-3 pr-11 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:bg-white focus:ring-4"
+                        />
+                        <div class="absolute inset-y-0 right-0 flex items-center gap-1 pr-3">
+                            {#if allRulesValid}
+                                <span class="text-green-500">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="h-4 w-4">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                    </svg>
+                                </span>
+                            {/if}
+                            <button
+                                type="button"
+                                onclick={() => (showPassword = !showPassword)}
+                                tabindex="-1"
+                                title={showPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+                                class="text-gray-400 transition hover:text-[#443210]"
+                            >
+                                {#if showPassword}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                    </svg>
+                                {:else}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    </svg>
+                                {/if}
+                            </button>
+                        </div>
+                    </div>
+
+                    {#if passwordTouched && !allRulesValid}
+                        <div class="mt-2 rounded-xl border border-gray-100 bg-gray-50/60 p-3">
+                            <p class="mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-400">ข้อกำหนดความปลอดภัยของรหัสผ่าน</p>
+                            <ul class="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                                {#each rules as rule}
+                                    <li class="flex items-center gap-1.5 text-[11px] font-medium">
+                                        {#if rule.valid}
+                                            <span class="flex h-4 w-4 flex-none items-center justify-center rounded-full bg-green-100 text-green-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="h-3 w-3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                                </svg>
+                                            </span>
+                                            <span class="text-green-600">{rule.label}</span>
+                                        {:else}
+                                            <span class="flex h-4 w-4 flex-none items-center justify-center rounded-full bg-red-100 text-red-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="h-3 w-3">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                                </svg>
+                                            </span>
+                                            <span class="text-gray-500">{rule.label}</span>
+                                        {/if}
+                                    </li>
+                                {/each}
+                            </ul>
+                        </div>
+                    {/if}
                 </div>
 
                 <div class="flex flex-col gap-1.5 sm:col-span-2">
                     <label for="conpass" class="text-xs font-bold uppercase tracking-wider text-gray-500">ยืนยันรหัสผ่านอีกครั้ง (Confirm Password)</label>
-                    <input
-                        id="conpass"
-                        type="password"
-                        placeholder="ระบุรหัสผ่านอีกครั้ง"
-                        name="confirmPassword"
-                        required
-                        class="w-full rounded-xl border-2 border-gray-200 bg-gray-50/50 p-3 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:border-[#dca11d] focus:bg-white focus:ring-4 focus:ring-amber-50"
-                    />
+                    <div class="relative">
+                        <input
+                            id="conpass"
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            bind:value={confirmPassword}
+                            placeholder="ระบุรหัสผ่านอีกครั้ง"
+                            name="confirmPassword"
+                            required
+                            class="w-full rounded-xl border-2 {confirmBorderClass} bg-gray-50/50 p-3 pr-11 text-sm text-gray-900 placeholder-gray-400 transition-all outline-none focus:bg-white focus:ring-4"
+                        />
+                        <div class="absolute inset-y-0 right-0 flex items-center gap-1 pr-3">
+                            {#if confirmPassword.length > 0}
+                                <span class={passwordMatch ? 'text-green-500' : 'text-red-500'}>
+                                    {#if passwordMatch}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="h-4 w-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                                        </svg>
+                                    {:else}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="h-4 w-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                                        </svg>
+                                    {/if}
+                                </span>
+                            {/if}
+                            <button
+                                type="button"
+                                onclick={() => (showConfirmPassword = !showConfirmPassword)}
+                                tabindex="-1"
+                                title={showConfirmPassword ? 'ซ่อนรหัสผ่าน' : 'แสดงรหัสผ่าน'}
+                                class="text-gray-400 transition hover:text-[#443210]"
+                            >
+                                {#if showConfirmPassword}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                                    </svg>
+                                {:else}
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    </svg>
+                                {/if}
+                            </button>
+                        </div>
+                    </div>
+                    {#if confirmPassword.length > 0 && !passwordMatch}
+                        <p class="mt-1.5 text-[11px] font-semibold text-red-500">❌ รหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง</p>
+                    {/if}
                 </div>
 
                 <div class="mt-4 sm:col-span-2">
                     <button
                         type="submit"
-                        disabled={isloading}
+                        disabled={isloading || !canSubmit}
                         class="w-full rounded-xl bg-[#443210] py-3.5 text-sm font-bold text-amber-400 shadow-[0_4px_12px_rgba(68,50,16,0.15)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#594216] hover:shadow-[0_6px_20px_rgba(68,50,16,0.25)] active:translate-y-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {#if isloading}

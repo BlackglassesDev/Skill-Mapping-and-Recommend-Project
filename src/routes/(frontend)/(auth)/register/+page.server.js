@@ -17,9 +17,42 @@ export const actions = {
 		const confirmPassword = data.get('confirmPassword');
 
 		try {
+			const trimmedName = String(full_name).trim();
+			const nameWords = trimmedName.split(/\s+/).filter(Boolean);
+			const isNameValid =
+				nameWords.length >= 2 &&
+				nameWords.every((w) => /^[A-Za-z\u0E00-\u0E7F]+$/.test(w));
+
+			if (!isNameValid) {
+				return fail(401, {
+					message: 'กรุณากรอกชื่อและนามสกุลให้ครบ (ภาษาไทยหรืออังกฤษ) เช่น สมชาย ใจดี❌'
+				});
+			}
+
+			const usernamePolicy = /^[A-Za-z]+_[A-Za-z]{2}[0-9]{2}$/;
+			if (!usernamePolicy.test(String(username))) {
+				return fail(401, {
+					message: 'ชื่อผู้ใช้ต้องเป็นภาษาอังกฤษ รูปแบบ ชื่อ_อักษร2ตัว+ตัวเลข2ตัว เช่น Somchai_Ja67❌'
+				});
+			}
+
+			const emailPolicy = /^[A-Za-z0-9._%+-]+@live\.rmutl\.ac\.th$/;
+			if (!emailPolicy.test(String(email))) {
+				return fail(401, {
+					message: 'ต้องเป็นอีเมลสถาบันที่ลงท้ายด้วย @live.rmutl.ac.th เท่านั้น❌'
+				});
+			}
+
 			if (password !== confirmPassword) {
 				return fail(401, {
 					message: 'รหัสผ่านไม่ตรงกัน❌'
+				});
+			}
+
+			const passwordPolicy = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+			if (!passwordPolicy.test(String(password))) {
+				return fail(401, {
+					message: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัวอักษร รวมตัวเล็ก ตัวใหญ่ ตัวเลข และอักขระพิเศษ❌'
 				});
 			}
 
