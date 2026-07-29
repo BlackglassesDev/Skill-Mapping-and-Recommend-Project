@@ -43,6 +43,24 @@ export const actions = {
 				return fail(400, { boxinfo: 'ไม่พบบัญชีที่ตรงกับชื่อผู้ใช้หรืออีเมลนี้❌' });
 			}
 
+			// ตรวจสอบฝั่งเซิร์ฟเวอร์: หากยังมี OTP ที่ใช้งานได้อยู่ (ยังไม่หมดอายุภายใน 5 นาที)
+			// ให้ปฏิเสธคำขอใหม่ เพื่อป้องกันการขอซ้ำ/สแปม (ปลอดภัยกว่าเก็บเวลาที่ฝั่ง client)
+			/** @type {[any, any]} */
+			const [active] = await pool.execute(
+				`SELECT TIMESTAMPDIFF(SECOND, DATE_ADD(UTC_TIMESTAMP(), INTERVAL 7 HOUR), otp_expires) AS remaining
+				 FROM users
+				 WHERE email = ? AND otp_expires > DATE_ADD(UTC_TIMESTAMP(), INTERVAL 7 HOUR)
+				 LIMIT 1`,
+				[email]
+			);
+			if (active.length > 0) {
+				const remaining = Math.max(1, Number(active[0].remaining) || 1);
+				return fail(429, {
+					boxinfo: `คุณเพิ่งขอรหัส OTP ไป กรุณารออีกประมาณ ${Math.ceil(remaining / 60)} นาทีก่อนขอรหัสใหม่❌`,
+					cooldown: remaining
+				});
+			}
+
 			// สุ่มเลข OTP 6 หลัก แล้วบันทึกลงฐานข้อมูล (หมดอายุใน 5 นาที)
 			const otp = Math.floor(100000 + Math.random() * 900000).toString();
 			await pool.execute(

@@ -2,6 +2,7 @@
     import { enhance } from '$app/forms';
     import { goto } from '$app/navigation';
     import { resolve } from '$app/paths';
+    import { onMount } from 'svelte';
 
     let message = $state('');
     let isloading = $state(false);
@@ -19,6 +20,41 @@
     let passwordTouched = $state(false);
     let otpRequested = $state(false);
     let resolvedEmail = $state('');
+
+    // Cooldown สำหรับปุ่มขอรหัส OTP (5 นาที) โดยเก็บเวลาหมดอายุไว้ใน localStorage
+    // เพื่อให้นับเวลาต่อได้แม้รีเฟรชหน้า
+    const COOLDOWN_MS = 5 * 60 * 1000;
+    const COOLDOWN_KEY = 'resetpw_otp_cooldown_end';
+    let cooldownEnd = $state(0);
+    let remaining = $state(0);
+
+    const countdownLabel = $derived(
+        remaining > 0
+            ? `${String(Math.floor(remaining / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`
+            : ''
+    );
+
+    onMount(() => {
+        const stored = Number(localStorage.getItem(COOLDOWN_KEY));
+        if (stored && stored > Date.now()) {
+            cooldownEnd = stored;
+            remaining = Math.max(0, Math.ceil((stored - Date.now()) / 1000));
+        } else if (stored) {
+            localStorage.removeItem(COOLDOWN_KEY);
+        }
+
+        const interval = setInterval(() => {
+            if (cooldownEnd > 0) {
+                remaining = Math.max(0, Math.ceil((cooldownEnd - Date.now()) / 1000));
+                if (remaining <= 0) {
+                    cooldownEnd = 0;
+                    localStorage.removeItem(COOLDOWN_KEY);
+                }
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    });
 
     const rules = $derived([
         { label: 'อย่างน้อย 8 ตัวอักษร', valid: newPassword.length >= 8 },
@@ -145,6 +181,9 @@
                         if (data?.otpSent) {
                             otpRequested = true;
                             resolvedEmail = data?.resolvedEmail || '';
+                            cooldownEnd = Date.now() + COOLDOWN_MS;
+                            localStorage.setItem(COOLDOWN_KEY, String(cooldownEnd));
+                            remaining = Math.ceil(COOLDOWN_MS / 1000);
                         }
                         if (data?.done) {
                             setTimeout(() => goto(login_page), 1800);
@@ -152,6 +191,13 @@
                     } else if (result.type === 'failure') {
                         const data = /** @type {any} */ (result.data);
                         message = data?.boxinfo || data?.message || 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง';
+                        // หากเซิร์ฟเวอร์ยังคงห้ามขอซ้ำ ให้ซิงค์ตัวนับเวลาฝั่ง client ตามค่าที่เซิร์ฟเวอร์ส่งกลับ
+                        const cooldown = Number(data?.cooldown);
+                        if (cooldown > 0) {
+                            cooldownEnd = Date.now() + cooldown * 1000;
+                            localStorage.setItem(COOLDOWN_KEY, String(cooldownEnd));
+                            remaining = cooldown;
+                        }
                     } else {
                         message = 'เกิดข้อผิดพลาด กรุณาลองอีกครั้ง';
                     }
@@ -180,11 +226,13 @@
                             type="submit"
                             formaction="?/sendotp"
                             formnovalidate
-                            disabled={isloading || !identifierValid}
+                            disabled={isloading || !identifierValid || remaining > 0}
                             class="flex-none rounded-xl border-2 border-[#dca11d] bg-amber-50 px-4 text-xs font-bold text-[#443210] transition-all hover:bg-amber-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
                         >
                             {#if isloading && otpRequested === false}
                                 รอสักครู่...
+                            {:else if remaining > 0}
+                                ขอใหม่ ({countdownLabel})
                             {:else}
                                 ขอรหัส OTP
                             {/if}
@@ -194,6 +242,31 @@
                         <p class="text-[11px] font-semibold text-green-600">
                             ✅ ส่งรหัส OTP ไปยัง {resolvedEmail} แล้ว (ตรวจสอบกล่องอีเมล)
                         </p>
+                    {/if}
+                    {#if remaining > 0}
+                        <div
+                            class="mt-2 flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50/70 px-3 py-2 text-[11px] font-semibold text-[#443210] shadow-sm animate-fade-in"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke-width="2"
+                                stroke="currentColor"
+                                class="h-4 w-4 flex-none text-[#dca11d]"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                />
+                            </svg>
+                            <span>
+                                ปุ่มขอรหัสถูกล็อกชั่วคราว กรุณารอ
+                                <span class="font-black tabular-nums">{countdownLabel}</span>
+                                ก่อนขอรหัส OTP ใหม่
+                            </span>
+                        </div>
                     {/if}
                 </div>
 
