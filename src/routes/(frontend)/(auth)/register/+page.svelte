@@ -19,6 +19,9 @@
     let showPassword = $state(false);
     let showConfirmPassword = $state(false);
     let passwordTouched = $state(false);
+    let showConfirmModal = $state(false);
+    /** @type {HTMLFormElement | null} */
+    let formEl = $state(null);
 
     const rules = $derived([
         { label: 'อย่างน้อย 8 ตัวอักษร', valid: password.length >= 8 },
@@ -127,6 +130,7 @@
         <form
             method="POST"
             action="?/regis"
+            bind:this={formEl}
             use:enhance={() => {
                 isloading = true;
                 message = 'กำลังตรวจสอบและบันทึกข้อมูลสมาชิกใหม่...';
@@ -369,8 +373,9 @@
 
                 <div class="mt-4 sm:col-span-2">
                     <button
-                        type="submit"
+                        type="button"
                         disabled={isloading || !canSubmit}
+                        onclick={() => (showConfirmModal = true)}
                         class="w-full rounded-xl bg-[#443210] py-3.5 text-sm font-bold text-amber-400 shadow-[0_4px_12px_rgba(68,50,16,0.15)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#594216] hover:shadow-[0_6px_20px_rgba(68,50,16,0.25)] active:translate-y-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                         {#if isloading}
@@ -389,4 +394,43 @@
             </section>
         </form>
     </article>
+
+    {#if showConfirmModal}
+        <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#443210]/40 backdrop-blur-md">
+            <div class="w-full max-w-md overflow-hidden rounded-[24px] border border-gray-100 bg-white p-6 shadow-2xl transition-all sm:p-8 animate-scale-in">
+                <div class="flex items-center gap-3">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-amber-100 bg-amber-50 text-lg">📧</div>
+                    <h2 class="text-lg font-black text-[#443210]">ยืนยันที่อยู่อีเมล</h2>
+                </div>
+
+                <p class="mt-4 text-xs leading-relaxed font-medium text-gray-500">
+                    กรุณาตรวจสอบอีเมลของคุณอีกครั้ง เนื่องจากระบบจะส่งรหัส OTP สำหรับการกู้คืนรหัสผ่านไปยังอีเมลนี้
+                </p>
+
+                <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-center">
+                    <p class="break-all text-sm font-black text-[#443210]">{email}</p>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button
+                        type="button"
+                        onclick={() => (showConfirmModal = false)}
+                        class="flex-1 rounded-xl border-2 border-gray-200 py-3 text-sm font-bold text-gray-500 transition-all hover:bg-gray-50 active:scale-[0.99]"
+                    >
+                        ยกเลิก
+                    </button>
+                    <button
+                        type="button"
+                        onclick={() => {
+                            showConfirmModal = false;
+                            formEl?.requestSubmit();
+                        }}
+                        class="flex-1 rounded-xl bg-[#443210] py-3 text-sm font-bold text-amber-400 shadow-md transition-all hover:bg-[#594216] active:scale-[0.99]"
+                    >
+                        ยืนยันและลงทะเบียน
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
 </main>
