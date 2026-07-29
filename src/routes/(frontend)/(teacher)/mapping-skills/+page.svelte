@@ -183,9 +183,7 @@
 				const result = deserialize(text);
 				if (result.type === 'success') {
 					await invalidateAll();
-					triggerAlert(
-						'บันทึกโครงสร้างผังทักษะเข้าสู่ระบบเรียบร้อย!'
-					);
+					triggerAlert('บันทึกโครงสร้างผังทักษะเข้าสู่ระบบเรียบร้อย!');
 				} else {
 					//@ts-ignore
 					triggerAlert('❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล: ' + (result.data?.error || ''));
@@ -245,10 +243,12 @@
 						เลือกรายวิชาในหลักสูตรเพื่อระบุและเชื่อมโยงทักษะความรู้ที่นักศึกษาจะได้รับ
 						พร้อมกำหนดระดับระดับความคาดหวัง (เลเวล 1-6) เพื่อใช้วิเคราะห์ Gap ของหลักสูตร
 					</p>
-					<div class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-amber-600 uppercase">
-                        <span class="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500"></span>
-                        Teacher Mode Only
-                    </div>
+					<div
+						class="mt-2 inline-flex items-center gap-1.5 rounded-full border border-amber-100 bg-amber-50 px-3 py-0.5 text-[10px] font-bold tracking-wider text-amber-600 uppercase"
+					>
+						<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-500"></span>
+						Teacher Mode Only
+					</div>
 				</div>
 				<div class="flex w-full shrink-0 flex-col gap-2.5 pt-2 md:w-auto md:items-end">
 					<a
@@ -346,78 +346,93 @@
 								[{currentSelectedCourse.course_code}] {currentSelectedCourse.course_name}
 							</h2>
 						</div>
-
-						<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
-						<div class="flex flex-col gap-1.5 md:col-span-2">
-							<span class="pl-1 text-xs font-bold text-gray-600"
-								>1. เลือกทักษะที่จะระบุในรายวิชา</span
-							>
-							<div class="relative">
-								<input
-									type="text"
-									autocomplete="off"
-									bind:value={skillSearch}
-									onfocus={() => (skillDropdownOpen = true)}
-									onblur={() => setTimeout(() => { skillDropdownOpen = false; skillSearch = ''; }, 150)}
-									placeholder='พิมพ์รหัสทักษะ / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ'
-									class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 pr-10 text-sm font-black text-[#443210] shadow-sm outline-none transition-all focus:border-[#dca11d] focus:ring-1 focus:ring-[#dca11d]"
-								/>
-								<div
-									class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400"
+						<div
+							class="grid grid-cols-1 items-end gap-4 md:grid-cols-4 border-b border-gray-100 pb-5"
+						>
+							<div class="flex flex-col gap-1.5 md:col-span-2">
+								<span class="pl-1 text-xs font-bold text-gray-600"
+									>1. เลือกทักษะที่จะระบุในรายวิชา</span
 								>
-									<svg
-										xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-										stroke-width="2.5" stroke="currentColor"
-										class="h-4 w-4 transition-transform duration-200 {skillDropdownOpen ? 'rotate-180' : ''}"
-									>
-										<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
-									</svg>
-								</div>
-
-								{#if skillDropdownOpen}
+								<div class="relative">
+									<input
+										type="text"
+										autocomplete="off"
+										bind:value={skillSearch}
+										onfocus={() => (skillDropdownOpen = true)}
+										onblur={() =>
+											setTimeout(() => {
+												skillDropdownOpen = false;
+												skillSearch = '';
+											}, 150)}
+										placeholder="พิมพ์รหัสทักษะ / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ"
+										class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 pr-10 text-sm font-black text-[#443210] shadow-sm outline-none transition-all focus:border-[#dca11d] focus:ring-1 focus:ring-[#dca11d]"
+									/>
 									<div
-										class="absolute z-30 mt-1 max-h-72 w-full overflow-y-auto rounded-xl border border-gray-200 bg-white py-1 shadow-xl"
+										class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3.5 text-gray-400"
 									>
-										{#if filteredSkills.length > 0}
-											{#each filteredSkills as skill (skill.id)}
-												<button
-													type="button"
-													onmousedown={() => selectSkill(skill)}
-													class="flex w-full cursor-pointer flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-amber-50/60 {skill.name === formSkillName ? 'bg-amber-50/40' : ''}"
-												>
-													<div class="flex items-center gap-2">
-														<span
-															class="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#443210]"
-															>{skill.code}</span
-														>
-														<span class="text-xs font-bold text-[#443210]">{skill.name}</span>
-														{#if skill.name === formSkillName}
-															<span class="ml-auto text-[10px] font-black text-[#dca11d]"
-																>✓ เลือกแล้ว</span
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											fill="none"
+											viewBox="0 0 24 24"
+											stroke-width="2.5"
+											stroke="currentColor"
+											class="h-4 w-4 transition-transform duration-200 {skillDropdownOpen
+												? 'rotate-180'
+												: ''}"
+										>
+											<path
+												stroke-linecap="round"
+												stroke-linejoin="round"
+												d="m19.5 8.25-7.5 7.5-7.5-7.5"
+											/>
+										</svg>
+									</div>
+
+									{#if skillDropdownOpen}
+										<div
+											class="absolute z-30 mt-1 max-h-72 w-full overflow-y-auto rounded-xl border border-gray-200 bg-white py-1 shadow-xl"
+										>
+											{#if filteredSkills.length > 0}
+												{#each filteredSkills as skill (skill.id)}
+													<button
+														type="button"
+														onmousedown={() => selectSkill(skill)}
+														class="flex w-full cursor-pointer flex-col gap-0.5 px-3 py-2 text-left transition-colors hover:bg-amber-50/60 {skill.name ===
+														formSkillName
+															? 'bg-amber-50/40'
+															: ''}"
+													>
+														<div class="flex items-center gap-2">
+															<span
+																class="rounded bg-gray-100 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#443210]"
+																>{skill.code}</span
+															>
+															<span class="text-xs font-bold text-[#443210]">{skill.name}</span>
+															{#if skill.name === formSkillName}
+																<span class="ml-auto text-[10px] font-black text-[#dca11d]"
+																	>✓ เลือกแล้ว</span
+																>
+															{/if}
+														</div>
+														{#if skill.description}
+															<span class="line-clamp-1 text-[10px] font-medium text-gray-400"
+																>{skill.description}</span
 															>
 														{/if}
-													</div>
-													{#if skill.description}
-														<span class="line-clamp-1 text-[10px] font-medium text-gray-400"
-															>{skill.description}</span
-														>
-													{/if}
-												</button>
-											{/each}
-										{:else}
-											<div class="px-4 py-6 text-center text-xs font-medium text-gray-400">
-												ไม่พบทักษะที่ตรงกับ "{skillSearch.trim()}"
-											</div>
-										{/if}
-									</div>
-								{/if}
+													</button>
+												{/each}
+											{:else}
+												<div class="px-4 py-6 text-center text-xs font-medium text-gray-400">
+													ไม่พบทักษะที่ตรงกับ "{skillSearch.trim()}"
+												</div>
+											{/if}
+										</div>
+									{/if}
+								</div>
 							</div>
-						</div>
 
 							<div class="flex flex-col gap-1.5">
-								<span class="pl-1 text-xs font-bold text-gray-600"
-									>2. ระดับของทักษะ (1 - 6)</span
-								>
+								<span class="pl-1 text-xs font-bold text-gray-600">2. ระดับของทักษะ (1 - 6)</span>
 								<select
 									bind:value={formSkillLevel}
 									class="w-full cursor-pointer appearance-none rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-black text-[#443210] shadow-sm outline-none focus:border-[#dca11d]"
@@ -430,16 +445,16 @@
 									<option value={6}>เลเวล 6 - ระดับผู้เชี่ยวชาญ/นวัตกร</option>
 								</select>
 							</div>
-						</div>
 
-						<div class="flex justify-end gap-2 border-t border-gray-100 pt-4">
-							<button
-								type="button"
-								onclick={addSkillToCourse}
-								class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#f5e2bf] border border-[#443210] px-5 py-2.5 text-xs font-black text-[#443210] shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
-							>
-								+ เพิ่มทักษะนี้
-							</button>
+							<div class="flex w-full">
+								<button
+									type="button"
+									onclick={addSkillToCourse}
+									class="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#fff8eb] border border-[#fdebbd] px-5 py-2.5 text-xs font-bold text-[#443210] shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#fdebbd] hover:border-[#dca11d]"
+								>
+									+ เพิ่มทักษะนี้
+								</button>
+							</div>
 						</div>
 					</div>
 
@@ -491,11 +506,11 @@
 								</p>
 							</div>
 						{/if}
-						<div class="mt-4 flex justify-end border-b border-gray-100 pb-3">
+						<div class="mt-4 flex justify-end border-t border-gray-100 pt-4">
 							<button
 								onclick={saveMappingToDatabase}
 								class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
-								>บันทึกทักษะลงในระบบ</button
+								>✅ บันทึกทักษะลงในระบบ</button
 							>
 						</div>
 					</div>
