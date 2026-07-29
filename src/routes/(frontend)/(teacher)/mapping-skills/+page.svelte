@@ -302,10 +302,10 @@
 								<span
 									class="font-mono font-bold {selectedCourseId === course.course_id
 										? 'text-[#dca11d]'
-										: 'text-gray-400'}">{course.course_code}</span
+										: 'text-gray-600'}">{course.course_code}</span
 								>
 								<span
-									class="rounded-md border border-gray-100 bg-white px-2 py-0.5 text-[10px] font-bold text-gray-400"
+									class="rounded-md border border-gray-100 bg-white px-2 py-0.5 text-[10px] font-bold text-gray-600"
 								>
 									จำนวนทักษะ: {course.skills.length}
 								</span>
@@ -316,9 +316,9 @@
 								<div class="mt-1 flex flex-wrap gap-1">
 									{#each course.skills as s}
 										<span
-											class="rounded-md border border-gray-100 bg-white px-1.5 py-0.5 text-[9px] font-medium text-[#443210]"
+											class="rounded-md border border-gray-100 bg-white px-1.5 py-0.5 text-[12px] font-medium text-[#443210]"
 										>
-											{s.name} <b class="text-[#dca11d]">L{s.level}</b>
+											{s.name} <b class="text-[#dca11d]">Lv.{s.level}</b>
 										</span>
 									{/each}
 								</div>
@@ -349,7 +349,7 @@
 
 						<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
 						<div class="flex flex-col gap-1.5 md:col-span-2">
-							<span class="pl-1 text-xs font-bold text-gray-400"
+							<span class="pl-1 text-xs font-bold text-gray-600"
 								>1. เลือกทักษะที่จะระบุในรายวิชา</span
 							>
 							<div class="relative">
@@ -415,7 +415,7 @@
 						</div>
 
 							<div class="flex flex-col gap-1.5">
-								<span class="pl-1 text-xs font-bold text-gray-400"
+								<span class="pl-1 text-xs font-bold text-gray-600"
 									>2. ระดับของทักษะ (1 - 6)</span
 								>
 								<select
@@ -436,9 +436,9 @@
 							<button
 								type="button"
 								onclick={addSkillToCourse}
-								class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
+								class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#f5e2bf] border border-[#443210] px-5 py-2.5 text-xs font-black text-[#443210] shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
 							>
-								🔗 บันทึกความเชื่อมโยงทักษะนี้
+								+ เพิ่มทักษะนี้
 							</button>
 						</div>
 					</div>
@@ -448,11 +448,6 @@
 							<h3 class="text-sm font-black text-[#443210]">
 								📊 ทักษะความสามารถรวมที่จะได้รับในวิชานี้
 							</h3>
-							<button
-								onclick={saveMappingToDatabase}
-								class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
-								>💾 ยืนยันบันทึกโครงสร้างทั้งหมด</button
-							>
 						</div>
 
 						{#if currentSelectedCourse.skills.length > 0}
@@ -469,9 +464,9 @@
 										</div>
 										<div class="flex items-center gap-3">
 											<span
-												class="inline-flex h-7 items-center justify-center rounded-lg bg-[#443210] px-2.5 font-mono text-xs font-black text-white"
+												class="inline-flex h-7 items-center justify-center rounded-lg px-2.5 font-mono text-xs font-black text-[#dca11d] bg-white border border-gray-200 shadow-sm"
 											>
-												LV: {skill.level}/6
+												Lv. {skill.level}/6
 											</span>
 											<button
 												type="button"
@@ -479,7 +474,7 @@
 												class="p-1 text-xs font-bold text-rose-400 transition-colors hover:text-rose-600"
 												title="ถอดถอนทักษะนี้"
 											>
-												✕
+												⨉
 											</button>
 										</div>
 									</div>
@@ -496,6 +491,13 @@
 								</p>
 							</div>
 						{/if}
+						<div class="mt-4 flex justify-end border-b border-gray-100 pb-3">
+							<button
+								onclick={saveMappingToDatabase}
+								class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#443210] px-5 py-2.5 text-xs font-black text-white shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#dca11d] hover:text-[#dca11d]"
+								>บันทึกทักษะลงในระบบ</button
+							>
+						</div>
 					</div>
 				{:else}
 					<div class="rounded-3xl border border-gray-200 bg-white p-12 text-center shadow-sm">
