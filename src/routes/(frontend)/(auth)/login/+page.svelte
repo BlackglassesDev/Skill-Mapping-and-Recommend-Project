@@ -5,12 +5,7 @@
 
     const home = resolve('/home');
     const regis = resolve('/register');
-
-    let showModal = $state(false);
-    let step = $state(1);
-    let backup_email = $state('');
-    let backup_otp = $state('');
-    let boxinfo = $state('');
+    const resetpass = resolve('/reset-password');
     let message = $state('');
     let isloading = $state(false);
 </script>
@@ -139,7 +134,7 @@
 
                 <button
                     type="button"
-                    onclick={() => (showModal = true)}
+                    onclick={() => goto(resetpass)}
                     class="flex items-center gap-1.5 font-bold text-gray-500 transition hover:text-[#443210]"
                 >
                     <svg
@@ -162,160 +157,3 @@
         </form>
     </article>
 </main>
-
-{#if showModal}
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#443210]/40 backdrop-blur-md">
-        <div class="w-full max-w-md overflow-hidden rounded-[24px] border border-gray-100 bg-white p-6 shadow-2xl transition-all sm:p-8 animate-scale-in">
-            <div class="flex items-center gap-3">
-                <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 border border-amber-100 text-lg">🔑</div>
-                <h2 class="text-lg font-black text-[#443210]">กู้คืนรหัสผ่านระบบ</h2>
-            </div>
-            
-            {#if boxinfo}
-                <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-center text-xs font-semibold text-[#443210]">
-                    💡 {boxinfo}
-                </div>
-            {/if}
-
-            <div class="mt-4">
-                {#if step === 1}
-                    <form
-                        method="POST"
-                        action="?/sendOTP"
-                        use:enhance={() => {
-                            isloading = true;
-                            boxinfo = 'กำลังตรวจสอบและจัดส่งรหัสยืนยัน...';
-
-                            return async ({ result }) => {
-                                if (result.type === 'success') {
-                                    // @ts-ignore
-                                    boxinfo = result.data?.boxinfo;
-                                    step = 2;
-                                    isloading = false;
-                                    boxinfo = '';
-                                } else {
-                                    // @ts-ignore
-                                    boxinfo = result.data?.boxinfo || 'ระบบไม่สามารถส่งรหัสได้ กรุณาลองใหม่อีกครั้ง';
-                                    isloading = false;
-                                }
-                            };
-                        }}
-                        class="space-y-4"
-                    >
-                        <p class="text-xs leading-relaxed font-medium text-gray-500">กรุณากรอกอีเมลเพื่อรับรหัสยืนยันความปลอดภัย</p>
-                        <input
-                            type="email"
-                            name="email"
-                            bind:value={backup_email}
-                            placeholder="username@live.rmutl.ac.th"
-                            required
-                            class="w-full rounded-xl border-2 border-gray-200 p-3 text-sm text-gray-900 transition-all outline-none focus:border-[#dca11d] focus:ring-4 focus:ring-amber-50"
-                        />
-                        <button
-                            type="submit"
-                            disabled={isloading}
-                            class="w-full rounded-xl bg-[#443210] py-3 text-sm font-bold text-amber-400 shadow-md transition-all hover:bg-[#594216] active:scale-[0.99] disabled:opacity-50"
-                        >
-                            {isloading ? 'กำลังดำเนินรายการ...' : 'ส่ง'}
-                        </button>
-                    </form>
-                {:else if step === 2}
-                    <form
-                        method="POST"
-                        action="?/verifyOTP"
-                        use:enhance={() => {
-                            isloading = true;
-                            boxinfo = 'กำลังตรวจสอบความถูกต้องของรหัส...';
-
-                            return async ({ result }) => {
-                                if (result.type === 'success') {
-                                    // @ts-ignore
-                                    boxinfo = result.data?.boxinfo;
-                                    step = 3;
-                                    isloading = false;
-                                    boxinfo = '';
-                                } else {
-                                    // @ts-ignore
-                                    boxinfo = result.data?.boxinfo || 'รหัสยืนยันไม่ถูกต้องหรือหมดอายุ';
-                                    isloading = false;
-                                }
-                            };
-                        }}
-                        class="space-y-4"
-                    >
-                        <p class="text-xs leading-relaxed font-medium text-gray-500">กรอกรหัสยืนยันจำนวน 6 หลักที่ได้รับในกล่องข้อความอีเมลของคุณ</p>
-                        <input type="hidden" name="email" value={backup_email}>
-                        <input
-                            type="text"
-                            name="otp"
-                            bind:value={backup_otp}
-                            maxlength="6"
-                            required
-                            placeholder="เช่น 000000"
-                            class="w-full text-center tracking-[0.5em] text-lg font-black rounded-xl border-2 border-gray-200 p-3 text-gray-900 transition-all outline-none focus:border-[#dca11d] focus:ring-4 focus:ring-amber-50"
-                        />
-                        <button
-                            type="submit"
-                            disabled={isloading}
-                            class="w-full rounded-xl bg-[#443210] py-3 text-sm font-bold text-amber-400 shadow-md transition-all hover:bg-[#594216] active:scale-[0.99] disabled:opacity-50"
-                        >
-                            {isloading ? 'กำลังตรวจสอบรหัส...' : 'ยืนยันรหัสความปลอดภัย (OTP)'}
-                        </button>
-                    </form>
-                {:else if step === 3}
-                    <form
-                        method="POST"
-                        action="?/resetpass"
-                        use:enhance={() => {
-                            isloading = true;
-                            boxinfo = 'กำลังบันทึกรหัสผ่านชุดใหม่...';
-
-                            return async ({ result }) => {
-                                if (result.type === 'success') {
-                                    // @ts-ignore
-                                    boxinfo = result.data?.boxinfo;
-                                    setTimeout(() => {
-                                        showModal = false;
-                                        isloading = false;
-                                        boxinfo = '';
-                                        step = 1; // รีเซ็ตสถานะกลับไปเริ่มต้น
-                                    }, 1500);
-                                } else {
-                                    // @ts-ignore
-                                    boxinfo = result.data?.boxinfo || 'ไม่สามารถแก้ไขรหัสผ่านได้ กรุณาตรวจสอบนโยบายความปลอดภัย';
-                                    isloading = false;
-                                }
-                            };
-                        }}
-                        class="space-y-4"
-                    >
-                        <p class="text-xs leading-relaxed font-medium text-gray-500">กำหนดรหัสผ่านใหม่สำหรับเข้าใช้งานระบบ (ต้องมีความยาวอย่างน้อย 8 ตัวอักษร)</p>
-                        <input type="hidden" name="email" value={backup_email}>
-                        <input type="hidden" name="otp" value={backup_otp}>
-                        <input
-                            type="password"
-                            name="newPassword"
-                            placeholder="กรุณากรอกรหัสผ่านใหม่ของคุณ"
-                            required
-                            class="w-full rounded-xl border-2 border-gray-200 p-3 text-sm text-gray-900 transition-all outline-none focus:border-[#dca11d] focus:ring-4 focus:ring-amber-50"
-                        />
-                        <button
-                            type="submit"
-                            disabled={isloading}
-                            class="w-full rounded-xl bg-[#443210] py-3 text-sm font-bold text-amber-400 shadow-md transition-all hover:bg-[#594216] active:scale-[0.99] disabled:opacity-50"
-                        >
-                            {isloading ? 'กำลังอัปเดตข้อมูล...' : 'ยืนยันการเปลี่ยนรหัสผ่าน'}
-                        </button>
-                    </form>
-                {/if}
-            </div>
-
-            <button
-                onclick={() => { showModal = false; boxinfo = ''; }}
-                class="mt-4 w-full text-center text-xs font-bold text-gray-400 transition hover:text-gray-600"
-            >
-                ยกเลิกรายการและปิดหน้าต่าง
-            </button>
-        </div>
-    </div>
-{/if}
