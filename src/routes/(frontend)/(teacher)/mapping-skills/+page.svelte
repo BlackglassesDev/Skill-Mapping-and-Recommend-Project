@@ -347,12 +347,12 @@
 							</h2>
 						</div>
 
-						<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-3">
+						<div class="grid grid-cols-1 items-end gap-4 md:grid-cols-4">
 						<div class="flex flex-col gap-1.5 md:col-span-2">
-							<span class="pl-1 text-xs font-bold text-gray-400"
+							<span class="pl-1 text-xs font-bold text-gray-600"
 								>1. เลือกทักษะที่จะระบุในรายวิชา</span
 							>
-							<span class="pl-1 text-xs font-bold text-gray-400"
+							<span class="pl-1 text-xs font-bold text-gray-600"
 								>📋Tip: พิมพ์เพื่อค้นหา รหัส / ชื่อทักษะ / ทักษะย่อย / คำอธิบายทักษะ</span>
 							<div class="relative">
 								<input
@@ -446,11 +446,11 @@
 							</div>
 
 							<div class="flex flex-col gap-1.5">
-								<span class="pl-1 text-xs font-bold text-gray-400"
+								<span class="pl-1 text-xs font-bold text-gray-600"
 									>2. ระดับของทักษะ (1 - 6)</span
 								>
 								<span
-									class="pl-1 text-xs font-bold text-gray-400"
+									class="pl-1 text-xs font-bold text-gray-600"
 									>📋Tip: เลเวลของทักษะในรายวิชา</span>
 								<select
 									bind:value={formSkillLevel}
