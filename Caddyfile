@@ -1,12 +1,12 @@
 # ถ้าเทสในเครื่องตัวเอง แบบเปิดพอร์ต VScode
-; :80 {
-;     reverse_proxy app:3000 {
-;         header_up Host {http.request.header.X-Forwarded-Host}
-;         header_up X-Forwarded-Host {http.request.header.X-Forwarded-Host}
-;         header_up X-Forwarded-Proto https
-;         header_up Origin "https://{http.request.header.X-Forwarded-Host}"
-;     }
-; }
+# :80 {
+#     reverse_proxy app:3000 {
+#         header_up Host {http.request.header.X-Forwarded-Host}
+#         header_up X-Forwarded-Host {http.request.header.X-Forwarded-Host}
+#         header_up X-Forwarded-Proto https
+#         header_up Origin "https://{http.request.header.X-Forwarded-Host}"
+#     }
+# }
 
 # รันในเครื่อง
 localhost {
