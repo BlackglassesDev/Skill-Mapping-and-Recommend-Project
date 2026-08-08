@@ -203,7 +203,7 @@
 </div>
 
 {#if job_skill_Modal}
-    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
+    <div class="fixed inset-0 z-60 flex items-center justify-center bg-black/50 backdrop-blur-sm transition-opacity">
         <div class="w-full max-w-lg rounded-2xl border border-gray-100 bg-white p-6 shadow-2xl modal-content mx-4">
             <h2 class="pb-4 text-center text-xl font-bold text-[#443210] border-b border-gray-100">🎯 ทักษะสำคัญที่ต้องมี</h2>
 
@@ -260,7 +260,7 @@
 {/if}
 
 {#if jobs_more}
-    <div class="fixed inset-0 z-40 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
         <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl modal-content max-h-[85vh] flex flex-col">
             
             <button
