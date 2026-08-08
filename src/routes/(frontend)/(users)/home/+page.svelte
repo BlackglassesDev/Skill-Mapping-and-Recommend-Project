@@ -27,11 +27,11 @@
         { icon: '💡', text: 'แนะนำรายวิชา' }
     ];
 
-    /** @param {string} id */
-    async function info_subject(id) {
-        const info = resolve(`/info_subject?info=${id}`);
-        goto(info);
-    }
+    // /** @param {string} id */
+    // async function info_subject(id) {
+    //     const info = resolve(`/info_subject?info=${id}`);
+    //     goto(info);
+    // }
 </script>
 
 <svelte:head>
@@ -149,10 +149,10 @@
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {#each displayCourses as course (course.course_id)}
                     {@const currentSkills = courseSkillsList.filter((s) => s.course_id === course.course_id)}
-                    <button
-                        type="button"
-                        onclick={() => info_subject(course.course_id)}
-                        class="group btn flex cursor-pointer flex-col justify-between rounded-2xl border border-gray-200/80 bg-white p-5 text-left shadow-sm transition-all duration-300 hover:border-[#DCA11D]/40"
+                    <div
+                        // type="button"
+                        // onclick={() => info_subject(course.course_id)}
+                        class="group btn flex flex-col justify-between rounded-2xl border border-gray-200/80 bg-white p-5 text-left shadow-sm transition-all duration-300 hover:border-[#DCA11D]/40"
                     >
                         <div class="mb-4">
                             <span class="inline-block rounded-md bg-amber-50 px-2.5 py-1 text-xs font-bold text-amber-700 border border-amber-200/40">
@@ -173,7 +173,7 @@
                                 <p class="mt-0.5 text-xs font-medium text-gray-400 italic">ไม่มีข้อมูลทักษะ</p>
                             {/if}
                         </div>
-                    </button>
+                    </div>
                 {/each}
             </div>
 
