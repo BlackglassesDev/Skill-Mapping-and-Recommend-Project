@@ -38,10 +38,10 @@ export const actions = {
 				});
 			}
 
-			const emailPolicy = /^[A-Za-z0-9._%+-]+@live\.rmutl\.ac\.th$/;
+			const emailPolicy = /^[A-Za-z0-9._%+-]+@(live\.)?rmutl\.ac\.th$/;
 			if (!emailPolicy.test(String(email))) {
 				return fail(401, {
-					message: 'ต้องเป็นอีเมลสถาบันที่ลงท้ายด้วย @live.rmutl.ac.th เท่านั้น❌'
+					message: 'ต้องเป็นอีเมลสถาบันที่ลงท้ายด้วย @live.rmutl.ac.th หรือ @rmutl.ac.th เท่านั้น❌'
 				});
 			}
 

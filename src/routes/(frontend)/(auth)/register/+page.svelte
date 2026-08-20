@@ -38,7 +38,7 @@
         nameWords.length >= 2 && nameWords.every((w) => /^[A-Za-z\u0E00-\u0E7F]+$/.test(w))
     );
     const usernameValid = $derived(/^[A-Za-z]+_[A-Za-z]{2}[0-9]{2}$/.test(username));
-    const emailValid = $derived(/^[A-Za-z0-9._%+-]+@live\.rmutl\.ac\.th$/.test(email));
+    const emailValid = $derived(/^[A-Za-z0-9._%+-]+@(live\.)?rmutl\.ac\.th$/.test(email));
     const canSubmit = $derived(nameValid && usernameValid && emailValid && allRulesValid && passwordMatch);
 
     const nameBorderClass = $derived(
@@ -224,7 +224,7 @@
                         <input
                             id="mail"
                             type="email"
-                            placeholder="username@live.rmutl.ac.th"
+                            placeholder="เช่น username@live.rmutl.ac.th หรือ username@rmutl.ac.th"
                             name="email"
                             bind:value={email}
                             oninput={() => (emailTouched = true)}
@@ -246,7 +246,7 @@
                         {/if}
                     </div>
                     {#if emailTouched && !emailValid}
-                        <p class="text-[11px] font-semibold text-red-500">❌ ต้องเป็นอีเมลสถาบันที่ลงท้ายด้วย @live.rmutl.ac.th เท่านั้น</p>
+                        <p class="text-[11px] font-semibold text-red-500">❌ ต้องเป็นอีเมลสถาบันที่ลงท้ายด้วย @live.rmutl.ac.th หรือ @rmutl.ac.th เท่านั้น</p>
                     {/if}
                 </div>
 
