@@ -2,6 +2,8 @@
 
 เว็บแอปพลิเคชัน Skill Mapping สำหรับหลักสูตรวิศวกรรมคอมพิวเตอร์ — มหาวิทยาลัยเทคโนโลยีราชมงคลล้านนา เชียงใหม่ (RMUTL)
 
+[Thai Version Content Readme](README.TH.md)
+
 A web application that links **courses**, **skills**, and **careers** for the Computer Engineering curriculum. Students assess their skill levels, compare them against career requirements (Skill Gap analysis), and receive course recommendations, while teachers and admins manage curricula, courses, skills, and users.
 
 ## Features
