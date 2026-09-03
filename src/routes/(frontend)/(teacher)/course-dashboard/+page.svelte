@@ -110,6 +110,24 @@
 
     // คำนวณความสูงของแท่งกราฟแบบไดนามิก (ค่าสูงสุดอิงจาก Max Count)
     let chartMaxHeight = $derived(maxCount > 0 ? maxCount + 2 : 20);
+
+    // จำกัดจำนวนรายการในการ์ดสรุปทักษะ (ตกหล่น / ใช้น้อยสุด / ใช้มากสุด) พร้อมปุ่มดูทั้งหมด/ซ่อน
+    let showAllUnmappedSkills = $state(false);
+    let showAllLeastSkills = $state(false);
+    let showAllMostSkills = $state(false);
+    let skillCardsLimit = 5;
+
+    let visibleUnmappedSkills = $derived(
+        showAllUnmappedSkills ? unmappedSkills : unmappedSkills.slice(0, skillCardsLimit)
+    );
+
+    let visibleLeastMappedSkills = $derived(
+        showAllLeastSkills ? leastMappedSkills : leastMappedSkills.slice(0, skillCardsLimit)
+    );
+
+    let visibleMostMappedSkills = $derived(
+        showAllMostSkills ? mostMappedSkills : mostMappedSkills.slice(0, skillCardsLimit)
+    );
 </script>
 
 <svelte:head><title>Teachers Control</title></svelte:head>
@@ -222,7 +240,7 @@
                     <h3 class="text-sm font-black text-[#443210]">ทักษะที่ตกหล่น (ยังไม่ถูกจับคู่)</h3>
                 </div>
                 <div class="flex flex-wrap gap-2 flex-1 items-start content-start">
-                    {#each unmappedSkills as skill}
+                    {#each visibleUnmappedSkills as skill}
                         <span class="inline-flex items-center gap-1.5 rounded-xl border border-rose-100 bg-rose-50/50 px-3 py-1.5 text-xs font-bold text-rose-600">
                             <span class="h-1.5 w-1.5 rounded-full bg-rose-500"></span>
                             {skill.skill_name}
@@ -231,6 +249,31 @@
                         <p class="text-xs text-gray-400 italic py-4">ยอดเยี่ยม! ทุกทักษะในหลักสูตรถูกนำไปกระจายใช้งานหมดแล้ว</p>
                     {/each}
                 </div>
+
+                {#if unmappedSkills.length > skillCardsLimit}
+                    <div class="mt-3 flex justify-center border-t border-gray-100 pt-3">
+                        <button
+                            type="button"
+                            onclick={() => {
+                                showAllUnmappedSkills = !showAllUnmappedSkills;
+                                if (showAllUnmappedSkills) {
+                                    setTimeout(() => {
+                                        window.scrollBy({ top: 150, behavior: 'smooth' });
+                                    }, 100);
+                                }
+                            }}
+                            class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-4.5 py-2 text-xs font-black text-gray-500 shadow-sm transition-all hover:border-[#dca11d] hover:text-[#dca11d]"
+                        >
+                            {#if !showAllUnmappedSkills}
+                                <span class="inline-block animate-bounce">↓</span>
+                                <span>ดูทักษะที่เหลือทั้งหมด (Show More)</span>
+                            {:else}
+                                <span class="inline-block">↑</span>
+                                <span>ซ่อนทักษะ (Show Less)</span>
+                            {/if}
+                        </button>
+                    </div>
+                {/if}
             </div>
 
             <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col">
@@ -239,7 +282,7 @@
                     <h3 class="text-sm font-black text-[#443210]">ทักษะที่มีการนำไปใช้น้อยที่สุด</h3>
                 </div>
                 <div class="flex flex-col gap-2.5 flex-1 justify-start">
-                    {#each leastMappedSkills as skill}
+                    {#each visibleLeastMappedSkills as skill}
                         <div class="flex items-center justify-between p-2.5 rounded-xl border border-gray-100 bg-gray-50/70 text-xs">
                             <span class="font-black text-[#443210]">{skill.skill_name}</span>
                             <span class="bg-white border border-gray-200 px-2.5 py-1 rounded-lg font-mono font-bold text-gray-500">ผูกกับ {skill.count} วิชา</span>
@@ -248,6 +291,31 @@
                         <p class="text-xs text-gray-400 italic py-4">ไม่มีข้อมูลสถิติ</p>
                     {/each}
                 </div>
+
+                {#if leastMappedSkills.length > skillCardsLimit}
+                    <div class="mt-3 flex justify-center border-t border-gray-100 pt-3">
+                        <button
+                            type="button"
+                            onclick={() => {
+                                showAllLeastSkills = !showAllLeastSkills;
+                                if (showAllLeastSkills) {
+                                    setTimeout(() => {
+                                        window.scrollBy({ top: 150, behavior: 'smooth' });
+                                    }, 100);
+                                }
+                            }}
+                            class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-4.5 py-2 text-xs font-black text-gray-500 shadow-sm transition-all hover:border-[#dca11d] hover:text-[#dca11d]"
+                        >
+                            {#if !showAllLeastSkills}
+                                <span class="inline-block animate-bounce">↓</span>
+                                <span>ดูทักษะที่เหลือทั้งหมด (Show More)</span>
+                            {:else}
+                                <span class="inline-block">↑</span>
+                                <span>ซ่อนทักษะ (Show Less)</span>
+                            {/if}
+                        </button>
+                    </div>
+                {/if}
             </div>
 
             <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm flex flex-col">
@@ -256,7 +324,7 @@
                     <h3 class="text-sm font-black text-[#443210]">ทักษะหลักโดดเด่น (ใช้มากที่สุด)</h3>
                 </div>
                 <div class="flex flex-col gap-2.5 flex-1 justify-start">
-                    {#each mostMappedSkills as skill}
+                    {#each visibleMostMappedSkills as skill}
                         <div class="flex items-center justify-between p-2.5 rounded-xl border border-amber-100 bg-amber-50/30 text-xs">
                             <span class="font-black text-[#443210]">{skill.skill_name}</span>
                             <span class="bg-[#443210] px-2.5 py-1 rounded-lg font-mono font-bold text-white">ผูกกับ {skill.count} วิชา</span>
@@ -265,6 +333,31 @@
                         <p class="text-xs text-gray-400 italic py-4">ไม่มีข้อมูลสถิติ</p>
                     {/each}
                 </div>
+
+                {#if mostMappedSkills.length > skillCardsLimit}
+                    <div class="mt-3 flex justify-center border-t border-gray-100 pt-3">
+                        <button
+                            type="button"
+                            onclick={() => {
+                                showAllMostSkills = !showAllMostSkills;
+                                if (showAllMostSkills) {
+                                    setTimeout(() => {
+                                        window.scrollBy({ top: 150, behavior: 'smooth' });
+                                    }, 100);
+                                }
+                            }}
+                            class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-4.5 py-2 text-xs font-black text-gray-500 shadow-sm transition-all hover:border-[#dca11d] hover:text-[#dca11d]"
+                        >
+                            {#if !showAllMostSkills}
+                                <span class="inline-block animate-bounce">↓</span>
+                                <span>ดูทักษะที่เหลือทั้งหมด (Show More)</span>
+                            {:else}
+                                <span class="inline-block">↑</span>
+                                <span>ซ่อนทักษะ (Show Less)</span>
+                            {/if}
+                        </button>
+                    </div>
+                {/if}
             </div>
 
         </div>
